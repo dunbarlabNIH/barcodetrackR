@@ -35,6 +35,5 @@ Creates a heatmap using the top 'n' rows from each column. Data undergoes a natu
 BCLH(your_data = zh33, names = colnames(zh33), n_clones = 10,
       your_title = "First Time Point", grid = TRUE, columnLabels = 3,
          writekey = FALSE)
-
 }
 

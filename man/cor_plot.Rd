@@ -38,6 +38,5 @@ Gives the pairwise correlation between each sample-sample pair in the data frame
 }
 \examples{
 cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
-
 }
 

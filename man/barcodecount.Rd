@@ -25,8 +25,5 @@ Counts the number of barcodes sequentially by column cumulatively, uniquely, or 
 \examples{
 barcodecount(your_data = zh33, count = "unique", months = c(1,2,3,4.5,6.5,9), threshold = 1000)
 barcodecount(your_data = zg66, count = "new", months = c(1:10), threshold = 900)
-
-
-
 }
 

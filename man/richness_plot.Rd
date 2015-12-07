@@ -42,6 +42,5 @@ richness_plot(your_data = zh33_first3m_T_B_NK,
                months = c(1,2,3), celltypes = c("T", "B", "NK"),
                thresh = 1000, richness_type = "cumulative")
 
-
 }
 

@@ -21,6 +21,5 @@ Gives the diversity for each sample (column) in your data.
 }
 \examples{
 clonaldiversity(your_data = zh33, threshold = 2000, divindex = "shannon")
-
 }
 

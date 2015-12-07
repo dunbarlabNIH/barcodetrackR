@@ -19,6 +19,5 @@ Given a subset of data, returns only the rows that contain the top N entries of 
 }
 \examples{
 gettopindices(your_data = zh33[,c(1:5)], top = 10)
-
 }
 
