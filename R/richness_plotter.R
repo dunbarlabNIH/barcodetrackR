@@ -20,7 +20,7 @@
 #'                months = c(1,2,3), celltypes = c("T", "B", "NK"),
 #'                thresh = 1000, richness_type = "cumulative")
 #'
-#'
+#'@export
 
 richness_plot <- function(your_data, months, celltypes, thresh = 0, point_size = 5, line_size = 3, richness_type = "unique", y_lower = 0, y_upper = 2000){
   your_data[your_data < thresh] <- 0

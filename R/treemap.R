@@ -10,6 +10,7 @@
 #'@return Displays a treemap (made by treemap) of the chosen column.
 #'@examples
 #'barcode_treemap(your_data = zh33, column_choice = "32m_CD4.fastq", colors_choice = c("red", "green"))
+#'@export
 barcode_treemap <- function(your_data, column_choice = NULL, threshold = 0, colors_choice = c("blue", "yellow"), your_title = ""){
   your_data[your_data < threshold] <- 0
   your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 2))

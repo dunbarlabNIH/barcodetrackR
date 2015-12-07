@@ -15,7 +15,7 @@
 #'BCLH(your_data = zh33, names = colnames(zh33), n_clones = 10,
 #'       your_title = "First Time Point", grid = TRUE, columnLabels = 3,
 #'          writekey = FALSE)
-#'
+#'@export
 
 
 BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_title = "", grid = TRUE, columnLabels = 1, dendro = "none", writekey = FALSE, star_size = 1) {

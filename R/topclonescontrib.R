@@ -11,6 +11,7 @@
 #'@return Prints a plot (using ggplot2) of the percentage contribution from each sample.
 #'@examples
 #'topclonescontrib(your_data = zh33[,c(1:6)], n_clones = 100, your_title = "SAMPLE")
+#'@export
 
 topclonescontrib <- function(your_data, n_clones = 10, linesize = 2, pointsize = 3, your_title = ""){
 

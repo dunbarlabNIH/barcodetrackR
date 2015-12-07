@@ -9,6 +9,7 @@
 #'@return A data frame where all rows (barcodes) that did not have at least one elemnt meet the threshold have been discarded.
 #'@examples
 #'threshold(zh33, thresh = 2000)
+#'@export
 
 
 

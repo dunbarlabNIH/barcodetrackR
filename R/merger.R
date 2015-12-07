@@ -5,6 +5,7 @@
 #'@return Merged data frame.
 #'@examples
 #'merger(dataframe1, dataframe2, dataframe3)
+#'@export
 
 
 merger <- function(...){

@@ -17,7 +17,7 @@
 #'@return Plots correlation plot of the data frame.
 #'@examples
 #'cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
-#'
+#'@export
 
 cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title = "", method_corr ="pearson", labelsizes = 1, plottype = "color", writetables = FALSE, no_negatives = FALSE) {
 

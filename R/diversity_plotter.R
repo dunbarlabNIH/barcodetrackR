@@ -20,7 +20,7 @@
 #'                months = c(1,2,3), celltypes = c("T", "B", "NK"),
 #'                thresh = 1000, index_type = "herfindahl-hirschman")
 #'
-#'
+#'@export
 diversity_plot <- function(your_data, months, celltypes, thresh = 0, point_size = 5, line_size = 3, index_type = "shannon", y_lower = 0, y_upper = 9.5) {
   bycelltype <- rep(celltypes, length(months))
   bymonth <- rep(months, each = length(celltypes))

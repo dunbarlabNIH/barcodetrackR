@@ -11,6 +11,7 @@
 #'
 #'radartopclones(your_data = zh33[,c(1:6)], columnChoice_Name = "zh331mT.fastq",
 #'               your_title = "1m Radar Plot")
+#'@export
 
 
 radartopclones <- function(your_data, columnChoice_Name = "", n_clones = 10, your_title = "", labelsize = 1){

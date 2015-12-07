@@ -10,9 +10,7 @@
 #'@examples
 #'barcodecount(your_data = zh33, count = "unique", months = c(1,2,3,4.5,6.5,9), threshold = 1000)
 #'barcodecount(your_data = zg66, count = "new", months = c(1:10), threshold = 900)
-#'
-#'
-#'
+#'@export
 barcodecount <- function(your_data, count = "cumulative", months = NULL, threshold = 0) {
   if (length(months) != ncol(your_data))
     stop("Number of months should match number of columns")

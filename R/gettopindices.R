@@ -7,7 +7,7 @@
 #'@return Vector of indices of the top N entries of each column.
 #'@examples
 #'gettopindices(your_data = zh33[,c(1:5)], top = 10)
-#'
+#'@export
 
 gettopindices <- function(your_data, top = 5){
   order.list <- apply(your_data, 2, function(x){sort.list(-x)[1:top]})

@@ -8,8 +8,7 @@
 #'@return Vector of the diversities of each column.
 #'@examples
 #'clonaldiversity(your_data = zh33, threshold = 2000, divindex = "shannon")
-#'
-
+#'@export
 clonaldiversity <- function(your_data, threshold = 2000, divindex = "shannon") {
   your_data[your_data < threshold] <- 0
   return(vegan::diversity(your_data, index = divindex, MARGIN = 2))
