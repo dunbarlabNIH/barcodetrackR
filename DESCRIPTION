@@ -6,6 +6,7 @@ Version: 0.1
 Date: 2015-12-04
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
 Description: TBA
+URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
 Imports:
