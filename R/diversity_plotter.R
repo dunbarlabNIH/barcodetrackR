@@ -40,7 +40,7 @@ diversity_plot <- function(your_data, months, celltypes, thresh = 0, point_size 
   your_data$celltype <- bycelltype
   your_data$month <- bymonth
 
-  ggplot2::ggplot(your_data, aes(x = month, y = value, group = celltype, colour = celltype))+
+  ggplot2::ggplot(your_data, ggplot2::aes(x = month, y = value, group = celltype, colour = celltype))+
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+
     ggplot2::ylab(paste0(index_type, " diversity"))+
