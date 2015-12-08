@@ -16,5 +16,6 @@ Imports:
     gplots,
     gridExtra,
     reshape2,
+    treemap,
     vegan
 RoxygenNote: 5.0.1
