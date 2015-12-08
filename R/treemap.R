@@ -15,6 +15,6 @@ barcode_treemap <- function(your_data, column_choice = NULL, threshold = 0, colo
   your_data[your_data < threshold] <- 0
   your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 2))
   your_data <- your_data[,column_choice, drop = FALSE]
-  your_data <- as.data.frame(melt(as.matrix(your_data)))
+  your_data <- as.data.frame(reshape2::melt(as.matrix(your_data)))
   treemap::treemap(your_data, index = "Var1", vSize = "value", type = "manual", title = your_title, palette = colorRampPalette(colors_choice)(10), fontsize.labels = 0, fontsize.title = 30)
 }
