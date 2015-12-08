@@ -38,7 +38,7 @@ topclonescontrib <- function(your_data, n_clones = 10, linesize = 2, pointsize =
 
   newdf <- reshape2::melt(newdf)
 
-  ggplot2::ggplot(newdf, aes(x=Var2, y= value, colour = Var1, group = Var1))+
+  ggplot2::ggplot(newdf, ggplot2::aes(x=Var2, y= value, colour = Var1, group = Var1))+
     ggplot2::geom_line(size = linesize)+
     ggplot2::geom_point(fill = "white", size = pointsize)+
     ggplot2::coord_cartesian(ylim = c(0,1))+

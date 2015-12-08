@@ -20,7 +20,7 @@ hematoper <- function(your_data, months, n_clones = 10, scale_percent = FALSE, l
   your_data <- your_data[barcodetrackR::gettopindices(your_data, top = n_clones),]
   colnames(your_data) <- months
   melty <- reshape2::melt(as.matrix(your_data))
-  ggplot2::ggplot(melty, aes(x=Var2, y = value, group = Var1, fill = Var1))+
+  ggplot2::ggplot(melty, ggplot2::aes(x=Var2, y = value, group = Var1, fill = Var1))+
     ggplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
     ggplot2::theme(legend.position = "none")+
     ggplot2::ylab("Hematopoietic Contribution")+
