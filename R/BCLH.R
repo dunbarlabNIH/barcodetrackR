@@ -9,16 +9,16 @@
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param columnLabels The size of the column labels.
 #'@param dendro Whether or not to rearrange data with dendrogram.
-#'@param writekey Logical. Write contributions to file or not.
+#'@param printtable Logical. Prints percent contribution as a table instead of plotting it.
 #'@return Displays a heatmap in the current plot window.
 #'@examples
 #'BCLH(your_data = zh33, names = colnames(zh33), n_clones = 10,
-#'       your_title = "First Time Point", grid = TRUE, columnLabels = 3,
-#'          writekey = FALSE)
+#'       your_title = "First Time Point", grid = TRUE, columnLabels = 3)
+#'BCLH(your_data = zh33, n_clones = 10, printtable = TRUE)
 #'@export
 
 
-BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_title = "", grid = TRUE, columnLabels = 1, dendro = "none", writekey = FALSE, star_size = 1) {
+BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_title = "", grid = TRUE, columnLabels = 1, dendro = "none", star_size = 1, printtable = FALSE) {
 
   #scales all data to be a percentage of reads instead of number of reads
   your_data <- as.data.frame(prop.table(as.matrix(your_data),2))
@@ -57,12 +57,6 @@ BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_tit
 
   e = hclust(dist(data.log))$order
 
-  #produces a keyfile with the heatmap that has the percentages
-  if (writekey == TRUE){
-    write.table(your_data[e,], file = paste(your_title, "_top", n_clones, "clones_BCLH_key.txt", sep = ""), sep = '\t', quote = FALSE)
-
-  }
-
   if(grid == TRUE){
     columnsep <- 1:ncol(data.log)
     rowseparation <- 1:nrow(data.log)
@@ -71,37 +65,36 @@ BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_tit
     rowseparation <- NULL
   }
 
-
-
-  gplots::heatmap.2(as.matrix(data.log[e,]),
-            labRow = c(1:nrow(data.log)),
-            notecex = star_size,
-            sepwidth=c(0,0.0001),
-            sepcolor="black",
-            colsep=columnsep,
-            rowsep=rowseparation,
-            offsetRow = -0.4,
-            offsetCol = 0,
-            Rowv = FALSE,
-            cellnote = is_a_topclone[e,], #applies the stars to the correct cells according to the hclust 'e'
-            dendrogram = dendro,
-            notecol = "black",
-            margins = c(15,6),
-            density.info="none",
-            trace = "none",
-            symm=F,
-            scale="none",
-            Colv = names,
-            col=(rainbow(256, s = 1, v = 1, start = 0, end = 0.75, alpha = 1)),
-            cexCol = columnLabels,
-            cexRow = .5,
-            labCol = names,
-            symkey = FALSE,
-            key = TRUE,
-            keysize = 0.8,
-            srtCol = 45,
-            main = your_title)
-
-
-
+  if(printtable == TRUE){
+    return(your_data[e,])
+  } else {
+    gplots::heatmap.2(as.matrix(data.log[e,]),
+                      labRow = c(1:nrow(data.log)),
+                      notecex = star_size,
+                      sepwidth=c(0,0.0001),
+                      sepcolor="black",
+                      colsep=columnsep,
+                      rowsep=rowseparation,
+                      offsetRow = -0.4,
+                      offsetCol = 0,
+                      Rowv = FALSE,
+                      cellnote = is_a_topclone[e,], #applies the stars to the correct cells according to the hclust 'e'
+                      dendrogram = dendro,
+                      notecol = "black",
+                      margins = c(15,6),
+                      density.info="none",
+                      trace = "none",
+                      symm=F,
+                      scale="none",
+                      Colv = names,
+                      col=(rainbow(256, s = 1, v = 1, start = 0, end = 0.75, alpha = 1)),
+                      cexCol = columnLabels,
+                      cexRow = .5,
+                      labCol = names,
+                      symkey = FALSE,
+                      key = TRUE,
+                      keysize = 0.8,
+                      srtCol = 45,
+                      main = your_title)
+  }
 }

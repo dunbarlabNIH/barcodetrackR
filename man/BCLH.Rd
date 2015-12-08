@@ -6,7 +6,7 @@
 \usage{
 BCLH(your_data, names = colnames(your_data), n_clones = 10,
   your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
-  writekey = FALSE, star_size = 1)
+  star_size = 1, printtable = FALSE)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -23,7 +23,7 @@ BCLH(your_data, names = colnames(your_data), n_clones = 10,
 
 \item{dendro}{Whether or not to rearrange data with dendrogram.}
 
-\item{writekey}{Logical. Write contributions to file or not.}
+\item{printtable}{Logical. Prints percent contribution as a table instead of plotting it.}
 }
 \value{
 Displays a heatmap in the current plot window.
@@ -33,7 +33,7 @@ Creates a heatmap using the top 'n' rows from each column. Data undergoes a natu
 }
 \examples{
 BCLH(your_data = zh33, names = colnames(zh33), n_clones = 10,
-      your_title = "First Time Point", grid = TRUE, columnLabels = 3,
-         writekey = FALSE)
+      your_title = "First Time Point", grid = TRUE, columnLabels = 3)
+BCLH(your_data = zh33, n_clones = 10, printtable = TRUE)
 }
 

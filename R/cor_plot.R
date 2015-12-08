@@ -11,15 +11,16 @@
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall".
 #'@param labelsizes Numeric. Size of the plot labels.
 #'@param plottype Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".
-#'@param writetables Logical. Whether or not to write p-values, confidence intervals, and R values to a zip file
-#'        in the current directory.
+#'@param printtables Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
+#'        displaying a plot.
 #'@param nonegatives Logical. Whether to make negative correlations = 0. Should almost always be TRUE.
 #'@return Plots correlation plot of the data frame.
 #'@examples
 #'cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
+#'cor_plot(your_data = zh33, thresh = 874, printtables = TRUE)
 #'@export
 
-cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title = "", method_corr ="pearson", labelsizes = 1, plottype = "color", writetables = FALSE, no_negatives = FALSE) {
+cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title = "", method_corr ="pearson", labelsizes = 1, plottype = "color", printtables = FALSE, no_negatives = FALSE) {
 
   #scales thresh to each column (sample)
   threshes <- thresh/colSums(your_data)
@@ -82,15 +83,21 @@ cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title
   colnames(ctab_ci_hi) <- names
   rownames(ctab_ci_hi) <- names
 
-  corrplot::corrplot(ctab,tl.cex = labelsizes, method=plottype, title = title(your_title, line = -1, cex.main = 2), addgrid.col="white", tl.col="black", outline=TRUE, col=colorRampPalette(rainbow(7))(200), mar = c(1, 1, 3, 1), cl.lim = colorlimits)
-
-
-  if (writetables == TRUE){
-    write.table(ctab, paste(your_title,"_cortable.txt", sep = ""), quote = FALSE, sep = '\t')
-    write.table(ctab_pval, paste(your_title,"_cortab_pval.txt", sep = ""), quote = FALSE, sep = '\t')
-    write.table(ctab_ci_lo, paste(your_title,"_cortab95%ci_low.txt", sep = ""), quote = FALSE, sep = '\t')
-    write.table(ctab_ci_hi, paste(your_title,"_cortab95%ci_hi.txt", sep = ""), quote = FALSE, sep = '\t')
+  if(printtables){
+    return(list("cortable" = ctab, "cortable_pval" = ctab_pval, "cortable_ci_hi" = ctab_ci_hi, "cortable_ci_lo" = ctab_ci_lo))
   }
+  else{
+    corrplot::corrplot(ctab,tl.cex = labelsizes, method=plottype, title = title(your_title, line = -1, cex.main = 2), addgrid.col="white", tl.col="black", outline=TRUE, col=colorRampPalette(rainbow(7))(200), mar = c(1, 1, 3, 1), cl.lim = colorlimits)
+
+  }
+#
+#
+#   if (writetables == TRUE){
+#     write.table(ctab, paste(your_title,"_cortable.txt", sep = ""), quote = FALSE, sep = '\t')
+#     write.table(ctab_pval, paste(your_title,"_cortab_pval.txt", sep = ""), quote = FALSE, sep = '\t')
+#     write.table(ctab_ci_lo, paste(your_title,"_cortab95%ci_low.txt", sep = ""), quote = FALSE, sep = '\t')
+#     write.table(ctab_ci_hi, paste(your_title,"_cortab95%ci_hi.txt", sep = ""), quote = FALSE, sep = '\t')
+#   }
 
 
 }

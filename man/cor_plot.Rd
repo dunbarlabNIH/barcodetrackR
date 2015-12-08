@@ -6,7 +6,7 @@
 \usage{
 cor_plot(your_data, names = colnames(your_data), thresh = 0,
   your_title = "", method_corr = "pearson", labelsizes = 1,
-  plottype = "color", writetables = FALSE, no_negatives = FALSE)
+  plottype = "color", printtables = FALSE, no_negatives = FALSE)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -25,8 +25,8 @@ scaled threshold will be used for finding correlation.}
 
 \item{plottype}{Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".}
 
-\item{writetables}{Logical. Whether or not to write p-values, confidence intervals, and R values to a zip file
-in the current directory.}
+\item{printtables}{Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
+displaying a plot.}
 
 \item{nonegatives}{Logical. Whether to make negative correlations = 0. Should almost always be TRUE.}
 }
@@ -38,5 +38,6 @@ Gives the pairwise correlation between each sample-sample pair in the data frame
 }
 \examples{
 cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
+cor_plot(your_data = zh33, thresh = 874, printtables = TRUE)
 }
 
