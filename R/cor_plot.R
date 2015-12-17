@@ -90,14 +90,5 @@ cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title
     corrplot::corrplot(ctab,tl.cex = labelsizes, method=plottype, title = title(your_title, line = -1, cex.main = 2), addgrid.col="white", tl.col="black", outline=TRUE, col=colorRampPalette(rainbow(7))(200), mar = c(1, 1, 3, 1), cl.lim = colorlimits)
 
   }
-#
-#
-#   if (writetables == TRUE){
-#     write.table(ctab, paste(your_title,"_cortable.txt", sep = ""), quote = FALSE, sep = '\t')
-#     write.table(ctab_pval, paste(your_title,"_cortab_pval.txt", sep = ""), quote = FALSE, sep = '\t')
-#     write.table(ctab_ci_lo, paste(your_title,"_cortab95%ci_low.txt", sep = ""), quote = FALSE, sep = '\t')
-#     write.table(ctab_ci_hi, paste(your_title,"_cortab95%ci_hi.txt", sep = ""), quote = FALSE, sep = '\t')
-#   }
-
 
 }
