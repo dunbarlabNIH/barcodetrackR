@@ -6,7 +6,6 @@
 #'@examples
 #'launchApp()
 #'@export
-
 launchApp <- function(){
   shiny::runGitHub("d93espinoza/barcode_app")
 }
