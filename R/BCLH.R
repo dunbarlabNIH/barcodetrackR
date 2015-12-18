@@ -69,7 +69,6 @@ BCLH <- function(your_data, names = colnames(your_data), n_clones = 10, your_tit
     return(your_data[e,])
   } else {
     gplots::heatmap.2(as.matrix(data.log[e,]),
-                      labRow = c(1:nrow(data.log)),
                       notecex = star_size,
                       sepwidth=c(0,0.0001),
                       sepcolor="black",
