@@ -6,7 +6,8 @@
 \usage{
 cor_plot(your_data, names = colnames(your_data), thresh = 0,
   your_title = "", method_corr = "pearson", labelsizes = 1,
-  plottype = "color", printtables = FALSE, no_negatives = FALSE)
+  plottype = "color", printtables = FALSE, no_negatives = FALSE,
+  show_grid = TRUE, colorscale = "default")
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -27,6 +28,10 @@ scaled threshold will be used for finding correlation.}
 
 \item{printtables}{Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
 displaying a plot.}
+
+\item{show_grid}{Logical. Wheter to show grid or not.}
+
+\item{colorscale}{Character. One of "default", "rainbow", or "white_heat"}
 
 \item{nonegatives}{Logical. Whether to make negative correlations = 0. Should almost always be TRUE.}
 }
