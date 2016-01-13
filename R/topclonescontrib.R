@@ -43,7 +43,7 @@ topclonescontrib <- function(your_data, n_clones = 10, linesize = 2, pointsize =
     ggplot2::geom_point(fill = "white", size = pointsize)+
     ggplot2::coord_cartesian(ylim = c(0,1))+
     ggplot2::scale_y_continuous(breaks = seq(0, 1, 0.1))+
-    ggplot2::theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust=1))+
     ggplot2::ylab("Hematopoietic Contribution")+
     ggplot2::xlab("")+
     ggplot2::ggtitle(your_title)
