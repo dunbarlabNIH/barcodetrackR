@@ -41,21 +41,24 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
   if (any(colSums(your_data) != 1)){
     stop("One of your columns contained no data")
   }
+  your_data[your_data == 0] <- NA
 
   #creates data frame that shows rank of original your_data
-  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min")
+  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
 
   #subsets those barcodes that have at least one top N clone
-  top_clones_choices <- apply(your_data_ranked, 1, function(x){any(x<=n_clones)})
+  top_clones_choices <- apply(your_data_ranked, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
   your_data <- your_data[top_clones_choices,]
   raw_reads <- raw_reads[top_clones_choices,]
 
 
   #creates empty data frame with dimension of subsetted data &
   #populates the empty data frame with '*' for those cells w/ top clones
-  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min")
+  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
   is_a_topclone <- data.frame(matrix(ncol = ncol(your_data), nrow = nrow(your_data)))
   is_a_topclone[your_data_ranked <= n_clones] <- "*"
+
+  your_data[is.na(your_data)] <- 0
 
   #takes log of data
   your_data_log <- custom_log(your_data, log_choice)
