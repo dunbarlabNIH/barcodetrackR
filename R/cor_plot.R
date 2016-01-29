@@ -1,6 +1,6 @@
-#' Correlation Plot
+#'@title Correlation Plot
 #'
-#' Gives the pairwise correlation between each sample-sample pair in the data frame.
+#'@description Gives the pairwise correlation between each sample-sample pair in the data frame.
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
 #'@param names Character vector. Labels for each sample.
