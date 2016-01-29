@@ -14,8 +14,6 @@ BBHM(your_data, your_names = colnames(your_data), threshold = 0,
 
 \item{threshold}{A chosen threshold that decides if a barcode exists or not.}
 
-\item{grid}{Logical. Include a grid or not in the heatmap.}
-
 \item{col_labels}{The size of the column labels.}
 }
 \value{

@@ -21,8 +21,8 @@ BBHM <- function(your_data, your_names = colnames(your_data), threshold = 0,
   your_data <- your_data[rowSums(your_data) != 0,]
   your_data[your_data <= threshold] = 0
   your_data[your_data > threshold] = 1
-  your_data <- your_data[do.call(order, as.data.frame(your_data)),]
-  gplots::heatmap.2(as.matrix(try),
+  your_data <- your_data[do.call(order, -as.data.frame(your_data)),]
+  gplots::heatmap.2(as.matrix(your_data),
             scale = "none",
             dendrogram = "none",
             Colv = FALSE,
