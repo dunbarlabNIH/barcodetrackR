@@ -4,13 +4,10 @@
 \alias{BBHM}
 \title{Binary Barcode Heat Map}
 \usage{
-BBHM(your_data, your_names = colnames(your_data), threshold = 0,
-  grid = TRUE, col_labels = 1)
+BBHM(your_data, threshold = 0, col_labels = 1)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
-
-\item{your_names}{Names for each column of the data frame.}
 
 \item{threshold}{A chosen threshold that decides if a barcode exists or not.}
 
@@ -23,8 +20,7 @@ Displays a binary heat map in the current plot window.
 Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
 }
 \examples{
-BBHM(your_data = zh33, names = colnames(zh33), threshold = 1000,
-      grid = TRUE, col_labels = 3)
-BBHM(your_data = zh33, grid = FALSE)
+BBHM(your_data = zh33, threshold = 1000, col_labels = 3)
+BBHM(your_data = zh33)
 }
 
