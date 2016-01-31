@@ -35,8 +35,7 @@ BBHM <- function(your_data, threshold = 0, col_labels = 1){
             rowsep = c(0, nrow(your_data)),
             sepwidth = c(1/ncol(your_data)^4, 1/nrow(your_data)^3),
             srtCol = 45,
-            lhei = c(1,10),
-            lwid = c(1,11),
+            margins = c(15,6),
             cexCol = col_labels
             )
 
