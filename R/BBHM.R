@@ -37,7 +37,6 @@ BBHM <- function(your_data, threshold = 0, col_labels = 1){
             srtCol = 45,
             lhei = c(1,10),
             lwid = c(1,11),
-            margins = c(10,9),
             cexCol = col_labels
             )
 
