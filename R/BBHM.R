@@ -15,6 +15,7 @@
 BBHM <- function(your_data, threshold = 0, col_labels = 1){
   print(head(your_data))
   your_data[your_data <= threshold] <- 0
+  print("UGH")
   your_data[your_data > threshold] <- 1
   print(head(your_data))
   your_data <- your_data[rowSums(your_data) != 0,]
