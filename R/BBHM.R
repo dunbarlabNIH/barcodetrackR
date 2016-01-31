@@ -13,9 +13,10 @@
 
 
 BBHM <- function(your_data, threshold = 0, col_labels = 1){
-  your_data <- your_data[rowSums(your_data) != 0,]
   your_data[your_data <= threshold] = 0
   your_data[your_data > threshold] = 1
+  your_data <- your_data[rowSums(your_data) != 0,]
+  print(your_data)
   if(any(colSums(your_data) == 0)){
     stop("BBHM: One of your columns had no reads above the threshold.")
   }
@@ -25,7 +26,7 @@ BBHM <- function(your_data, threshold = 0, col_labels = 1){
             dendrogram = "none",
             Colv = FALSE,
             labRow = "",
-            col = colorRampPalette(c("white", "blue"))(2),
+            col = colorRampPalette(c("white", "navyblue"))(2),
             key = FALSE,
             density.info = "none",
             trace = "none",
@@ -33,10 +34,12 @@ BBHM <- function(your_data, threshold = 0, col_labels = 1){
             sepcolor = "black",
             colsep = c(0, ncol(your_data)),
             rowsep = c(0, nrow(your_data)),
-            sepwidth = c(0.01, 20),
+            sepwidth = c(1/ncol(your_data)^4, 1/nrow(your_data)^3),
             srtCol = 45,
             lhei = c(1,10),
-            lwid = c(1,9),
-            margins = c(15,6),
-            cexCol = col_labels)+rect(1,2,3,6)
+            lwid = c(1,11),
+            margins = c(10,9),
+            cexCol = col_labels
+            )
+
 }
