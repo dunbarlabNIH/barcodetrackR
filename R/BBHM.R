@@ -13,8 +13,9 @@
 
 
 BBHM <- function(your_data, threshold = 0, col_labels = 1){
-  your_data[your_data <= threshold] = 0
-  your_data[your_data > threshold] = 1
+  print(head(your_data))
+  your_data[your_data <= threshold] <- 0
+  your_data[your_data > threshold] <- 1
   your_data <- your_data[rowSums(your_data) != 0,]
   if(any(colSums(your_data) == 0)){
     stop("BBHM: One of your columns had no reads above the threshold.")
