@@ -13,21 +13,13 @@
 
 
 BBHM <- function(your_data, threshold = 0, col_labels = 1){
-  print(head(your_data))
-  print("ARGH")
-  print(is.data.frame(your_data))
   your_data[your_data <= threshold] <- 0
-  print("UGH")
   your_data[your_data > threshold] <- 1
-  print(head(your_data))
   your_data <- your_data[rowSums(your_data) != 0,]
-  print("D")
-  print(head(your_data))
   if(any(colSums(your_data) == 0)){
     stop("BBHM: One of your columns had no reads above the threshold.")
   }
   your_data <- your_data[do.call(order, -as.data.frame(your_data)),]
-  print(head(your_data))
   gplots::heatmap.2(as.matrix(your_data),
             scale = "none",
             dendrogram = "none",
