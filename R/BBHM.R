@@ -33,10 +33,12 @@ BBHM <- function(your_data, threshold = 0, col_labels = 1){
             sepcolor = "black",
             colsep = c(0, ncol(your_data)),
             rowsep = c(0, nrow(your_data)),
-            sepwidth = c(1/ncol(your_data)^4, 1/nrow(your_data)^3),
+            sepwidth = c(1/ncol(your_data)^10, 1/nrow(your_data)^3),
             srtCol = 45,
-            margins = c(15,6),
-            cexCol = col_labels
+            cexCol = col_labels,
+            lhei = c(1,10),
+            lwid = c(1,11),
+            margins = c(12,5)
             )
 
 }
