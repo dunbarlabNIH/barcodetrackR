@@ -7,5 +7,5 @@
 #'launchApp()
 #'@export
 launchApp <- function(){
-  shiny::runGitHub("d93espinoza/barcode_app")
+  shiny::runApp(system.file("barcode_app", package = "barcodetrackR"))
 }
