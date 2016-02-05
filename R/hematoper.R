@@ -29,7 +29,7 @@ hematoper <- function(your_data, months, n_clones = 10, scale_percent = FALSE, l
     ggplot2::scale_x_continuous(breaks = seq(0, months[length(months)], by = 0.5), name = "Month")+
     ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10), name = "Hematopoietic Contribution %")+
     switch(plot_theme, BW = ggplot2::theme_bw(), classic = ggplot2::theme_classic(), original = ggplot2::theme_grey())+
-    ggplot2::theme(text = element_text(size=text_size))+
+    ggplot2::theme(text = ggplot2::element_text(size=text_size))+
     ggplot2::coord_cartesian(ylim = c(0, y_limit))
 
 }
