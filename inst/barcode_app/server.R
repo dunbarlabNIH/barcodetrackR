@@ -1,24 +1,24 @@
 options(shiny.maxRequestSize=1000*1024^2)
 
 shinyServer(
-  
+
   function(input, output) {
-    
-    
+
+
     #=================================================================================``insta========================
-    
+
     output$thresholdPanel <- renderUI({
       if (is.null(input$file1) | is.null(input$file2))
         return()
-      
+
       column(3,
              wellPanel(
                strong("4. Press Button to Apply Threshold"),
                actionButton("threshybutton", "Apply Threshold")
              ))
-      
+
     })
-    
+
     thresholded_data <- eventReactive(input$threshybutton, {
       withProgress(message = "Applying Threshold", value = 0, {
         df <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
@@ -33,32 +33,32 @@ shinyServer(
       return(df)
     }
     )
-    
-    
+
+
     current_threshold <- eventReactive(input$threshybutton,{
       return(paste("Current threshold applied is: ", input$thresholdvalue, sep = ""))
     })
-    
-    
+
+
     output$thresholdInfo <- renderUI({
       if (is.null(thresholded_data()))
         return()
-      
+
       column(3, align = "center",
              wellPanel(
                strong(current_threshold())
              ))
-      
-      
+
+
     })
     #======================================================================================================
-    
+
     #TABPANEL
-    
+
     output$Panel <- renderUI({
       if (is.null(thresholded_data()))
         return()
-      
+
       tabsetPanel(
         tabPanel("BCheatmap",
                  uiOutput("BCheatmap")),
@@ -79,21 +79,21 @@ shinyServer(
         tabPanel("BBHM",
                  uiOutput("BBHM"))
       )
-      
+
     })
-    
+
     #======================================================================================================
-    
+
     #HEATMAP TAB
-    
+
     output$BCheatmap <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
-      
+
+
       #======================================================================================================
-      
+
       BCheatmapInput <- function(){
         barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
                                  names = colnames(BCheatmap_data()),
@@ -125,22 +125,22 @@ shinyServer(
           ), file, sep = '\t', quote = FALSE)
         }
       )
-      
+
       output$viewBCheatmap <- renderPlot({
         BCheatmapInput()
         height = 900
       })
-      
-      
+
+
       BCheatmap_data <- reactive({
         df <- thresholded_data()
         df <- df[df$GIVENNAME %in% input$BCheatmap_samples,] #subset samples
         df$GIVENNAME <- factor(df$GIVENNAME, levels = input$BCheatmap_samples)
         df <- df[order(df$GIVENNAME),]
         newcolnames <- df$GIVENNAME
-        
-        
-        
+
+
+
         df$GIVENNAME <- NULL
         df$EXPERIMENT <- NULL
         df$CELLTYPE <- NULL
@@ -149,12 +149,12 @@ shinyServer(
         df$MISC <- NULL
         df <- data.frame(t(df))
         colnames(df) <- newcolnames
-        
-        
+
+
         return(df)
-        
+
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -187,30 +187,30 @@ shinyServer(
                  strong("12. Press button to download BCheatmap Key."),
                  br(),
                  downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
-                 
-                 
+
+
                )
         ),
         column(9,
                plotOutput('viewBCheatmap', height = 1000)
         )
-        
+
       )
-      
-      
-      
+
+
+
     })
-    
+
     #======================================================================================================
-    
+
     #CORPLOT TAB
-    
-    
+
+
     output$CorPlot <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       corplotInput <- function(){
         barcodetrackR::cor_plot(your_data = corplot_data(), names = colnames(corplot_data()),
                                 thresh = input$corplot_thresh, your_title = input$corplot_Title,
@@ -219,7 +219,7 @@ shinyServer(
                                 no_negatives = input$corplot_excludeneg,
                                 show_grid = input$corplot_Grid, colorscale = input$corplot_Colors)
       }
-      
+
       output$downloadcorplotzip <- downloadHandler(
         filename = function() {"corplot_files.zip"},
         content = function(file){
@@ -237,14 +237,14 @@ shinyServer(
         },
         contentType = "application/zip"
       )
-      
-      
-      
+
+
+
       output$viewcorplot <- renderPlot({
         corplotInput()
         height = 900
       })
-      
+
       corplot_data <- reactive({
         cf <- thresholded_data()
         cf <- cf[cf$GIVENNAME %in% input$corplot_Samples,] #subset samples
@@ -260,12 +260,12 @@ shinyServer(
         cf <- data.frame(t(cf))
         colnames(cf) <- newcolnames
         return(cf)
-        
+
       })
-      
+
       #======================================================================================================
-      
-      
+
+
       fluidRow(
         column(3,
                wellPanel(
@@ -286,30 +286,30 @@ shinyServer(
                  downloadButton('downloadcorplotzip', 'corr_plot.zip')
                )
         ),
-        
+
         column(9,
                plotOutput('viewcorplot', height = 1000)
         )
-        
+
       )
-      
-      
-      
-      
-      
+
+
+
+
+
     })
-    
-    
+
+
     #======================================================================================================
-    
-    
-    
-    
+
+
+
+
     output$RadarChart <- renderUI({
-      
-      
+
+
       radarchart_data <- reactive({
-        
+
         rf <- thresholded_data()
         rf <- rf[rf$GIVENNAME %in% input$radar_Samples,] #subset samples
         rf$GIVENNAME <- factor(rf$GIVENNAME, levels = input$radar_Samples)
@@ -317,16 +317,16 @@ shinyServer(
         newcolnames <- rf$GIVENNAME
         rf$GIVENNAME <- NULL
         rf$EXPERIMENT <- NULL
-        rf$CELLTYPE <- NULL 
+        rf$CELLTYPE <- NULL
         rf$MONTH <- NULL
         rf$LOCATION <- NULL
         rf$MISC <- NULL
         rf <- data.frame(t(rf))
         colnames(rf) <- newcolnames
         return(rf)
-        
+
       })
-      
+
       radarInput <- function(){
         barcodetrackR::radartopclones(your_data = radarchart_data(),
                                       columnChoice_Name = input$radar_Choice,
@@ -336,197 +336,203 @@ shinyServer(
       output$viewradarchart <- renderPlot({
         radarInput()
       })
-      
-      
+
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("radar_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 
+
                  selectizeInput("radar_Choice", label = "2. Which Sample for Top Clones: ",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME))),
-                 
+
                  numericInput("radar_Clones", "3. Select Number of Clones", value = 100, step = 10),
-                 
+
                  textInput("radar_Title", "4. Title", value = ""),
-                 
+
                  numericInput("radar_labelsize", "5. Enter Label Size: ", value = 1)
-                 
-                 
-                 
-               )),  
-        
-        
-        
-        
+
+
+
+               )),
+
+
+
+
         column(9,
                plotOutput('viewradarchart', height = 700)
         )
-        
+
       )
     })
-    
-    
-    
-    
-    
+
+
+
+
+
     #======================================================================================================
-    
+
     #TOPCLONESCONTRIB TAB
-    
+
     output$TopClonesContrib <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
-      
+
+
       topclonescontribInput <- function(){
         barcodetrackR::topclonescontrib(your_data = topclonescontrib_data(),
-                                        n_clones = input$topclonescontrib_Clones, linesize = input$topclonescontrib_Linesize,
+                                        n_clones = input$topclonescontrib_Clones,
+                                        linesize = input$topclonescontrib_Linesize,
                                         pointsize = input$topclonescontrib_Pointsize, your_title = input$topclonescontrib_Title)
       }
-      
-      
+
+
       output$viewtopclones <- renderPlot({
         print(topclonescontribInput())
         height = 700
       })
-      
+
       topclonescontrib_data <- reactive({
-        
+
         ef <- thresholded_data()
-        
+
         ef <- ef[ef$GIVENNAME %in% input$topclonescontrib_Samples,] #subset samples
         ef$GIVENNAME <- factor(ef$GIVENNAME, levels = input$topclonescontrib_Samples)
         ef <- ef[order(ef$GIVENNAME),]
         newcolnames <- ef$GIVENNAME
         ef$GIVENNAME <- NULL
         ef$EXPERIMENT <- NULL
-        ef$CELLTYPE <- NULL 
+        ef$CELLTYPE <- NULL
         ef$MONTH <- NULL
         ef$LOCATION <- NULL
         ef$MISC <- NULL
         ef <- data.frame(t(ef))
         colnames(ef) <- newcolnames
         return(ef)
-        
+
       })
-      
-      
+
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("topclonescontrib_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 
+
                  numericInput("topclonescontrib_Clones", "2. Select Number of Clones", value = 50),
-                 
+
                  numericInput("topclonescontrib_Linesize", "3. Select Line Size", value = 2),
-                 
+
                  numericInput("topclonescontrib_Pointsize", "4. Select Point Size", value = 3),
-                 
+
                  textInput("topclonescontrib_Title", "5. Title for Plot", value = "")
-                 
-                 
-                 
-               )),  
-        
-        
-        
+
+
+
+               )),
+
+
+
         column(9,
                plotOutput('viewtopclones', height = 700)
         )
-        
+
       )
-      
-      
-      
+
+
+
     })
-    
-    
+
+
     #======================================================================================================
     #HEMATOPER TAB
-    
+
     output$HematoPer <- renderUI({
       if(is.null(thresholded_data()))
         return()
-      
+
       hematoperInput <- function(){
-        print(barcodetrackR::hematoper(hematoper_data(), months = hematoper_Months(), n_clones = input$hematoper_Clones, scale_percent = input$hematoper_Scale, linesize = input$hematoper_Linesize))
-        
+        print(barcodetrackR::hematoper(hematoper_data(),
+                                       months = hematoper_Months(),
+                                       n_clones = input$hematoper_Clones,
+                                       scale_percent = input$hematoper_Scale,
+                                       linesize = input$hematoper_Linesize,
+                                       text_size = input$hematoper_Textsize,
+                                       y_limit = input$hematoper_yLim,
+                                       plot_theme = input$hematoper_Theme))
+
       }
-      
+
       output$viewhematoper <- renderPlot({
         hematoperInput()
         height = 700
       })
-      
+
       hematoper_data <- reactive({
         ff <- thresholded_data()
-        
+
         ff <- ff[ff$GIVENNAME %in% input$hematoper_Samples,] #subset samples
         ff$GIVENNAME <- factor(ff$GIVENNAME, levels = input$hematoper_Samples)
         ff <- ff[order(ff$GIVENNAME),]
         newcolnames <- ff$GIVENNAME
-        
+
         ff$GIVENNAME <- NULL
         ff$EXPERIMENT <- NULL
-        ff$CELLTYPE <- NULL 
+        ff$CELLTYPE <- NULL
         ff$MONTH <- NULL
         ff$LOCATION <- NULL
         ff$MISC <- NULL
-        
+
         ff <- data.frame(t(ff))
         colnames(ff) <- newcolnames
         return(ff)
-        
+
       })
-      
+
       hematoper_Months <- reactive({
         return(as.numeric(unlist(strsplit(input$hematoper_Months, split = ','))))
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("hematoper_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 
                  textInput("hematoper_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
-                 
                  numericInput("hematoper_Clones", "3. Select Number of Clones", value = 10),
-                 
                  numericInput("hematoper_Linesize", "4. Enter Line Size: ", value = 1),
-                 
                  strong("5. Scale as Percent?"),
-                 
-                 checkboxInput("hematoper_Scale", "", value = TRUE)
-                 
-               )),  
-        
-        
-        
+                 checkboxInput("hematoper_Scale", "", value = TRUE),
+                 numericInput("hematoper_Textsize", "6. Enter Text Size: ", value = 15),
+                 numericInput("hematoper_yLim", "7. Enter Y Limit: ", value = 100),
+                 selectInput("hematoper_Theme", "8. Choose Theme",
+                             choices = c("original", "BW", "classic"), selected = "classic")
+               )),
+
+
+
         column(9,
                plotOutput('viewhematoper', height = 700)
         )
-        
+
       )
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
     })
-    
+
     #======================================================================================================
     #DIVERSITY TAB
-    
+
     output$Diversity <- renderUI({
       if(is.null(thresholded_data()))
         return()
-      
+
       diversityInput <- function(){
         if (input$diversity_Type == "richness"){
           print(barcodetrackR::richness_plot(your_data = diversity_data(),
@@ -534,7 +540,7 @@ shinyServer(
                                              thresh = input$diversity_Thresh, point_size = input$diversity_Pointsize,
                                              line_size = input$diversity_Linesize, richness_type = input$richness_Type,
                                              y_lower = input$diversity_yLower, y_upper = input$diversity_yUpper))
-          
+
         } else {
           print(barcodetrackR::diversity_plot(your_data = diversity_data(),
                                               months = diversity_Months(), celltypes = diversity_Celltypes(),
@@ -543,123 +549,123 @@ shinyServer(
                                               y_lower = input$diversity_yLower, y_upper = input$diversity_yUpper))
         }
       }
-      
+
       output$viewdiversity <- renderPlot({
         diversityInput()
         height = 700
       })
-      
+
       diversity_data <- reactive({
         gf <- thresholded_data()
-        
+
         gf <- gf[gf$GIVENNAME %in% input$diversity_Samples,] #subset samples
         gf$GIVENNAME <- factor(gf$GIVENNAME, levels = input$diversity_Samples)
         gf <- gf[order(gf$GIVENNAME),]
         newcolnames <- gf$GIVENNAME
-        
+
         gf$GIVENNAME <- NULL
         gf$EXPERIMENT <- NULL
-        gf$CELLTYPE <- NULL 
+        gf$CELLTYPE <- NULL
         gf$MONTH <- NULL
         gf$LOCATION <- NULL
         gf$MISC <- NULL
-        
+
         gf <- data.frame(t(gf))
         colnames(gf) <- newcolnames
         return(gf)
-        
+
       })
-      
+
       diversity_Months <- reactive({
         return(as.numeric(unlist(strsplit(input$diversity_Months, split = ','))))
       })
-      
+
       diversity_Celltypes <- reactive({
         return(as.character(unlist(strsplit(input$diversity_Celltypes, split = ','))))
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("diversity_Samples", label = "1. Which Samples to Use (order by month, then by celltype: e.g. 1m T, 1m B, 1m Gr, 2m T, 2m B, etc.)",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 
+
                  textInput("diversity_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
-                 
+
                  textInput("diversity_Celltypes", '3. Enter celltypes (in order) seperated by a comma: ', value = ""),
-                 
+
                  numericInput("diversity_Thresh", "4. Select Threshold", value = 0, step = 100, min = 0),
-                 
+
                  selectInput("diversity_Type", label  = "5A. Select Diversity Index", choices = c("shannon", "simpson", "invsimpson", "herfindahl-hirschman", "richness"), selected = "shannon"),
-                 
+
                  selectInput("richness_Type", label = "5B. If \"richness\" selected, please select type:", choices = c("unique", "cumulative", "new")),
-                 
+
                  numericInput("diversity_Pointsize", "6. Point Size: ", value = 3),
-                 
+
                  numericInput("diversity_Linesize", "7. Line Size: ", value = 2),
-                 
+
                  numericInput("diversity_yUpper", "8. y-upper Lim", value = 10),
-                 
+
                  numericInput("diversity_yLower", "9. y-lower Lim", value = 0)
-                 
-               )),  
-        
-        
-        
+
+               )),
+
+
+
         column(9,
                plotOutput('viewdiversity', height = 700)
         )
-        
+
       )
-      
-      
-      
-      
-      
-      
+
+
+
+
+
+
     })
-    
-    
-    
-    
-    
+
+
+
+
+
     #======================================================================================================
     #SCATTER PLOT TAB
-    
+
     output$ScatterPlot <- renderUI({
       if(is.null(thresholded_data()))
         return()
-      
+
       scatterInput <- function(){
         normdata <- 100*prop.table(as.matrix(scatter_data()), margin = 2)
         plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize)
         legend("topright", legend = paste("Correlation (R) =", cor(normdata[,1], normdata[,2])))
       }
-      
+
       output$viewscatter <- renderPlot({
         scatterInput()
         height = 700
       })
-      
+
       scatter_data <- reactive({
         scf <- thresholded_data()
-        
+
         scf <- scf[scf$GIVENNAME %in% c(input$scatter_Sample1, input$scatter_Sample2),] #subset samples
         newcolnames <- scf$GIVENNAME
-        
+
         scf$GIVENNAME <- NULL
         scf$EXPERIMENT <- NULL
-        scf$CELLTYPE <- NULL 
+        scf$CELLTYPE <- NULL
         scf$MONTH <- NULL
         scf$LOCATION <- NULL
         scf$MISC <- NULL
-        
+
         scf <- data.frame(t(scf))
         colnames(scf) <- newcolnames
         return(scf)
-        
+
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -669,28 +675,28 @@ shinyServer(
                  numericInput("scatter_Ylim", "4. Y Limit: ", value = 100, step = 0.1, min = 0),
                  numericInput("scatter_Xlim", "5. X Limit: ", value = 100, step = 0.1, min = 0),
                  numericInput("scatter_Dotsize","6. Dot Size: ", value = 1)
-                 
-               )),  
-        
-        
-        
+
+               )),
+
+
+
         column(9,
                plotOutput('viewscatter', height = 700)
         )
-        
+
       )
-      
-      
+
+
     })
-    
+
     #======================================================================================================
     #TREEMAP TAB
-    
+
     output$TreeMap <- renderUI({
-      
+
       if(is.null(thresholded_data()))
         return()
-      
+
       output$viewtreemap <- renderPlot({
         barcodetrackR::barcode_treemap(your_data = treemap_data(), column_choice = colnames(treemap_data()),
                                        threshold = input$treemap_Threshold,
@@ -698,14 +704,14 @@ shinyServer(
                                        your_title = input$treemap_Title)
         height = 700
       })
-      
+
       treemap_data <- reactive({
         tmdf <- thresholded_data()
         tmdf <- tmdf[tmdf$GIVENNAME %in% input$treemap_Sample,,drop = FALSE] #subset samples
         newcolnames <- tmdf$GIVENNAME
         tmdf$GIVENNAME <- NULL
         tmdf$EXPERIMENT <- NULL
-        tmdf$CELLTYPE <- NULL 
+        tmdf$CELLTYPE <- NULL
         tmdf$MONTH <- NULL
         tmdf$LOCATION <- NULL
         tmdf$MISC <- NULL
@@ -713,57 +719,57 @@ shinyServer(
         colnames(tmdf) <- newcolnames
         return(tmdf)
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("treemap_Sample", label = "1. Which Sample to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME))),
-                 
+
                  numericInput("treemap_Threshold", "2. Select Threshold", value = 0, step = 100, min = 0),
-                 
-                 selectInput("treemap_HiColor", label  = "3. Select Upper Color", 
+
+                 selectInput("treemap_HiColor", label  = "3. Select Upper Color",
                              choices = c("red", "orange", "yellow", "green", "blue", "violet", "black", "white", "grey"),
                              selected = "yellow"),
-                 
+
                  selectInput("treemap_LoColor", label = "4. Select Lower Color",
                              choices = c("red", "orange", "yellow", "green", "blue", "violet", "black", "white", "grey"),
                              selected = "blue"),
                  textInput("treemap_Title", "5. Title", value = "")
-               )),  
+               )),
         column(9,
                plotOutput('viewtreemap', height = 700)
         )
-        
+
       )
-      
-      
-      
+
+
+
     })
-    
+
     #======================================================================================================
     #BBHM TAB
-    
+
     output$BBHM <- renderUI({
-      
-      
+
+
       if (is.null(thresholded_data()))
         return()
-      
-      
+
+
       BBHMInput <- function(){
         barcodetrackR::BBHM(your_data = BBHM_data(),
                             col_labels = input$BBHM_labels,
                             threshold = input$BBHM_threshold
         )
       }
-      
+
       output$viewBBHM <- renderPlot({
         BBHMInput()
         height = 900
       })
-      
-      
+
+
       BBHM_data <- reactive({
         BBdf <- thresholded_data()
         BBdf <- BBdf[BBdf$GIVENNAME %in% input$BBHM_samples,] #subset samples
@@ -780,7 +786,7 @@ shinyServer(
         colnames(BBdf) <- newcolnames
         return(BBdf)
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -793,13 +799,13 @@ shinyServer(
         column(9,
                plotOutput('viewBBHM', height = 700)
         )
-        
+
       )
-      
+
     })
-    
-    
-    
+
+
+
   }
 )
 
