@@ -5,7 +5,7 @@
 \title{Hematopoietic Contribution}
 \usage{
 hematoper(your_data, months, n_clones = 10, scale_percent = FALSE,
-  linesize = 0.5)
+  linesize = 0.5, text_size = 15, y_limit = 100, plot_theme = "classic")
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -17,6 +17,12 @@ hematoper(your_data, months, n_clones = 10, scale_percent = FALSE,
 \item{scale_percent}{Logical. Scale as percent of hematopoiesis or keep as number of reads.}
 
 \item{linesize}{Numeric. Thickness of the lines.}
+
+\item{text_size}{Numeric. Size of text in plot.}
+
+\item{y_limit}{Numeric. Limit of y axis in plot.}
+
+\item{plot_theme}{Character. One of "BW", "classic", or "original".}
 }
 \value{
 Displays a stacked area plot (made by ggplot2) of the samples' top clones.
