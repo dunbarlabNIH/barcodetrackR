@@ -457,7 +457,6 @@ shinyServer(
         print(barcodetrackR::hematoper(hematoper_data(),
                                        months = hematoper_Months(),
                                        n_clones = input$hematoper_Clones,
-                                       scale_percent = input$hematoper_Scale,
                                        linesize = input$hematoper_Linesize,
                                        text_size = input$hematoper_Textsize,
                                        y_limit = input$hematoper_yLim,
@@ -503,11 +502,9 @@ shinyServer(
                  textInput("hematoper_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
                  numericInput("hematoper_Clones", "3. Select Number of Clones", value = 10),
                  numericInput("hematoper_Linesize", "4. Enter Line Size: ", value = 1),
-                 strong("5. Scale as Percent?"),
-                 checkboxInput("hematoper_Scale", "", value = TRUE),
-                 numericInput("hematoper_Textsize", "6. Enter Text Size: ", value = 15),
-                 numericInput("hematoper_yLim", "7. Enter Y Limit: ", value = 100),
-                 selectInput("hematoper_Theme", "8. Choose Theme",
+                 numericInput("hematoper_Textsize", "5. Enter Text Size: ", value = 15),
+                 numericInput("hematoper_yLim", "6. Enter Y Limit: ", value = 100),
+                 selectInput("hematoper_Theme", "7. Choose Theme",
                              choices = c("original", "BW", "classic"), selected = "classic")
                )),
 
