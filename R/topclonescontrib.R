@@ -15,10 +15,7 @@
 
 topclonescontrib <- function(your_data, n_clones = 10, linesize = 2, pointsize = 3, your_title = ""){
 
-  maxRow = rep(1,ncol(your_data))
-  minRow = rep(0,ncol(your_data))
-
-  your_data <- prop.table(as.matrix(your_data),2)
+  your_data <- as.data.frame(100*prop.table(as.matrix(your_data),2))
 
   #takes care of limiting top clones to the number of barcodes in a sample
   if (n_clones > min(colSums(your_data!=0)))
