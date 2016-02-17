@@ -5,7 +5,7 @@ shinyServer(
   function(input, output) {
 
 
-    #=================================================================================``insta========================
+    #=========================================================================================================
 
     output$thresholdPanel <- renderUI({
       if (is.null(input$file1) | is.null(input$file2))
@@ -813,10 +813,10 @@ shinyServer(
       ternplotInput <- function(){
         print(barcodetrackR::ternary_plot(ternplot_data(),
                                           dot_size = input$ternplot_Dotsize,
-                                          show_numeric_scale = input$ternplot_Group[2],
-                                          show_arrows = input$ternplot_Group[4],
-                                          show_breaks = input$ternplot_Group[3],
-                                          density_mode = input$ternplot_Group[1]))
+                                          show_numeric_scale = input$ternplot_Showlabels,
+                                          show_arrows = input$ternplot_Showarrows,
+                                          show_ticks = input$ternplot_Showticks,
+                                          density_mode = input$ternplot_Density))
 
       }
 
@@ -851,9 +851,10 @@ shinyServer(
                wellPanel(
                  selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 checkboxGroupInput("ternplot_Group", label = "2. Options",
-                                    choices = list("Density Mode" = TRUE, "Show Scale" = TRUE, "Show Arrows" = TRUE, "Show Breaks" = TRUE),
-                                    selected = 3),
+                 strong("2. Options"),
+                 checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
+                 checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
+                 checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE),
                  numericInput("ternplot_Dotsize", "3. Enter Dot Size: ", value = 1000)
                )),
 

@@ -4,21 +4,19 @@
 \alias{ternary_plot}
 \title{Ternary Plot}
 \usage{
-ternary_plot(your_data, dot_size = 2000, show_numeric_scale = FALSE,
-  show_arrows = TRUE, show_breaks = TRUE, density_mode = FALSE)
+ternary_plot(your_data, dot_size = 2000, show_ticks = TRUE,
+  show_breaks = TRUE, density_mode = FALSE)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
 
 \item{dot_size}{The size of the dots (does not apply to density mode).}
 
-\item{show_numeric_scale}{Logical. Display numbers on axes or not.}
-
-\item{show_arrows}{Logical. Display arrows or not.}
-
-\item{show_breaks}{Logical. Display tick marks or not.}
+\item{show_ticks}{Logical. Display tick marks or not.}
 
 \item{density_mode}{Logical. Uses a kernel density estimation to view concentrations of clones.}
+
+\item{show_arrows}{Logical. Display arrows or not.}
 }
 \value{
 Displays a ternary plot in the current plot window.

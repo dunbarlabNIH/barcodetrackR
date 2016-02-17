@@ -4,16 +4,14 @@
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
 #'@param dot_size The size of the dots (does not apply to density mode).
-#'@param show_numeric_scale Logical. Display numbers on axes or not.
 #'@param show_arrows Logical. Display arrows or not.
-#'@param show_breaks Logical. Display tick marks or not.
+#'@param show_ticks Logical. Display tick marks or not.
 #'@param density_mode Logical. Uses a kernel density estimation to view concentrations of clones.
 #'@return Displays a ternary plot in the current plot window.
 #'@examples
 #'ternary_plot(your_data = zh33, dot_size = 1000, density_mode = TRUE)
 #'@export
-ternary_plot <- function(your_data, dot_size = 2000, show_numeric_scale = FALSE,
-                         show_arrows = TRUE,show_breaks = TRUE, density_mode = FALSE){
+ternary_plot <- function(your_data, dot_size = 2000, show_ticks = TRUE,show_breaks = TRUE, density_mode = FALSE){
   if (ncol(your_data) != 3){
     stop("You must include 3 columns of data.")
   }
@@ -50,7 +48,7 @@ ternary_plot <- function(your_data, dot_size = 2000, show_numeric_scale = FALSE,
   }
   if (show_arrows == TRUE)
     g <- g + ggtern::theme_arrowlong()
-  if (show_numeric_scale == FALSE)
+  if (show_ticks == FALSE)
     g <- g + ggtern::theme_hidelabels()+ggtern::theme_hideticks()
 
   g
