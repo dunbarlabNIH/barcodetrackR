@@ -17,9 +17,8 @@ ternary_plot <- function(your_data, dot_size = 2000, show_arrows = TRUE, show_ti
   }
 
   your_data <- your_data[rowSums(your_data) != 0,]
-  ABUNDANCE <- rowSums(your_data)[rowSums(your_data) != 0]
+  ABUNDANCE <- rowSums(your_data)
   ABUNDANCE <- ABUNDANCE/sum(ABUNDANCE)
-
   your_data <- prop.table(as.matrix(your_data), margin = 2)
   your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 1))
 
@@ -28,15 +27,17 @@ ternary_plot <- function(your_data, dot_size = 2000, show_arrows = TRUE, show_ti
   label_names <- colnames(your_data)
   colnames(your_data) <- c("X1", "X2", "X3")
 
+
+
   if(density_mode == TRUE){
     point_size = .5
     point_color = "black"
   } else {
-    point_size = ABUNDANCE * dot_size
-    point_color = COLORS
+    your_data <- your_data[order(-ABUNDANCE),]
+    point_color <- COLORS[order(-ABUNDANCE)]
+    point_size <- (ABUNDANCE*dot_size)[order(-ABUNDANCE)]
   }
 
-  your_data <- your_data[order(-ABUNDANCE),]
 
   g <- ggtern::ggtern(your_data, ggtern::aes(X1, X2, X3))
   if (density_mode == TRUE) {
@@ -45,15 +46,12 @@ ternary_plot <- function(your_data, dot_size = 2000, show_arrows = TRUE, show_ti
   } else {
     g <- g + ggplot2::theme_minimal()
   }
-
-  g <- ggplot2::geom_point(size = point_size, fill = point_color, shape = 21)+
+  g <- g + ggplot2::geom_point(size = point_size, fill = point_color, shape = 21)+
     ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])
-
   if (show_arrows == TRUE)
     g <- g + ggtern::theme_arrowlong()
   if (show_ticks == FALSE)
     g <- g + ggtern::theme_hidelabels()+ggtern::theme_hideticks()
-
   g
 
 
