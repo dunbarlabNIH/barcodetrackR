@@ -11,7 +11,7 @@
 #'@examples
 #'ternary_plot(your_data = zh33, dot_size = 1000, density_mode = TRUE)
 #'@export
-ternary_plot <- function(your_data, dot_size = 2000, show_ticks = TRUE,show_breaks = TRUE, density_mode = FALSE){
+ternary_plot <- function(your_data, dot_size = 2000, show_arrows = TRUE, show_ticks = TRUE, density_mode = FALSE){
   if (ncol(your_data) != 3){
     stop("You must include 3 columns of data.")
   }
