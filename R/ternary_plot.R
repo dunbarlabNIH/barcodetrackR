@@ -36,16 +36,19 @@ ternary_plot <- function(your_data, dot_size = 2000, show_arrows = TRUE, show_ti
     point_color = COLORS
   }
 
+  your_data <- your_data[order(-ABUNDANCE),]
 
-  g <- ggtern::ggtern(your_data, ggtern::aes(X1, X2, X3))+
-    ggplot2::geom_point(size = point_size, fill = point_color, shape = 21)+
-    ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])
+  g <- ggtern::ggtern(your_data, ggtern::aes(X1, X2, X3))
   if (density_mode == TRUE) {
     g <- g + ggtern::stat_density_tern(geom='polygon', ggtern::aes(fill=..level..), base="identity", colour = 'black') +
       ggplot2::scale_fill_gradient(low='green',high='red', guide = FALSE) + ggtern::theme_bw() + ggtern::theme_nogrid()
   } else {
     g <- g + ggplot2::theme_minimal()
   }
+
+  g <- ggplot2::geom_point(size = point_size, fill = point_color, shape = 21)+
+    ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])
+
   if (show_arrows == TRUE)
     g <- g + ggtern::theme_arrowlong()
   if (show_ticks == FALSE)
