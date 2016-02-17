@@ -13,6 +13,7 @@ Imports:
     corrplot,
     fmsb,
     ggplot2,
+    ggtern,
     gplots,
     gridExtra,
     reshape2,

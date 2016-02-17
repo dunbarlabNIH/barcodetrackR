@@ -77,7 +77,9 @@ shinyServer(
         tabPanel("Tree Map",
                  uiOutput("TreeMap")),
         tabPanel("BBHM",
-                 uiOutput("BBHM"))
+                 uiOutput("BBHM")),
+        tabPanel("TernPlot",
+                 uiOutput("TernPlot"))
       )
 
     })
@@ -281,7 +283,7 @@ shinyServer(
                  selectInput("corplot_Method", "7. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman"), selected = "pearson"),
                  selectInput("corplot_Colors", "8. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
                  numericInput("corplot_Labels", "9. Set Label Size", value = 0.5),
-                strong("10. Press button to downlaod CorPlot Files as .zip"),
+                 strong("10. Press button to downlaod CorPlot Files as .zip"),
                  br(),
                  downloadButton('downloadcorplotzip', 'corr_plot.zip')
                )
@@ -798,6 +800,75 @@ shinyServer(
         )
 
       )
+
+    })
+
+    #======================================================================================================
+    #TERNPLOT TAB
+
+    output$TernPlot <- renderUI({
+      if(is.null(thresholded_data()))
+        return()
+
+      ternplotInput <- function(){
+        print(barcodetrackR::ternary_plot(ternplot_data(),
+                                          dot_size = input$ternplot_Dotsize,
+                                          show_numeric_scale = input$ternplot_Group[2],
+                                          show_arrows = input$ternplot_Group[4],
+                                          show_breaks = input$ternplot_Group[3],
+                                          density_mode = input$ternplot_Group[1]))
+
+      }
+
+      output$viewternplot<- renderPlot({
+        ternplotInput()
+        height = 700
+      })
+
+      ternplot_data <- reactive({
+        terndf <- thresholded_data()
+
+        terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
+        terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
+        terndf <- terndf[order(terndf$GIVENNAME),]
+        newcolnames <- terndf$GIVENNAME
+
+        terndf$GIVENNAME <- NULL
+        terndf$EXPERIMENT <- NULL
+        terndf$CELLTYPE <- NULL
+        terndf$MONTH <- NULL
+        terndf$LOCATION <- NULL
+        terndf$MISC <- NULL
+
+        terndf <- data.frame(t(terndf))
+        colnames(terndf) <- newcolnames
+        return(terndf)
+
+      })
+
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 checkboxGroupInput("ternplot_Group", label = "2. Options",
+                                    choices = list("Density Mode" = TRUE, "Show Scale" = TRUE, "Show Arrows" = TRUE, "Show Breaks" = TRUE),
+                                    selected = 3),
+                 numericInput("ternplot_Dotsize", "3. Enter Dot Size: ", value = 1000)
+               )),
+
+
+
+        column(9,
+               plotOutput('viewternplot', height = 700)
+        )
+
+      )
+
+
+
+
+
 
     })
 
