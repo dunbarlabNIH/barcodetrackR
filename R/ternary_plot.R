@@ -1,5 +1,5 @@
 ternary_plot <- function(your_data, colors = "random", dot_size = 2000, scale_abundance = TRUE,
-                         show_numeric_scale = FALSE, corner_labels = 20, show_arrows = TRUE,
+                         show_numeric_scale = FALSE, show_arrows = TRUE,
                          show_breaks = TRUE, density_mode = FALSE){
   if (ncol(your_data) != 3){
     stop("You must include 3 columns of data.")
@@ -31,14 +31,16 @@ ternary_plot <- function(your_data, colors = "random", dot_size = 2000, scale_ab
     ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])
   if (density_mode == TRUE) {
     g <- g + ggtern::stat_density_tern(geom='polygon', ggtern::aes(fill=..level..), base="identity", colour = 'black') +
-      ggplot2::scale_fill_gradient(low='green',high='red', guide = FALSE) + ggtern::theme_bw(base_size = corner_labels) + ggtern::theme_nogrid()
+      ggplot2::scale_fill_gradient(low='green',high='red', guide = FALSE) + ggtern::theme_bw() + ggtern::theme_nogrid()
   } else {
-    g <- g + ggplot2::theme_minimal(base_size = corner_labels)
+    g <- g + ggplot2::theme_minimal()
   }
   if (show_arrows == TRUE)
     g <- g + ggtern::theme_arrowlong()
+  if (show_numeric_scale == FALSE)
+    g <- g + ggtern::theme_hidelabels()+ggtern::theme_hideticks()
 
-  g+ggtern::theme_hidelabels()+ggtern::theme_hideticks()
+  g
 
 
 }
