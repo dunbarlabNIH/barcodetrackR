@@ -896,9 +896,8 @@ shinyServer(
 
       rankabundance_data <- reactive({
         rankabdf <- thresholded_data()
-
-        rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
-        rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$ternplot_Samples)
+        rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
+        rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
         rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
         newcolnames <- rankabdf$GIVENNAME
 
@@ -920,7 +919,7 @@ shinyServer(
                wellPanel(
                  selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 1000),
+                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
                  numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
                )),
 
