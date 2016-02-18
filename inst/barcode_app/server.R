@@ -79,7 +79,9 @@ shinyServer(
         tabPanel("BBHM",
                  uiOutput("BBHM")),
         tabPanel("TernPlot",
-                 uiOutput("TernPlot"))
+                 uiOutput("TernPlot")),
+        tabPanel("RankAbundance",
+                 uiOutput("RankAbundance"))
       )
 
     })
@@ -872,6 +874,70 @@ shinyServer(
 
     })
 
+
+    #======================================================================================================
+    #RANKABUNDANCE TAB
+
+    output$RankAbundance <- renderUI({
+      if(is.null(thresholded_data()))
+        return()
+
+      rankabundanceInput <- function(){
+        print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
+                                          dot_size = input$rankabundance_Dotsize,
+                                          text_size = input$rankabundance_Textsize))
+
+      }
+
+      output$viewrankabundance<- renderPlot({
+        rankabundanceInput()
+        height = 700
+      })
+
+      rankabundance_data <- reactive({
+        rankabdf <- thresholded_data()
+
+        rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
+        rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$ternplot_Samples)
+        rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
+        newcolnames <- rankabdf$GIVENNAME
+
+        rankabdf$GIVENNAME <- NULL
+        rankabdf$EXPERIMENT <- NULL
+        rankabdf$CELLTYPE <- NULL
+        rankabdf$MONTH <- NULL
+        rankabdf$LOCATION <- NULL
+        rankabdf$MISC <- NULL
+
+        rankabdf <- data.frame(t(rankabdf))
+        colnames(rankabdf) <- newcolnames
+        return(rankabdf)
+
+      })
+
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 1000),
+                 numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
+               )),
+
+
+
+        column(9,
+               plotOutput('viewrankabundance', height = 700)
+        )
+
+      )
+
+
+
+
+
+
+    })
 
 
   }
