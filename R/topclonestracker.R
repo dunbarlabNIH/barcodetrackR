@@ -12,7 +12,7 @@
 #'@param plot_theme Character. One of "BW", "classic", or "original".
 #'@return Displays a stacked area plot (made by ggplot2) of the samples' top clones.
 #'@examples
-#'hematoper(your_data = zh33_Tlineage, months = c(1,2,3,4,5,6.5, 9.5, 12), y_limit = 50)
+#'topclonestracker(your_data = zh33_Tlineage, top_clones_choice = zh33T1m, months = c(1,2,3,4,5,6.5, 9.5, 12), y_limit = 50)
 #'@export
 
 topclonestracker <- function(your_data, top_clones_choice, months = c(1:ncol(your_data)), n_clones = 10,
