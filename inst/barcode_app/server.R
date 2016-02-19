@@ -68,8 +68,8 @@ shinyServer(
                  uiOutput("RadarChart")),
         tabPanel("TopClonesContribt",
                  uiOutput("TopClonesContrib")),
-        tabPanel("HematoPer",
-                 uiOutput("HematoPer")),
+        tabPanel("TopClonesTracker",
+                 uiOutput("TopClonesTracker")),
         tabPanel("Diversity & Richness",
                  uiOutput("Diversity")),
         tabPanel("Scatter Plot",
@@ -451,71 +451,87 @@ shinyServer(
 
 
     #======================================================================================================
-    #HEMATOPER TAB
+    #TOPCLONESTRACKER TAB
 
-    output$HematoPer <- renderUI({
+    output$TopClonesTracker <- renderUI({
       if(is.null(thresholded_data()))
         return()
 
-      hematoperInput <- function(){
-        print(barcodetrackR::hematoper(hematoper_data(),
-                                       months = hematoper_Months(),
-                                       n_clones = input$hematoper_Clones,
-                                       linesize = input$hematoper_Linesize,
-                                       text_size = input$hematoper_Textsize,
-                                       y_limit = input$hematoper_yLim,
-                                       plot_theme = input$hematoper_Theme))
+      topclonestrackerInput <- function(){
+        print(barcodetrackR::topclonestracker(topclonestracker_data(),
+                                              top_clones_choice = topclonestracker_Choice(),
+                                              months = topclonestracker_Months(),
+                                              n_clones = input$topclonestracker_Clones,
+                                              linesize = input$topclonestracker_Linesize,
+                                              text_size = input$topclonestracker_Textsize,
+                                              y_limit = input$topclonestracker_yLim,
+                                              plot_theme = input$topclonestracker_Theme))
 
       }
 
-      output$viewhematoper <- renderPlot({
-        hematoperInput()
+      output$viewtopclonestracker <- renderPlot({
+        topclonestrackerInput()
         height = 700
       })
 
-      hematoper_data <- reactive({
+      topclonestracker_data <- reactive({
         ff <- thresholded_data()
-
-        ff <- ff[ff$GIVENNAME %in% input$hematoper_Samples,] #subset samples
-        ff$GIVENNAME <- factor(ff$GIVENNAME, levels = input$hematoper_Samples)
+        ff <- ff[ff$GIVENNAME %in% input$topclonestracker_Samples,] #subset samples
+        ff$GIVENNAME <- factor(ff$GIVENNAME, levels = input$topclonestracker_Samples)
         ff <- ff[order(ff$GIVENNAME),]
         newcolnames <- ff$GIVENNAME
-
         ff$GIVENNAME <- NULL
         ff$EXPERIMENT <- NULL
         ff$CELLTYPE <- NULL
         ff$MONTH <- NULL
         ff$LOCATION <- NULL
         ff$MISC <- NULL
-
         ff <- data.frame(t(ff))
         colnames(ff) <- newcolnames
         return(ff)
-
       })
 
-      hematoper_Months <- reactive({
-        return(as.numeric(unlist(strsplit(input$hematoper_Months, split = ','))))
+      topclonestracker_Choice <- reactive({
+        tcchoice <- thresholded_data()
+        tcchoice <- tcchoice[tcchoice$GIVENNAME == input$topclonestracker_Selected,,drop = FALSE]
+        newcolnames <- tcchoice$GIVENNAME
+        tcchoice$GIVENNAME <- NULL
+        tcchoice$EXPERIMENT <- NULL
+        tcchoice$CELLTYPE <- NULL
+        tcchoice$MONTH <- NULL
+        tcchoice$LOCATION <- NULL
+        tcchoice$MISC <- NULL
+        tcchoice <- data.frame(t(tcchoice))
+        colnames(tcchoice) <- newcolnames
+        return(tcchoice)
+      })
+
+
+
+      topclonestracker_Months <- reactive({
+        return(as.numeric(unlist(strsplit(input$topclonestracker_Months, split = ','))))
       })
 
       fluidRow(
         column(3,
                wellPanel(
-                 selectInput("hematoper_Samples", label = "1. Which Samples to Use",
+                 selectInput("topclonestracker_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 textInput("hematoper_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
-                 numericInput("hematoper_Clones", "3. Select Number of Clones", value = 10),
-                 numericInput("hematoper_Linesize", "4. Enter Line Size: ", value = 1),
-                 numericInput("hematoper_Textsize", "5. Enter Text Size: ", value = 15),
-                 numericInput("hematoper_yLim", "6. Enter Y Limit: ", value = 100),
-                 selectInput("hematoper_Theme", "7. Choose Theme",
+                 selectInput("topclonestracker_Selected", label = "2. Which Sample to Use for Top Clones",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
+                 textInput("topclonestracker_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
+                 numericInput("topclonestracker_Clones", "3. Select Number of Clones", value = 10),
+                 numericInput("topclonestracker_Linesize", "4. Enter Line Size: ", value = 1),
+                 numericInput("topclonestracker_Textsize", "5. Enter Text Size: ", value = 15),
+                 numericInput("topclonestracker_yLim", "6. Enter Y Limit: ", value = 100),
+                 selectInput("topclonestracker_Theme", "7. Choose Theme",
                              choices = c("original", "BW", "classic"), selected = "classic")
                )),
 
 
 
         column(9,
-               plotOutput('viewhematoper', height = 700)
+               plotOutput('viewtopclonestracker', height = 700)
         )
 
       )
@@ -884,8 +900,8 @@ shinyServer(
 
       rankabundanceInput <- function(){
         print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
-                                          dot_size = input$rankabundance_Dotsize,
-                                          text_size = input$rankabundance_Textsize))
+                                                 dot_size = input$rankabundance_Dotsize,
+                                                 text_size = input$rankabundance_Textsize))
 
       }
 
