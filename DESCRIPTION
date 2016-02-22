@@ -18,6 +18,7 @@ Imports:
     gridExtra,
     reshape2,
     shiny,
+    shinyBS,
     treemap,
     vegan
 RoxygenNote: 5.0.1
