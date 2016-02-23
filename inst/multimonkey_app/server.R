@@ -127,7 +127,7 @@ shinyServer(
     })
 
     barcode_count_plotInput <- function(){
-      print(multimonkey_richness_plot(
+      print(barcodetrackR::multimonkey_richness_plot(
         outfile_list = data_as_list_subsets(),
         outfile_names = sample_names(),
         outfile_months_list = months_list(),
