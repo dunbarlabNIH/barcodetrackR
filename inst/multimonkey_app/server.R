@@ -47,7 +47,7 @@ shinyServer(
         tabPanel("Library Contributions",
                  uiOutput("lib_contrib")),
         tabPanel("Rank Abundance",
-                 uiOutput("rank_abundance"))
+                 uiOutput("rankabundance"))
       )
     })
 
@@ -94,6 +94,14 @@ shinyServer(
       return(listy)
     })
 
+    data_as_list_subsets <- reactive({
+      listy = list()
+      for(i in 1:as.numeric(input$nummonkeys)){
+        listy[[i]] = data_as_list()[[i]][,sample_list()[[i]],drop = FALSE]
+      }
+      return(listy)
+    })
+
     months_list <- reactive({
       listy = list()
       for(i in 1:as.numeric(input$nummonkeys)){
@@ -120,17 +128,17 @@ shinyServer(
 
     barcode_count_plotInput <- function(){
       print(multimonkey_richness_plot(
-        outfile_list = thresholded_list(),
+        outfile_list = data_as_list_subsets(),
         outfile_names = sample_names(),
         outfile_months_list = months_list(),
         celltypes_list = cells_list(),
         threshold_list = thresh_list(),
-        combine = input$combinebarcodes,
-        richness_type = input$barcodecountmethod,
-        point_size = input$barcodecountdotsize,
-        line_size = input$barcodecountlinesize,
-        y_lower = input$barcodecountylower,
-        y_upper = input$barcodecountyupper))
+        combine = input$barcodecount_Combine,
+        richness_type = input$barcodecount_Method,
+        point_size = input$barcodecount_Dotsize,
+        line_size = input$barcodecount_Linesize,
+        y_lower = input$barcodecount_yLower,
+        y_upper = input$barcodecount_yUpper))
 
     }
 
@@ -160,16 +168,56 @@ shinyServer(
                )
         ),
         column(9,
-               plotOutput('barcode_count_plot', height = 500))
+               plotOutput('barcode_count_plot', height = 800))
       )
+    })
+
+    #========================================================================================================================
+    #RANKABUNDANCE STUFF
+
+    rankabundance_totaldata <- reactive({
+      col_lengths <- unlist(lapply(data_as_list(), nrow))
+      max_rows <- max(col_lengths)
+      listy = list()
+      for(i in 1:as.numeric(input$nummonkeys)){
+        listy[[i]] = data_as_list()[[i]][1:max_rows,,drop = FALSE]
+        listy[[i]][is.na(listy[[i]])] <- 0
+      }
+      print(listy)
+      temp_data <- do.call(cbind, listy)
+      rownames(temp_data) <- NULL
+      return(temp_data)
+    })
+
+    rankabundance_data <- reactive({
+      return(rankabundance_totaldata()[,input$rankabundance_Samples,drop = FALSE])
+    })
+
+    rankabundance_plotInput <- function(){
+      print(rankabundance_data())
+      print(barcodetrackR::rank_abundance_plot(rankabundance_data(), dot_size = input$rankabundance_Dotsize, text_size = input$rankabundance_Textsize))
+    }
+
+    output$rankabundance_plot <- renderPlot({
+      rankabundance_plotInput()
+      height = 800
     })
 
 
 
+    output$rankabundance <- renderUI({
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("rankabundance_Samples", label = "1. Which Samples to Use", choices = colnames(rankabundance_totaldata()), multiple = TRUE),
+                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
+                 numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
+               )),
+        column(9,
+               plotOutput("rankabundance_plot", height = 800))
+      )
 
-
-
-
+    })
 
   }
 )
