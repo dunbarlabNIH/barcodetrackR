@@ -40,8 +40,10 @@ shinyServer(
       if (is.null(data_as_list()))
         return()
       tabsetPanel(
-        tabPanel("Barcode Count & Diversity",
+        tabPanel("Barcode Count",
                  uiOutput("barcodecount")),
+        tabPanel("Diversity",
+                 uiOutput("diversity")),
         tabPanel("Library Contributions",
                  uiOutput("lib_contrib")),
         tabPanel("Rank Abundance",
@@ -116,6 +118,28 @@ shinyServer(
       return(listy)
     })
 
+    barcode_count_plotInput <- function(){
+      print(multimonkey_richness_plot(
+        outfile_list = thresholded_list(),
+        outfile_names = sample_names(),
+        outfile_months_list = months_list(),
+        celltypes_list = cells_list(),
+        threshold_list = thresh_list(),
+        combine = input$combinebarcodes,
+        richness_type = input$barcodecountmethod,
+        point_size = input$barcodecountdotsize,
+        line_size = input$barcodecountlinesize,
+        y_lower = input$barcodecountylower,
+        y_upper = input$barcodecountyupper))
+
+    }
+
+    output$barcode_count_plot <- renderPlot({
+      barcode_count_plotInput()
+      height = 500
+    })
+
+
 
     output$barcodecount <- renderUI({
       fluidRow(
@@ -127,18 +151,16 @@ shinyServer(
                  barcodecount_Modals(),
                  br(),
                  br(),
-                 selectInput("barcodecount_Method", label = "2. Barcode Plot Type", choices = c("cumulative", "unique", "new", "diversity"), selected = "cumulative"),
-                 selectInput("barcodecount_Combine", label = "3. Combine Monthly (if cumulative/unique/new chosen)", choices = c(TRUE, FALSE)),
-                 selectInput("barcodecount_Diversitytype", label = "4. Diversity Type (if diversity chosen)", choices = c("shannon", "simpson", "invsimpson", selected = "shannon")),
-                 numericInput("barcodecount_Linesize", label = "5. Size of Line", value = 1.5, min = 0),
-                 numericInput("barcodecount_Dotsize", label = "6. Size of Dot", value = 1.5, min = 0),
-                 numericInput("barcodecount_yLower", label = "7. Lower Limit of Y axis", value = 0, min = 0),
-                 numericInput("barcodecount_yUpper", label = "8. Upper Limit of Y axis", value = 3000, min = 0)
+                 selectInput("barcodecount_Method", label = "2. Barcode Plot Type", choices = c("cumulative", "unique", "new"), selected = "cumulative"),
+                 selectInput("barcodecount_Combine", label = "3. Combine Monthly", choices = c(TRUE, FALSE)),
+                 numericInput("barcodecount_Linesize", label = "4. Size of Line", value = 1.5, min = 0),
+                 numericInput("barcodecount_Dotsize", label = "5. Size of Dot", value = 1.5, min = 0),
+                 numericInput("barcodecount_yLower", label = "6. Lower Limit of Y axis", value = 0, min = 0),
+                 numericInput("barcodecount_yUpper", label = "7. Upper Limit of Y axis", value = 3000, min = 0)
                )
         ),
         column(9,
-               plotOutput(plot(mtcars), height = 700)
-        )
+               plotOutput('barcode_count_plot', height = 500))
       )
     })
 
