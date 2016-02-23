@@ -40,7 +40,6 @@ multimonkey_richness_plot <- function(outfile_list,
 
 
   for(i in 1:length(outfile_list)){
-    print(head(outfile_list[[i]]))
     outfile_list[[i]] <- barcodetrackR::richness_plot(outfile_list[[i]],
                                                       months = outfile_months_list[[i]],
                                                       celltypes = celltypes_list[[i]],

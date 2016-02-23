@@ -183,7 +183,6 @@ shinyServer(
         listy[[i]] = data_as_list()[[i]][1:max_rows,,drop = FALSE]
         listy[[i]][is.na(listy[[i]])] <- 0
       }
-      print(listy)
       temp_data <- do.call(cbind, listy)
       rownames(temp_data) <- NULL
       return(temp_data)
@@ -194,7 +193,6 @@ shinyServer(
     })
 
     rankabundance_plotInput <- function(){
-      print(rankabundance_data())
       print(barcodetrackR::rank_abundance_plot(rankabundance_data(), dot_size = input$rankabundance_Dotsize, text_size = input$rankabundance_Textsize))
     }
 
