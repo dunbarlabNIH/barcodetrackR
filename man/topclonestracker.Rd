@@ -6,7 +6,7 @@
 \usage{
 topclonestracker(your_data, top_clones_choice, months = c(1:ncol(your_data)),
   n_clones = 10, linesize = 0.5, text_size = 15, y_limit = 100,
-  plot_theme = "classic")
+  plot_theme = "classic", your_title = "")
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -22,6 +22,8 @@ topclonestracker(your_data, top_clones_choice, months = c(1:ncol(your_data)),
 \item{y_limit}{Numeric. Limit of y axis in plot.}
 
 \item{plot_theme}{Character. One of "BW", "classic", or "original".}
+
+\item{your_title}{Your title for the plot.}
 
 \item{your_data}{A data frame of one column, with rownames being the barcodes. Used to get the top clones.}
 }

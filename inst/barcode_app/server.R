@@ -66,8 +66,8 @@ shinyServer(
                  uiOutput("CorPlot")),
         tabPanel("RadarChart",
                  uiOutput("RadarChart")),
-        tabPanel("TopClonesContribt",
-                 uiOutput("TopClonesContrib")),
+        tabPanel("TopClonesBarChart",
+                 uiOutput("TopClonesBarChart")),
         tabPanel("TopClonesTracker",
                  uiOutput("TopClonesTracker")),
         tabPanel("Diversity & Richness",
@@ -377,33 +377,33 @@ shinyServer(
 
     #======================================================================================================
 
-    #TOPCLONESCONTRIB TAB
+    #TOPCLONESBARCHART TAB
 
-    output$TopClonesContrib <- renderUI({
+    output$TopClonesBarChart <- renderUI({
 
       if (is.null(thresholded_data()))
         return()
 
-
-      topclonescontribInput <- function(){
-        barcodetrackR::topclonescontrib(your_data = topclonescontrib_data(),
-                                        n_clones = input$topclonescontrib_Clones,
-                                        linesize = input$topclonescontrib_Linesize,
-                                        pointsize = input$topclonescontrib_Pointsize, your_title = input$topclonescontrib_Title)
+      topclonesbarchartInput <- function(){
+        barcodetrackR::topclones_barchart(your_data = topclonesbarchart_data(),
+                           top_clones_choice = topclonesbarchart_Choice(),
+                           n_clones = input$topclonesbarchart_Clones,
+                           text_size = input$topclonesbarchart_Textsize,
+                           y_limit = input$topclonesbarchart_yLim,
+                           other_color = input$topclonesbarchart_Othercolor,
+                           your_title = input$topclonesbarchart_Title)
       }
 
 
-      output$viewtopclones <- renderPlot({
-        print(topclonescontribInput())
+      output$viewtopclonesbarchart <- renderPlot({
+        print(topclonesbarchartInput())
         height = 700
       })
 
-      topclonescontrib_data <- reactive({
-
+      topclonesbarchart_data <- reactive({
         ef <- thresholded_data()
-
-        ef <- ef[ef$GIVENNAME %in% input$topclonescontrib_Samples,] #subset samples
-        ef$GIVENNAME <- factor(ef$GIVENNAME, levels = input$topclonescontrib_Samples)
+        ef <- ef[ef$GIVENNAME %in% input$topclonesbarchart_Samples,] #subset samples
+        ef$GIVENNAME <- factor(ef$GIVENNAME, levels = input$topclonesbarchart_Samples)
         ef <- ef[order(ef$GIVENNAME),]
         newcolnames <- ef$GIVENNAME
         ef$GIVENNAME <- NULL
@@ -415,23 +415,37 @@ shinyServer(
         ef <- data.frame(t(ef))
         colnames(ef) <- newcolnames
         return(ef)
+      })
 
+      topclonesbarchart_Choice <- reactive({
+        tcbchoice <- thresholded_data()
+        tcbchoice <- tcbchoice[tcbchoice$GIVENNAME == input$topclonesbarchart_Selected,,drop = FALSE]
+        newcolnames <- tcbchoice$GIVENNAME
+        tcbchoice$GIVENNAME <- NULL
+        tcbchoice$EXPERIMENT <- NULL
+        tcbchoice$CELLTYPE <- NULL
+        tcbchoice$MONTH <- NULL
+        tcbchoice$LOCATION <- NULL
+        tcbchoice$MISC <- NULL
+        tcbchoice <- data.frame(t(tcbchoice))
+        colnames(tcbchoice) <- newcolnames
+        return(tcbchoice)
       })
 
 
       fluidRow(
         column(3,
                wellPanel(
-                 selectInput("topclonescontrib_Samples", label = "1. Which Samples to Use",
+                 selectInput("topclonesbarchart_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-
-                 numericInput("topclonescontrib_Clones", "2. Select Number of Clones", value = 50),
-
-                 numericInput("topclonescontrib_Linesize", "3. Select Line Size", value = 2),
-
-                 numericInput("topclonescontrib_Pointsize", "4. Select Point Size", value = 3),
-
-                 textInput("topclonescontrib_Title", "5. Title for Plot", value = "")
+                 selectInput("topclonesbarchart_Selected", label = "2. Which Sample to Use for Top Clones",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
+                 numericInput("topclonesbarchart_Clones", "3. Select Number of Clones", value = 50),
+                 numericInput("topclonesbarchart_Textsize", "4. Enter Text Size: ", value = 15),
+                 numericInput("topclonesbarchart_yLim", "5. Enter Y Limit: ", value = 100),
+                 selectInput("topclonesbarchart_Othercolor", "6. Choose Other Color",
+                             choices = c("grey", "black", "white"), selected = "black"),
+                 textInput("topclonesbarchart_Title", "7. Title", value = "Bar Chart")
 
 
 
@@ -440,7 +454,7 @@ shinyServer(
 
 
         column(9,
-               plotOutput('viewtopclones', height = 700)
+               plotOutput('viewtopclonesbarchart', height = 700)
         )
 
       )
@@ -465,7 +479,8 @@ shinyServer(
                                               linesize = input$topclonestracker_Linesize,
                                               text_size = input$topclonestracker_Textsize,
                                               y_limit = input$topclonestracker_yLim,
-                                              plot_theme = input$topclonestracker_Theme))
+                                              plot_theme = input$topclonestracker_Theme,
+                                              your_title = input$topclonestracker_Title))
 
       }
 
@@ -519,13 +534,14 @@ shinyServer(
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
                  selectInput("topclonestracker_Selected", label = "2. Which Sample to Use for Top Clones",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
-                 textInput("topclonestracker_Months", '2. Enter months (in order) seperated by a comma: ', value = ""),
-                 numericInput("topclonestracker_Clones", "3. Select Number of Clones", value = 10),
-                 numericInput("topclonestracker_Linesize", "4. Enter Line Size: ", value = 1),
-                 numericInput("topclonestracker_Textsize", "5. Enter Text Size: ", value = 15),
-                 numericInput("topclonestracker_yLim", "6. Enter Y Limit: ", value = 100),
-                 selectInput("topclonestracker_Theme", "7. Choose Theme",
-                             choices = c("original", "BW", "classic"), selected = "classic")
+                 textInput("topclonestracker_Months", '3. Enter months (in order) seperated by a comma: ', value = ""),
+                 numericInput("topclonestracker_Clones", "4. Select Number of Clones", value = 10),
+                 numericInput("topclonestracker_Linesize", "5. Enter Line Size: ", value = 1),
+                 numericInput("topclonestracker_Textsize", "6. Enter Text Size: ", value = 15),
+                 numericInput("topclonestracker_yLim", "7. Enter Y Limit: ", value = 100),
+                 selectInput("topclonestracker_Theme", "8. Choose Theme",
+                             choices = c("original", "BW", "classic"), selected = "classic"),
+                 textInput("topclonestracker_Title", "9. Title", value = "Stacked Area Plot")
                )),
 
 

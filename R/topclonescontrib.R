@@ -1,48 +1,39 @@
-#' Top Clones Contributions
+#' Top Clones Bar Chart
 #'
-#' Makes a line plot of your data frame, plotting the percentage contribution from
-#' the top N clones from each column as a line.
+#' Makes a histogram of your data frame, showing the percentage contribution from
+#' the top N clones from a chosen dataset in colors.
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
-#'@param n_clones Numeric. The number of top clones to take from columnChoice_Name.
-#'@param linesize Numeric. Size of the lines.
-#'@param pointsize Numeric. Size of the points.
-#'@param your_title Character. Title for the plot.
-#'@return Prints a plot (using ggplot2) of the percentage contribution from each sample.
+#'@param top_clones_choice A data frame of one column, with rownames being the barcodes. Used to get the top clones.
+#'@param n_clones Numeric. Number of top clones from each month that should be displayed.
+#'@param text_size Numeric. Size of text in plot.
+#'@param y_limit Numeric. Limit of y axis in plot.
+#'@param other_color Color to use for representation of non-top clones in the bar chart.
+#'@param your_title Your title for the plot.
+#'@return Displays a bar chart (made by ggplot2) of the samples' top clones in other samples.
 #'@examples
-#'topclonescontrib(your_data = zh33[,c(1:6)], n_clones = 100, your_title = "SAMPLE")
+#'topclones_barchart(your_data = zh33_Tlineage, top_clones_choice = zh33T1m, y_limit = 50)
 #'@export
 
-topclonescontrib <- function(your_data, n_clones = 10, linesize = 2, pointsize = 3, your_title = ""){
+topclones_barchart <- function(your_data, top_clones_choice, n_clones = 10, text_size = 15,
+                               y_limit = 100, other_color = "black", your_title = "Bar Chart"){
+  top_barcodes <- rownames(top_clones_choice[order(-top_clones_choice),,drop = FALSE])[1:n_clones]
+  your_data <- as.data.frame(100*prop.table(as.matrix(your_data), margin = 2))
+  your_data <- rbind(your_data[rownames(your_data) %in% top_barcodes,],
+                     colSums(your_data[!(rownames(your_data) %in% top_barcodes),,drop = FALSE]))
+  rownames(your_data)[nrow(your_data)] <- "OTHERS"
+  your_data <- reshape2::melt(as.matrix(your_data))
+  colnames(your_data) <- c("BARCODE", "SAMPLE", "PROP")
+  ggplot2::ggplot(your_data, ggplot2::aes(x=SAMPLE, y = PROP,fill = BARCODE))+
+    ggplot2::geom_bar(stat="identity", show.legend = FALSE)+
+    ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10), name = "Hematopoietic Contribution %")+
+    ggplot2::xlab("Sample")+
+    ggplot2::theme_classic()+
+    ggplot2::ggtitle(your_title)+
+    ggplot2::scale_fill_manual(guide = FALSE,
+                               values = c(rainbow(length(unique(your_data$BARCODE))-1, s = 1, v = 1, start = 0, end = 0.75, alpha = 1), other_color))+
+    ggplot2::theme(text = ggplot2::element_text(size=text_size))+
+    ggplot2::coord_cartesian(ylim = c(0, y_limit))
 
-  your_data <- as.data.frame(100*prop.table(as.matrix(your_data),2))
-
-  #takes care of limiting top clones to the number of barcodes in a sample
-  if (n_clones > min(colSums(your_data!=0)))
-    stop("Number of clones exceeds number of barcodes for a lineage")
-
-  newdf <- matrix(ncol = ncol(your_data), nrow = ncol(your_data))
-  colnames(newdf) <- colnames(your_data)
-
-  for(i in 1:ncol(your_data)){
-    temp <- your_data[order(-your_data[,i]),][c(1:n_clones),]
-    if (n_clones > 1)
-      temp <- colSums(temp)
-    newdf[i,] <- temp
-  }
-
-  rownames(newdf) <- paste0("top_",n_clones,"_",colnames(your_data))
-
-  newdf <- reshape2::melt(newdf)
-
-  ggplot2::ggplot(newdf, ggplot2::aes(x=Var2, y= value, colour = Var1, group = Var1))+
-    ggplot2::geom_line(size = linesize)+
-    ggplot2::geom_point(fill = "white", size = pointsize)+
-    ggplot2::coord_cartesian(ylim = c(0,1))+
-    ggplot2::scale_y_continuous(breaks = seq(0, 1, 0.1))+
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, hjust=1))+
-    ggplot2::ylab("Hematopoietic Contribution")+
-    ggplot2::xlab("")+
-    ggplot2::ggtitle(your_title)
 
 }
