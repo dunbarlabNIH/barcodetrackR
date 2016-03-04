@@ -132,7 +132,7 @@ shinyServer(
 
       output$viewBCheatmap <- renderPlot({
         BCheatmapInput()
-        height = 900
+        height = 700
       })
 
 
@@ -196,7 +196,7 @@ shinyServer(
                )
         ),
         column(9,
-               plotOutput('viewBCheatmap', height = 1000)
+               plotOutput('viewBCheatmap', height = 900)
         )
 
       )

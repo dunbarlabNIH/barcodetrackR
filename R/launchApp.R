@@ -6,6 +6,6 @@
 #'@examples
 #'launchApp()
 #'@export
-launchApp <- function(){
+launchApp <- function(x){
   shiny::runApp(system.file("barcode_app", package = "barcodetrackR"))
 }

@@ -34,7 +34,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       cellnote_option = "stars", hclust_linkage = "complete") {
 
   #scales all data to be a percentage of reads instead of number of reads and keeps copy of raw read number
-  raw_reads <- your_data
+  raw_reads <- your_data + 1
   your_data <- as.data.frame(prop.table(as.matrix(your_data),2))
   your_data[is.na(your_data)] <- 0
 
@@ -61,8 +61,8 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
   your_data[is.na(your_data)] <- 0
 
   #takes log of data
-  your_data_log <- custom_log(your_data, log_choice)
-
+  #your_data_log <- custom_log(your_data, log_choice)
+  your_data_log <- log(your_data)
   e = hclust(dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power),
              method = hclust_linkage)$order
 
