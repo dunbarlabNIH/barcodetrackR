@@ -26,7 +26,7 @@
 #'@export
 
 
-BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
+BCheatmap2 <- function(your_data, names = colnames(your_data), n_clones = 10,
                       your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
                       star_size = 1, printtable = FALSE,
                       table_option = "percents", log_transform = TRUE, log_choice = exp(1),
@@ -34,10 +34,9 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       cellnote_option = "stars", hclust_linkage = "complete") {
 
   #scales all data to be a percentage of reads instead of number of reads and keeps copy of raw read number
-  raw_reads <- your_data + 1
+  raw_reads <- your_data
   your_data <- as.data.frame(prop.table(as.matrix(your_data),2))
   your_data[is.na(your_data)] <- 0
-
   if (any(colSums(your_data) != 1)){
     stop("One of your columns contained no data")
   }
@@ -61,8 +60,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
   your_data[is.na(your_data)] <- 0
 
   #takes log of data
-  #your_data_log <- custom_log(your_data, log_choice)
-  your_data_log <- log(your_data)
+  your_data_log <- custom_log(your_data, log_choice)
   e = hclust(dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power),
              method = hclust_linkage)$order
 
