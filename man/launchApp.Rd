@@ -4,7 +4,7 @@
 \alias{launchApp}
 \title{Launch Barcode App}
 \usage{
-launchApp()
+launchApp(x)
 }
 \value{
 Page launching the Shiny Barcode App

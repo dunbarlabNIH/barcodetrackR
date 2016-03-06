@@ -25,8 +25,7 @@
 #'BCheatmap(your_data = zh33, n_clones = 10, printtable = TRUE)
 #'@export
 
-
-BCheatmap2 <- function(your_data, names = colnames(your_data), n_clones = 10,
+BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
                       star_size = 1, printtable = FALSE,
                       table_option = "percents", log_transform = TRUE, log_choice = exp(1),
