@@ -109,7 +109,9 @@ shinyServer(
                                  distance_method = input$BCheatmap_distance,
                                  minkowski_power = input$BCmink_distance,
                                  cellnote_option = input$BCheatmap_cellnote_option,
-                                 hclust_linkage = input$BCheatmap_hclust_linkage
+                                 hclust_linkage = input$BCheatmap_hclust_linkage,
+                                 row_order = input$BCheatmap_row_order,
+                                 clusters = input$BCheatmap_clusters
         )
       }
 
@@ -173,9 +175,9 @@ shinyServer(
                  selectInput("BCheatmap_scale", "4. Select Log",
                              choices = c("2", "e", "10", "100"),
                              selected = "e"),
-                 selectInput("BCheatmap_distance", "5. Select Distance Metric",
-                             choices = c("euclidean", "maximum", "manhattan", "canberra", "binary","minkowski"),
-                             selected = "euclidean"),
+                 selectInput("BCheatmap_distance", "5. Select Distance Metric/Function",
+                             choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
+                             selected = "Euclidean"),
                  numericInput("BCmink_distance", "6. If Minkowski, choose Minkowski Power", value = 2, step = 1),
                  selectInput("BCheatmap_cellnote_option", "7. Select Cell Display Option",
                              choices = c("reads", "percents", "logs", "stars"),
@@ -183,12 +185,14 @@ shinyServer(
                  selectInput("BCheatmap_hclust_linkage", "8. Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
-                 numericInput("BCheatmap_labels", "9. Set Column Label Size", value = 1.5),
-                 numericInput("BCheatmap_starsize", "10. Set Cell Label Size", value = 1.5),
-                 selectInput("BCheatmap_table_option", "11. Select Format for Key (below)",
+                 numericInput("BCheatmap_clusters", "9. Select number of clusters to cut", value = 0, step = 1, min = 0, max = 9),
+                 selectInput("BCheatmap_row_order", "10. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
+                 numericInput("BCheatmap_labels", "10. Set Column Label Size", value = 1.5),
+                 numericInput("BCheatmap_starsize", "11. Set Cell Label Size", value = 1.5),
+                 selectInput("BCheatmap_table_option", "12. Select Format for Key (below)",
                              choices = c("logs", "reads", "percents"),
                              selected = "percents"),
-                 strong("12. Press button to download BCheatmap Key."),
+                 strong("13. Press button to download BCheatmap Key."),
                  br(),
                  downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
 

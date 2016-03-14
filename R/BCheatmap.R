@@ -14,10 +14,12 @@
 #'@param table_option Character. One of "logs", "reads", or "percents".
 #'@param log_transform Logical. Log transform data before clustering and plotting.
 #'@param log_choice Data is log transformed with this log.
-#'@param distance_method Character. One of "euclidean", "minkowski", "canberra", manhatan", "maximum", or "binary"
+#'@param distance_method Character. Use summary(proxy::pr_DB) to see all options.
 #'@param minkowski_power The power of the Minkowski distance (if minkowski is used).
 #'@param cellnote_option Character. One of "stars", "reads", or "percents"
 #'@param hclust_linkage Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+#'@param row_order Character. One of "hierarchical" or "emergence" to organize rows.
+#'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
 #'@return Displays a heatmap in the current plot window.
 #'@examples
 #'BCheatmap(your_data = zh33, names = colnames(zh33), n_clones = 10,
@@ -29,8 +31,9 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
                       star_size = 1, printtable = FALSE,
                       table_option = "percents", log_transform = TRUE, log_choice = exp(1),
-                      distance_method = "euclidean", minkowski_power = 1,
-                      cellnote_option = "stars", hclust_linkage = "complete") {
+                      distance_method = "Euclidean", minkowski_power = 1,
+                      cellnote_option = "stars", hclust_linkage = "complete",
+                      row_order = "hierarchical", clusters = 3) {
 
   #scales all data to be a percentage of reads instead of number of reads and keeps copy of raw read number
   raw_reads <- your_data
@@ -60,8 +63,19 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
 
   #takes log of data
   your_data_log <- custom_log(your_data, log_choice)
-  e = hclust(dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power),
-             method = hclust_linkage)$order
+
+  if(row_order == "hierarchical") {
+    hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power),
+                         method = hclust_linkage)
+    e <- hclustering$order
+    cuts <- cutree(hclustering, k = clusters)
+    cluster_colors = RColorBrewer::brewer.pal(clusters, "Set1")[cuts[e]]
+
+  } else if(row_order == "emergence") {
+    e <- do.call(order, -as.data.frame(your_data_log))
+  } else {
+    stop("row_order must be one of \" hierarchical\" or \"emergence\"")
+  }
 
   if(printtable == TRUE){
     switch(table_option,
@@ -96,7 +110,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       cexCol = columnLabels,
                       labCol = names,
                       symkey = FALSE,
-
+                      RowSideColors = if(row_order == "hierarchical") cluster_colors else rep("white", length(e)),
                       key = TRUE,
                       keysize = 0.8,
                       srtCol = 45,
@@ -104,7 +118,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
   }
 }
 
-custom_log <- function(x, log_choice, inf_scaler){
+custom_log <- function(x, log_choice){
   x <- log(x, log_choice)
   #sets the -inf values to be the minimum of the possible value in the data frame -1
   x[x == -Inf] <- (min(x[x > -Inf]) - 1)
