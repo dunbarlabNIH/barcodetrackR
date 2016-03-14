@@ -65,11 +65,19 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
   your_data_log <- custom_log(your_data, log_choice)
 
   if(row_order == "hierarchical") {
-    hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power),
-                         method = hclust_linkage)
+
+    if(distance_method == "Minkowski"){
+      hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power), method = hclust_linkage)
+    } else {
+      hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method), method = hclust_linkage)
+    }
     e <- hclustering$order
-    cuts <- cutree(hclustering, k = clusters)
-    cluster_colors = RColorBrewer::brewer.pal(clusters, "Set1")[cuts[e]]
+    if( clusters > 0){
+      cuts <- cutree(hclustering, k = clusters)
+      cluster_colors = RColorBrewer::brewer.pal(clusters, "Set1")[cuts[e]]
+    } else {
+      cluster_colors = rep("white", length(e))
+    }
 
   } else if(row_order == "emergence") {
     e <- do.call(order, -as.data.frame(your_data_log))

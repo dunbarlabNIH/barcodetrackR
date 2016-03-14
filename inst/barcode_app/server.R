@@ -144,9 +144,6 @@ shinyServer(
         df$GIVENNAME <- factor(df$GIVENNAME, levels = input$BCheatmap_samples)
         df <- df[order(df$GIVENNAME),]
         newcolnames <- df$GIVENNAME
-
-
-
         df$GIVENNAME <- NULL
         df$EXPERIMENT <- NULL
         df$CELLTYPE <- NULL
@@ -155,8 +152,6 @@ shinyServer(
         df$MISC <- NULL
         df <- data.frame(t(df))
         colnames(df) <- newcolnames
-
-
         return(df)
 
       })
@@ -167,11 +162,10 @@ shinyServer(
                  selectizeInput("BCheatmap_samples", label = "1. Which Samples to Use (in order)",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
                  numericInput("BCheatmap_top_clones", "2. Number of top clones", value = 10),
-                 textInput("BCheatmap_title", "2. Title for BCheatmap", value = ""),
-                 strong("3. Grid ON/OFF"),
-                 checkboxInput("BCheatmap_grid", "", value = TRUE),
-                 strong("4. Log Transform?"),
-                 checkboxInput("BCheatmap_log_transform", "", value = TRUE),
+                 textInput("BCheatmap_title", "3. Title for BCheatmap", value = ""),
+                 strong("4. Options"),
+                 checkboxInput("BCheatmap_grid", label = "Grid", value = TRUE),
+                 checkboxInput("BCheatmap_log_transform", label = "Log-Transform?", value = TRUE),
                  selectInput("BCheatmap_scale", "4. Select Log",
                              choices = c("2", "e", "10", "100"),
                              selected = "e"),
@@ -185,7 +179,7 @@ shinyServer(
                  selectInput("BCheatmap_hclust_linkage", "8. Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
-                 numericInput("BCheatmap_clusters", "9. Select number of clusters to cut", value = 0, step = 1, min = 0, max = 9),
+                 numericInput("BCheatmap_clusters", "9. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 9),
                  selectInput("BCheatmap_row_order", "10. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
                  numericInput("BCheatmap_labels", "10. Set Column Label Size", value = 1.5),
                  numericInput("BCheatmap_starsize", "11. Set Cell Label Size", value = 1.5),
