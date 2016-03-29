@@ -100,7 +100,7 @@ shinyServer(
 
       BCheatmapInput <- function(){
         barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
-                                 names = colnames(BCheatmap_data()),
+                                 names = paste0(colnames(BCheatmap_data()), "  "),
                                  n_clones = input$BCheatmap_top_clones,
                                  your_title = input$BCheatmap_title,
                                  grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
@@ -111,7 +111,9 @@ shinyServer(
                                  cellnote_option = input$BCheatmap_cellnote_option,
                                  hclust_linkage = input$BCheatmap_hclust_linkage,
                                  row_order = input$BCheatmap_row_order,
-                                 clusters = input$BCheatmap_clusters
+                                 clusters = input$BCheatmap_clusters,
+                                 dendro = input$BCheatmap_dendrogram,
+                                 variable_log_min = input$BCheatmap_minimum
         )
       }
 
@@ -127,7 +129,8 @@ shinyServer(
                                                log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
                                                distance_method = input$BCheatmap_distance,
                                                minkowski_power = input$BCmink_distance,
-                                               hclust_linkage = input$BCheatmap_hclust_linkage
+                                               hclust_linkage = input$BCheatmap_hclust_linkage,
+                                               variable_log_min = input$BCheatmap_minimum
           ), file, sep = '\t', quote = FALSE)
         }
       )
@@ -165,7 +168,9 @@ shinyServer(
                  textInput("BCheatmap_title", "3. Title for BCheatmap", value = ""),
                  strong("4. Options"),
                  checkboxInput("BCheatmap_grid", label = "Grid", value = TRUE),
-                 checkboxInput("BCheatmap_log_transform", label = "Log-Transform?", value = TRUE),
+                 checkboxInput("BCheatmap_log_transform", label = "Log-Transform", value = TRUE),
+                 checkboxInput("BCheatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
+                 checkboxInput("BCheatmap_minimum", label = "Variable Minimum for Log", value = TRUE),
                  selectInput("BCheatmap_scale", "4. Select Log",
                              choices = c("2", "e", "10", "100"),
                              selected = "e"),
@@ -174,17 +179,17 @@ shinyServer(
                              selected = "Euclidean"),
                  numericInput("BCmink_distance", "6. If Minkowski, choose Minkowski Power", value = 2, step = 1),
                  selectInput("BCheatmap_cellnote_option", "7. Select Cell Display Option",
-                             choices = c("reads", "percents", "logs", "stars"),
+                             choices = c("reads", "percents", "logs", "stars", "ranks"),
                              selected = "stars"),
                  selectInput("BCheatmap_hclust_linkage", "8. Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
                  numericInput("BCheatmap_clusters", "9. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 9),
                  selectInput("BCheatmap_row_order", "10. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
-                 numericInput("BCheatmap_labels", "10. Set Column Label Size", value = 1.5),
+                 numericInput("BCheatmap_labels", "10. Set Column Label Size", value = 3),
                  numericInput("BCheatmap_starsize", "11. Set Cell Label Size", value = 1.5),
                  selectInput("BCheatmap_table_option", "12. Select Format for Key (below)",
-                             choices = c("logs", "reads", "percents"),
+                             choices = c("logs", "reads", "percents", "ranks"),
                              selected = "percents"),
                  strong("13. Press button to download BCheatmap Key."),
                  br(),
@@ -282,7 +287,7 @@ shinyServer(
                  checkboxInput("corplot_Grid", "", value = TRUE),
                  selectInput("corplot_Method", "7. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman"), selected = "pearson"),
                  selectInput("corplot_Colors", "8. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
-                 numericInput("corplot_Labels", "9. Set Label Size", value = 0.5),
+                 numericInput("corplot_Labels", "9. Set Label Size", value = 2),
                  strong("10. Press button to downlaod CorPlot Files as .zip"),
                  br(),
                  downloadButton('downloadcorplotzip', 'corr_plot.zip')
