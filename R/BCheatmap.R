@@ -8,12 +8,13 @@
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param columnLabels The size of the column labels.
-#'@param dendro Whether or not to rearrange data with dendrogram.
+#'@param dendro Logical. Whether or not to show row dendrogram for hierarchical clustering.
 #'@param star_size The numerical size of the cell note labels.
 #'@param printtable Logical. Prints percent contribution as a table instead of plotting it.
 #'@param table_option Character. One of "logs", "reads", or "percents".
 #'@param log_transform Logical. Log transform data before clustering and plotting.
 #'@param log_choice Data is log transformed with this log.
+#'@param variable_log_min Logical. TRUE to make log(0) = minimum nonzero - 1. FALSE to make log(0) = log(100/4000000) - 1.
 #'@param distance_method Character. Use summary(proxy::pr_DB) to see all options.
 #'@param minkowski_power The power of the Minkowski distance (if minkowski is used).
 #'@param cellnote_option Character. One of "stars", "reads", or "percents"
@@ -28,108 +29,145 @@
 #'@export
 
 BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
-                      your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
+                      your_title = "", grid = TRUE, columnLabels = 1, dendro = FALSE,
                       star_size = 1, printtable = FALSE,
                       table_option = "percents", log_transform = TRUE, log_choice = exp(1),
+                      variable_log_min = TRUE,
                       distance_method = "Euclidean", minkowski_power = 1,
                       cellnote_option = "stars", hclust_linkage = "complete",
                       row_order = "hierarchical", clusters = 3) {
-
+  
   #scales all data to be a percentage of reads instead of number of reads and keeps copy of raw read number
-  raw_reads <- your_data
-  your_data <- as.data.frame(prop.table(as.matrix(your_data),2))
-  your_data[is.na(your_data)] <- 0
-  if (any(colSums(your_data) != 1)){
+  your_data_list <- list(raw_reads = your_data, prop_table = as.data.frame(prop.table(as.matrix(your_data),2)))
+  your_data_list$prop_table[is.na(your_data)] <- 0
+  if (any(colSums(your_data_list$prop_table) != 1)){
     stop("One of your columns contained no data")
   }
-  your_data[your_data == 0] <- NA
-
+  your_data_list$prop_table[your_data_list$prop_table == 0] <- NA
+  
   #creates data frame that shows rank of original your_data
-  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
-
+  your_data_list <- c(your_data_list, list(ranks = apply(-your_data_list$prop_table, 2, rank, ties.method = "min", na.last = "keep")))
+  
   #subsets those barcodes that have at least one top N clone
-  top_clones_choices <- apply(your_data_ranked, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
-  your_data <- your_data[top_clones_choices,]
-  raw_reads <- raw_reads[top_clones_choices,]
-
-
-  #creates empty data frame with dimension of subsetted data &
-  #populates the empty data frame with '*' for those cells w/ top clones
-  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
-  is_a_topclone <- data.frame(matrix(ncol = ncol(your_data), nrow = nrow(your_data)))
-  is_a_topclone[your_data_ranked <= n_clones] <- "*"
-
-  your_data[is.na(your_data)] <- 0
-
+  top_clones_choices <- apply(your_data_list$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
+  your_data_list <- lapply(your_data_list, function(x) {x[top_clones_choices,]})
+  
+  #creates data frame with '*' for those cells w/ top clones
+  your_data_list <- c(your_data_list, list(cellnote_matrix = your_data_list$ranks))
+  your_data_list$cellnote_matrix[your_data_list$cellnote_matrix > n_clones] <- NA
+  your_data_list$cellnote_matrix[your_data_list$cellnote_matrix <= n_clones] <- "*"
+  your_data_list$prop_table[is.na(your_data_list$prop_table)] <- 0
+  
   #takes log of data
-  your_data_log <- custom_log(your_data, log_choice)
-
+  your_data_list <- c(your_data_list, list(logged_data = custom_log(your_data_list$prop_table, log_choice, variable_log_min)))
+  
+  #This does the clustering
+  
+  
+  
   if(row_order == "hierarchical") {
-
     if(distance_method == "Minkowski"){
-      hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method, p = minkowski_power), method = hclust_linkage)
+      hclustering <-hclust(proxy::dist((if (log_transform) your_data_list$logged_data else your_data_list$prop_table), method = distance_method, p = minkowski_power), method = hclust_linkage)
     } else {
-      hclustering <-hclust(proxy::dist((if (log_transform) your_data_log else your_data), method = distance_method), method = hclust_linkage)
+      hclustering <-hclust(proxy::dist((if (log_transform) your_data_list$logged_data else your_data_list$prop_table), method = distance_method), method = hclust_linkage)
     }
     e <- hclustering$order
-    if( clusters > 0){
+    if(clusters > 0){
+      myPalette <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588", "#5F7FC7", 
+                     "#673770", "#D3D93E", "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B", "#CD9BCD", 
+                     "#D14285", "#6DDE88", "#652926", "#7FDCC0", "#C84248", "#8569D5", "#5E738F", "#D1A33D", 
+                     "#8A7C64", "#599861")
       cuts <- cutree(hclustering, k = clusters)
-      cluster_colors = RColorBrewer::brewer.pal(clusters, "Set1")[cuts[e]]
-    } else {
-      cluster_colors = rep("white", length(e))
+      cluster_colors = myPalette[1:clusters][cuts]
     }
-
   } else if(row_order == "emergence") {
-    e <- do.call(order, -as.data.frame(your_data_log))
+    e <- do.call(order, -as.data.frame(your_data_list$prop_table))
   } else {
     stop("row_order must be one of \" hierarchical\" or \"emergence\"")
   }
-
+  
+  
+  
   if(printtable == TRUE){
     switch(table_option,
-           reads = return(raw_reads[e,]),
-           percents = return(your_data[e,]),
-           logs = return(your_data_log[e,]))
+           reads = return(your_data_list$raw_reads[e,]),
+           percents = return(your_data_list$prop_table[e,]),
+           logs = return(your_data_list$logged_data[e,]),
+           ranks = return(your_data_list$ranks[e,]))
   } else {
-    gplots::heatmap.2(as.matrix((if (log_transform) your_data_log[e,] else your_data[e,])),
-                      labRow = "",
-                      notecex = star_size,
-                      sepwidth=c(0,0.0001),
-                      sepcolor="black",
-                      colsep= if (grid) 1:ncol(your_data) else NULL,
-                      rowsep= if (grid) 1:nrow(your_data) else NULL,
-                      offsetRow = -0.4,
-                      offsetCol = 0,
-                      Rowv = FALSE,
-                      cellnote = switch(cellnote_option,
-                                        stars = is_a_topclone[e,],
-                                        reads = (raw_reads[rownames(your_data[e,]),]),
-                                        percents = t(apply(round(your_data[e,]*100, digits = 2), 1, paste0, "%")),
-                                        logs = round(your_data_log[e,], digits = 2)),
-                      dendrogram = dendro,
-                      notecol = "black",
-                      margins = c(15,6),
-                      density.info="none",
-                      trace = "none",
-                      symm=F,
-                      scale="none",
-                      Colv = names,
-                      col=(rainbow(256, s = 1, v = 1, start = 0, end = 0.75, alpha = 1)),
-                      cexCol = columnLabels,
-                      labCol = names,
-                      symkey = FALSE,
-                      RowSideColors = if(row_order == "hierarchical") cluster_colors else rep("white", length(e)),
-                      key = TRUE,
-                      keysize = 0.8,
-                      srtCol = 45,
-                      main = your_title)
+    
+    if (row_order == "emergence") {
+      call_list <- list(
+        x = as.matrix(if(log_transform) your_data_list$logged_data[e,] else your_data_list$prop_table[e,]),
+        cellnote = switch(cellnote_option,
+                                    stars = your_data_list$cellnote_matrix[e,],
+                                    reads = your_data_list$raw_reads[e,],
+                                    percents = t(apply(round(your_data_list$prop_table *100, digits = 2), 1, paste0, "%"))[e,],
+                                    logs = round(your_data_list$logged_data, digits = 2)[e,],
+                                    ranks = your_data_list$ranks[e,]),
+        dendrogram = "none",
+        Rowv = FALSE)
+    } else if (row_order == "hierarchical") {
+      call_list <- list(
+        x = as.matrix(if(log_transform) your_data_list$logged_data else your_data_list$prop_table),
+        cellnote = switch(cellnote_option,
+                                    stars = your_data_list$cellnote_matrix,
+                                    reads = your_data_list$raw_reads,
+                                    percents = t(apply(round(your_data_list$prop_table *100, digits = 2), 1, paste0, "%")),
+                                    logs = round(your_data_list$logged_data, digits = 2),
+                                    ranks = your_data_list$ranks),
+        Rowv = as.dendrogram(hclustering),
+        dendrogram = if(dendro) "row" else "none"
+      )
+      if (clusters > 0) {
+        call_list <- c(call_list, list(RowSideColors = cluster_colors))
+      }
+    } else {
+      stop("row_order must be one of \" hierarchical\" or \"emergence\"")
+    }
+    
+    
+    call_list <- c(call_list, list(
+      labRow = "",
+      notecex = star_size,
+      sepwidth=c(0,0.0001),
+      sepcolor="black",
+      colsep= if (grid) 1:ncol(your_data_list$raw_reads) else NULL,
+      rowsep= if (grid) 1:nrow(your_data_list$raw_reads) else NULL,
+      offsetRow = -0.4,
+      offsetCol = 0,
+      notecol = "black",
+      margins = c(15,6),
+      density.info="none",
+      trace = "none",
+      symm=F,
+      scale="none",
+      Colv = names,
+      col=(rainbow(256, s = 1, v = 1, start = 0, end = 0.75, alpha = 1)),
+      cexCol = columnLabels,
+      labCol = names,
+      symkey = FALSE,
+      key = TRUE,
+      keysize = 0.8,
+      srtCol = 45,
+      main = paste0("\n\n", your_title)
+    ))
+    
+    par(cex.main = 1.8)
+    do.call(gplots::heatmap.2, call_list)
+    
+    
   }
 }
 
-custom_log <- function(x, log_choice){
+custom_log <- function(x, log_choice, vary_log_min){
   x <- log(x, log_choice)
   #sets the -inf values to be the minimum of the possible value in the data frame -1
-  x[x == -Inf] <- (min(x[x > -Inf]) - 1)
+  if(vary_log_min) {
+    x[x == -Inf] <- (min(x[x > -Inf]) - 1)
+  } else {
+    x[x == -Inf] <- (log(100/4000000) - 1)
+  }
   return(x)
 }
 
