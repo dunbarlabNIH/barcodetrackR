@@ -71,7 +71,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
     } else {
       hclustering <-hclust(proxy::dist((if (log_transform) your_data_list$logged_data else your_data_list$prop_table), method = distance_method), method = hclust_linkage)
     }
-    e <- hclustering$order
+    e <- rev(hclustering$order)
     if(clusters > 0){
       myPalette <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588", "#5F7FC7",
                      "#673770", "#D3D93E", "#38333E", "#508578", "#D7C1B1", "#689030", "#AD6F3B", "#CD9BCD",

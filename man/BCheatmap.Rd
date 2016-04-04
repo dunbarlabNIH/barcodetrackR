@@ -5,9 +5,9 @@
 \title{BCheatmap (Barcode Heatmap)}
 \usage{
 BCheatmap(your_data, names = colnames(your_data), n_clones = 10,
-  your_title = "", grid = TRUE, columnLabels = 1, dendro = "none",
+  your_title = "", grid = TRUE, columnLabels = 1, dendro = FALSE,
   star_size = 1, printtable = FALSE, table_option = "percents",
-  log_transform = TRUE, log_choice = exp(1),
+  log_transform = TRUE, log_choice = exp(1), variable_log_min = TRUE,
   distance_method = "Euclidean", minkowski_power = 1,
   cellnote_option = "stars", hclust_linkage = "complete",
   row_order = "hierarchical", clusters = 3)
@@ -25,7 +25,7 @@ BCheatmap(your_data, names = colnames(your_data), n_clones = 10,
 
 \item{columnLabels}{The size of the column labels.}
 
-\item{dendro}{Whether or not to rearrange data with dendrogram.}
+\item{dendro}{Logical. Whether or not to show row dendrogram for hierarchical clustering.}
 
 \item{star_size}{The numerical size of the cell note labels.}
 
@@ -36,6 +36,8 @@ BCheatmap(your_data, names = colnames(your_data), n_clones = 10,
 \item{log_transform}{Logical. Log transform data before clustering and plotting.}
 
 \item{log_choice}{Data is log transformed with this log.}
+
+\item{variable_log_min}{Logical. TRUE to make log(0) = minimum nonzero - 1. FALSE to make log(0) = log(100/4000000) - 1.}
 
 \item{distance_method}{Character. Use summary(proxy::pr_DB) to see all options.}
 
