@@ -985,23 +985,46 @@ shinyServer(
         return()
 
       unilineagebiasInput <- function(){
-        print(barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
-                                             CT = input$unilineagebias_CT,
-                                             TP = input$unilineagebias_TP,
-                                             percent_thresh = input$unilineagebias_thresh,
-                                             ratio_thresh = input$unilineagebias_ratio,
-                                             line_months = unilineagebias_line_months(),
-                                             only_biased = input$unilineagebias_only_biased,
-                                             plot_mode = input$unilineagebias_plot_mode,
-                                             text_size = input$unilineagebias_text_size,
-                                             line_size = input$unilineagebias_line_size,
-                                             dot_size = input$unilineagebias_dot_size,
-                                             your_title = input$unilineagebias_your_title,
-                                             y_upper = input$unilineagebias_y_upper,
-                                             y_lower = input$unilineagebias_y_lower,
-                                             cellnote_display = input$unilineagebias_cellnote_display,
-                                             by_celltype = input$unilineagebias_by_celltype,
-                                             print_table = input$unilineagebias_print_table))
+        if(input$unilineagebias_plot_mode == "heatmap"){
+          barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
+                          CT = input$unilineagebias_CT,
+                          TP = input$unilineagebias_TP,
+                          percent_thresh = input$unilineagebias_thresh,
+                          ratio_thresh = input$unilineagebias_ratio,
+                          line_months = unilineagebias_line_months(),
+                          only_biased = input$unilineagebias_only_biased,
+                          plot_mode = input$unilineagebias_plot_mode,
+                          text_size = input$unilineagebias_text_size,
+                          line_size = input$unilineagebias_line_size,
+                          dot_size = input$unilineagebias_dot_size,
+                          your_title = input$unilineagebias_your_title,
+                          y_upper = input$unilineagebias_y_upper,
+                          y_lower = input$unilineagebias_y_lower,
+                          cellnote_display = input$unilineagebias_cellnote_display,
+                          by_celltype = input$unilineagebias_by_celltype,
+                          cellnote_size = input$unilineagebias_cellnote_size,
+                          print_table = FALSE)
+
+        } else {
+          print(barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
+                                CT = input$unilineagebias_CT,
+                                TP = input$unilineagebias_TP,
+                                percent_thresh = input$unilineagebias_thresh,
+                                ratio_thresh = input$unilineagebias_ratio,
+                                line_months = unilineagebias_line_months(),
+                                only_biased = input$unilineagebias_only_biased,
+                                plot_mode = input$unilineagebias_plot_mode,
+                                text_size = input$unilineagebias_text_size,
+                                line_size = input$unilineagebias_line_size,
+                                dot_size = input$unilineagebias_dot_size,
+                                your_title = input$unilineagebias_your_title,
+                                y_upper = input$unilineagebias_y_upper,
+                                y_lower = input$unilineagebias_y_lower,
+                                cellnote_display = input$unilineagebias_cellnote_display,
+                                by_celltype = input$unilineagebias_by_celltype,
+                                cellnote_size = input$unilineagebias_cellnote_size,
+                                print_table = FALSE))
+        }
       }
 
       output$viewunilineagebias<- renderPlot({
@@ -1012,8 +1035,8 @@ shinyServer(
       unilineagebias_data <- reactive({
         uni_df <- thresholded_data()
         uni_df <- uni_df[uni_df$GIVENNAME %in% input$unilineagebias_samples,] #subset samples
-        uni_df$GIVENNAME <- factor(uni_df$GIVENNAME, levels = input$unilineagebias_Samples)
-        uni_df <- rankabdf[order(uni_df$GIVENNAME),]
+        uni_df$GIVENNAME <- factor(uni_df$GIVENNAME, levels = input$unilineagebias_samples)
+        uni_df <- uni_df[order(uni_df$GIVENNAME),]
         newcolnames <- uni_df$GIVENNAME
         uni_df$GIVENNAME <- NULL
         uni_df$EXPERIMENT <- NULL
@@ -1041,7 +1064,7 @@ shinyServer(
                  numericInput("unilineagebias_ratio", label = "5. Ratio or Bias", value = 10),
                  textInput("unilineagebias_line_months", '6. Enter months (in order) seperated by a comma: ', value = ""),
                  strong("7. Options"),
-                 checkboxInput("unilineagebias_only_biased", label = "Only Biased", value = TRUE),
+                 checkboxInput("unilineagebias_only_biased", label = "Only Biased", value = FALSE),
                  checkboxInput("unilineagebias_by_celltype", label = "By Celltype", value = FALSE),
                  selectInput("unilineagebias_plot_mode", label = "8. Choose plot type",
                              choices = c("heatmap", "bar", "line"), multiple = FALSE),
@@ -1052,13 +1075,14 @@ shinyServer(
                  numericInput("unilineagebias_y_upper", label = "13. Upper Y limit", value = 1),
                  numericInput("unilineagebias_y_lower", label = "14. Lower Y Limit", value = 0),
                  selectInput("unilineagebias_cellnote_display", label = "15. Cellnote Labels",
-                             choices = c("stars", "percents"))
+                             choices = c("stars", "percents")),
+                 numericInput("unilineagebias_cellnote_size", label = "16. Size of Cell Labels", value = 3)
                )),
 
 
 
         column(9,
-               plotOutput('viewrankabundance', height = 900)
+               plotOutput('viewunilineagebias', height = 900)
         )
 
       )
@@ -1073,7 +1097,9 @@ shinyServer(
 
 
   }
-  )
+)
+
+
 
 
 

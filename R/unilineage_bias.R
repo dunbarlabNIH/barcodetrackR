@@ -29,7 +29,8 @@ unilineage_bias <- function(your_data, CT, TP, percent_thresh = 0.01,
                             dot_size = 4, your_title = "",
                             y_upper = 1, y_lower = 0,
                             cellnote_display = "stars", by_celltype = FALSE,
-                            print_table = FALSE){
+                            print_table = FALSE, cellnote_size = 3){
+  print(colnames((your_data)))
   your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 2))
   your_data[is.na(your_data)] <- 0
   x <- lapply(1:TP, function(i){
@@ -84,7 +85,11 @@ unilineage_bias <- function(your_data, CT, TP, percent_thresh = 0.01,
                      panel.background = ggplot2::element_rect(fill = "white", colour = "black"),
                      axis.text.x = ggplot2::element_text(angle = 90))
   }else if(plot_mode == "bar"){
+    print(colnames(your_data))
     if(only_biased){
+      if(ncol(your_data) == CT){
+        stop("Cannot use only biased when looking at only one time point")
+      }
       your_data <- your_data[,seq(from = CT, to = CT*TP, by = CT)]
       listy <- list()
       for(i in 1:TP){
@@ -96,7 +101,9 @@ unilineage_bias <- function(your_data, CT, TP, percent_thresh = 0.01,
         listy[[i]] <- reshape2::melt(as.matrix(your_data[x[[i]],c((CT*i - (CT-1)):(CT*i)), drop = FALSE]))
       }
     }
+    print(listy)
     plotting_table <- do.call(rbind, listy)
+    print(plotting_table)
     colnames(plotting_table) <- c("BARCODE", "SAMPLE", "PROP")
     plotting_table$SAMPLE <- factor(plotting_table$SAMPLE, levels = total_order)
     plotting_table <- plotting_table[order(plotting_table$SAMPLE),]
@@ -121,6 +128,9 @@ unilineage_bias <- function(your_data, CT, TP, percent_thresh = 0.01,
                      axis.text.x = ggplot2::element_text(angle = 90))
   }else if(plot_mode == "heatmap"){
     if(only_biased){
+      if(ncol(your_data) == CT){
+        stop("Cannot use only biased when looking at only one time point")
+      }
       your_data <- your_data[,seq(from = CT, to = CT*TP, by = CT)]
       cellnote_matrix <- cellnote_matrix[,seq(from = CT, to = CT*TP, by = CT)]
     } else {
@@ -150,7 +160,8 @@ unilineage_bias <- function(your_data, CT, TP, percent_thresh = 0.01,
                       cellnote = plotting_cells,
                       notecol = "black",
                       labRow = "",
-                      cexCol = text_size,
+                      notecex = cellnote_size,
+                      cexCol = text_size/10,
                       col = (rainbow(256, s = 1, v = 1, start = 0, end = 0.75, alpha = 1)))
 
   }else{
