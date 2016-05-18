@@ -2,6 +2,7 @@
 
 export(BBHM)
 export(BCLH)
+export(BC_clusters)
 export(BCheatmap)
 export(barcode_treemap)
 export(barcodecount)
@@ -22,3 +23,4 @@ export(ternary_plot)
 export(threshold)
 export(topclones_barchart)
 export(topclonestracker)
+export(unilineage_bias)
