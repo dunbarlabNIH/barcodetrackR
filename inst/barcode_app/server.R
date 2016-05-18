@@ -81,7 +81,9 @@ shinyServer(
         tabPanel("TernPlot",
                  uiOutput("TernPlot")),
         tabPanel("RankAbundance",
-                 uiOutput("RankAbundance"))
+                 uiOutput("RankAbundance")),
+        tabPanel("UnilineageBias",
+                 uiOutput("UnilineageBias"))
       )
 
     })
@@ -389,12 +391,12 @@ shinyServer(
 
       topclonesbarchartInput <- function(){
         barcodetrackR::topclones_barchart(your_data = topclonesbarchart_data(),
-                           top_clones_choice = topclonesbarchart_Choice(),
-                           n_clones = input$topclonesbarchart_Clones,
-                           text_size = input$topclonesbarchart_Textsize,
-                           y_limit = input$topclonesbarchart_yLim,
-                           other_color = input$topclonesbarchart_Othercolor,
-                           your_title = input$topclonesbarchart_Title)
+                                          top_clones_choice = topclonesbarchart_Choice(),
+                                          n_clones = input$topclonesbarchart_Clones,
+                                          text_size = input$topclonesbarchart_Textsize,
+                                          y_limit = input$topclonesbarchart_yLim,
+                                          other_color = input$topclonesbarchart_Othercolor,
+                                          your_title = input$topclonesbarchart_Title)
       }
 
 
@@ -974,8 +976,104 @@ shinyServer(
     })
 
 
+
+    #======================================================================================================
+    #UNILINEAGEBIAS TAB
+
+    output$UnilineageBias <- renderUI({
+      if(is.null(thresholded_data()))
+        return()
+
+      unilineagebiasInput <- function(){
+        print(barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
+                                             CT = input$unilineagebias_CT,
+                                             TP = input$unilineagebias_TP,
+                                             percent_thresh = input$unilineagebias_thresh,
+                                             ratio_thresh = input$unilineagebias_ratio,
+                                             line_months = unilineagebias_line_months(),
+                                             only_biased = input$unilineagebias_only_biased,
+                                             plot_mode = input$unilineagebias_plot_mode,
+                                             text_size = input$unilineagebias_text_size,
+                                             line_size = input$unilineagebias_line_size,
+                                             dot_size = input$unilineagebias_dot_size,
+                                             your_title = input$unilineagebias_your_title,
+                                             y_upper = input$unilineagebias_y_upper,
+                                             y_lower = input$unilineagebias_y_lower,
+                                             cellnote_display = input$unilineagebias_cellnote_display,
+                                             by_celltype = input$unilineagebias_by_celltype,
+                                             print_table = input$unilineagebias_print_table))
+      }
+
+      output$viewunilineagebias<- renderPlot({
+        unilineagebiasInput()
+        height = 700
+      })
+
+      unilineagebias_data <- reactive({
+        uni_df <- thresholded_data()
+        uni_df <- uni_df[uni_df$GIVENNAME %in% input$unilineagebias_samples,] #subset samples
+        uni_df$GIVENNAME <- factor(uni_df$GIVENNAME, levels = input$unilineagebias_Samples)
+        uni_df <- rankabdf[order(uni_df$GIVENNAME),]
+        newcolnames <- uni_df$GIVENNAME
+        uni_df$GIVENNAME <- NULL
+        uni_df$EXPERIMENT <- NULL
+        uni_df$CELLTYPE <- NULL
+        uni_df$MONTH <- NULL
+        uni_df$LOCATION <- NULL
+        uni_df$MISC <- NULL
+        uni_df <- data.frame(t(uni_df))
+        colnames(uni_df) <- newcolnames
+        return(uni_df)
+      })
+
+      unilineagebias_line_months <- reactive({
+        return(as.numeric(unlist(strsplit(input$unilineagebias_line_months, split = ','))))
+      })
+
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("unilineagebias_samples", label = "1. Which Samples to Use",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 numericInput("unilineagebias_CT", label = "2. Number of Cell Types", value = 5),
+                 numericInput("unilineagebias_TP", label = "3. Number of Time Points", value = 1),
+                 numericInput("unilineagebias_thresh", label = "4. Threshold of Bias", value = 0.01),
+                 numericInput("unilineagebias_ratio", label = "5. Ratio or Bias", value = 10),
+                 textInput("unilineagebias_line_months", '6. Enter months (in order) seperated by a comma: ', value = ""),
+                 strong("7. Options"),
+                 checkboxInput("unilineagebias_only_biased", label = "Only Biased", value = TRUE),
+                 checkboxInput("unilineagebias_by_celltype", label = "By Celltype", value = FALSE),
+                 selectInput("unilineagebias_plot_mode", label = "8. Choose plot type",
+                             choices = c("heatmap", "bar", "line"), multiple = FALSE),
+                 numericInput("unilineagebias_text_size", label = "9. Text Size", value = 10),
+                 numericInput("unilineagebias_line_size", label = "10. Line Size", value = 3),
+                 numericInput("unilineagebias_dot_size", label = "11. Dot Size", value = 5),
+                 textInput("unilineagebias_your_title", label = "12. Your title", value = ""),
+                 numericInput("unilineagebias_y_upper", label = "13. Upper Y limit", value = 1),
+                 numericInput("unilineagebias_y_lower", label = "14. Lower Y Limit", value = 0),
+                 selectInput("unilineagebias_cellnote_display", label = "15. Cellnote Labels",
+                             choices = c("stars", "percents"))
+               )),
+
+
+
+        column(9,
+               plotOutput('viewrankabundance', height = 900)
+        )
+
+      )
+
+
+
+
+
+
+    })
+
+
+
   }
-)
+  )
 
 
 
