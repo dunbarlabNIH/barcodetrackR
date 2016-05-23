@@ -8,7 +8,7 @@ unilineage_bias(your_data, CT, TP, percent_thresh = 0.01, ratio_thresh = 10,
   line_months = c(1:TP), only_biased = FALSE, plot_mode = "",
   text_size = 20, line_size = 3, dot_size = 4, your_title = "",
   y_upper = 1, y_lower = 0, cellnote_display = "stars",
-  by_celltype = FALSE, print_table = FALSE)
+  by_celltype = FALSE, print_table = FALSE, cellnote_size = 3)
 }
 \arguments{
 \item{your_data}{A data frame. Arranged by time point.}
