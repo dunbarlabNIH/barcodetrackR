@@ -4,7 +4,6 @@ shinyServer(
 
   function(input, output) {
 
-
     #=========================================================================================================
 
     output$thresholdPanel <- renderUI({
@@ -83,10 +82,12 @@ shinyServer(
         tabPanel("RankAbundance",
                  uiOutput("RankAbundance")),
         tabPanel("UnilineageBias",
-                 uiOutput("UnilineageBias"))
+                 uiOutput("UnilineageBias")),
+        tabPanel("ClonalBias",
+                 uiOutput("ClonalBias"))
       )
-
     })
+
 
     #======================================================================================================
 
@@ -987,43 +988,43 @@ shinyServer(
       unilineagebiasInput <- function(){
         if(input$unilineagebias_plot_mode == "heatmap"){
           barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
-                          CT = input$unilineagebias_CT,
-                          TP = input$unilineagebias_TP,
-                          percent_thresh = input$unilineagebias_thresh,
-                          ratio_thresh = input$unilineagebias_ratio,
-                          line_months = unilineagebias_line_months(),
-                          only_biased = input$unilineagebias_only_biased,
-                          plot_mode = input$unilineagebias_plot_mode,
-                          text_size = input$unilineagebias_text_size,
-                          line_size = input$unilineagebias_line_size,
-                          dot_size = input$unilineagebias_dot_size,
-                          your_title = input$unilineagebias_your_title,
-                          y_upper = input$unilineagebias_y_upper,
-                          y_lower = input$unilineagebias_y_lower,
-                          cellnote_display = input$unilineagebias_cellnote_display,
-                          by_celltype = input$unilineagebias_by_celltype,
-                          cellnote_size = input$unilineagebias_cellnote_size,
-                          print_table = FALSE)
+                                         CT = input$unilineagebias_CT,
+                                         TP = input$unilineagebias_TP,
+                                         percent_thresh = input$unilineagebias_thresh,
+                                         ratio_thresh = input$unilineagebias_ratio,
+                                         line_months = unilineagebias_line_months(),
+                                         only_biased = input$unilineagebias_only_biased,
+                                         plot_mode = input$unilineagebias_plot_mode,
+                                         text_size = input$unilineagebias_text_size,
+                                         line_size = input$unilineagebias_line_size,
+                                         dot_size = input$unilineagebias_dot_size,
+                                         your_title = input$unilineagebias_your_title,
+                                         y_upper = input$unilineagebias_y_upper,
+                                         y_lower = input$unilineagebias_y_lower,
+                                         cellnote_display = input$unilineagebias_cellnote_display,
+                                         by_celltype = input$unilineagebias_by_celltype,
+                                         cellnote_size = input$unilineagebias_cellnote_size,
+                                         print_table = FALSE)
 
         } else {
           print(barcodetrackR::unilineage_bias(your_data = unilineagebias_data(),
-                                CT = input$unilineagebias_CT,
-                                TP = input$unilineagebias_TP,
-                                percent_thresh = input$unilineagebias_thresh,
-                                ratio_thresh = input$unilineagebias_ratio,
-                                line_months = unilineagebias_line_months(),
-                                only_biased = input$unilineagebias_only_biased,
-                                plot_mode = input$unilineagebias_plot_mode,
-                                text_size = input$unilineagebias_text_size,
-                                line_size = input$unilineagebias_line_size,
-                                dot_size = input$unilineagebias_dot_size,
-                                your_title = input$unilineagebias_your_title,
-                                y_upper = input$unilineagebias_y_upper,
-                                y_lower = input$unilineagebias_y_lower,
-                                cellnote_display = input$unilineagebias_cellnote_display,
-                                by_celltype = input$unilineagebias_by_celltype,
-                                cellnote_size = input$unilineagebias_cellnote_size,
-                                print_table = FALSE))
+                                               CT = input$unilineagebias_CT,
+                                               TP = input$unilineagebias_TP,
+                                               percent_thresh = input$unilineagebias_thresh,
+                                               ratio_thresh = input$unilineagebias_ratio,
+                                               line_months = unilineagebias_line_months(),
+                                               only_biased = input$unilineagebias_only_biased,
+                                               plot_mode = input$unilineagebias_plot_mode,
+                                               text_size = input$unilineagebias_text_size,
+                                               line_size = input$unilineagebias_line_size,
+                                               dot_size = input$unilineagebias_dot_size,
+                                               your_title = input$unilineagebias_your_title,
+                                               y_upper = input$unilineagebias_y_upper,
+                                               y_lower = input$unilineagebias_y_lower,
+                                               cellnote_display = input$unilineagebias_cellnote_display,
+                                               by_celltype = input$unilineagebias_by_celltype,
+                                               cellnote_size = input$unilineagebias_cellnote_size,
+                                               print_table = FALSE))
         }
       }
 
@@ -1078,11 +1079,60 @@ shinyServer(
                              choices = c("stars", "percents")),
                  numericInput("unilineagebias_cellnote_size", label = "16. Size of Cell Labels", value = 3)
                )),
+        column(9,
+               plotOutput('viewunilineagebias', height = 900)
+        )
+      )
+    })
+
+    #======================================================================================================
+    #CLONALBIAS TAB
+
+    output$ClonalBias <- renderUI({
+      if(is.null(thresholded_data()))
+        return()
+
+      clonalbiasInput <- function(){
+        print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+      }
+
+      output$viewclonalbias<- renderPlot({
+        clonalbiasInput()
+        height = 700
+      })
+
+      clonalbias_data <- reactive({
+        cb_df <- thresholded_data()
+        cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
+        cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
+        cb_df <- cb_df[order(cb_df$GIVENNAME),]
+        newcolnames <- cb_df$GIVENNAME
+
+        cb_df$GIVENNAME <- NULL
+        cb_df$EXPERIMENT <- NULL
+        cb_df$CELLTYPE <- NULL
+        cb_df$MONTH <- NULL
+        cb_df$LOCATION <- NULL
+        cb_df$MISC <- NULL
+
+        cb_df <- data.frame(t(cb_df))
+        colnames(cb_df) <- newcolnames
+        return(cb_df)
+
+      })
+
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15)
+               )),
 
 
 
         column(9,
-               plotOutput('viewunilineagebias', height = 900)
+               plotOutput('viewclonalbias', height = 700)
         )
 
       )
@@ -1093,6 +1143,9 @@ shinyServer(
 
 
     })
+
+
+
 
 
 
