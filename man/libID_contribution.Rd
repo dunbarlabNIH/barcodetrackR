@@ -4,8 +4,8 @@
 \alias{libID_contribution}
 \title{LibID Contribution}
 \usage{
-libID_contribution(your_data, top_clones_choice,
-  months = c(1:ncol(your_data)), n_clones = 20, linesize = 0.5,
+libID_contribution(your_data, months = c(1:ncol(your_data)),
+  separate_libraries = FALSE, n_clones = 5, linesize = 0.5,
   text_size = 15, y_limit = 100, plot_theme = "classic",
   your_title = "")
 }
