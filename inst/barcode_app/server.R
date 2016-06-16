@@ -102,22 +102,39 @@ shinyServer(
       #======================================================================================================
 
       BCheatmapInput <- function(){
-        barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
-                                 names = paste0(colnames(BCheatmap_data()), "  "),
-                                 n_clones = input$BCheatmap_top_clones,
-                                 your_title = input$BCheatmap_title,
-                                 grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
-                                 star_size = input$BCheatmap_starsize, log_transform = input$BCheatmap_log_transform,
-                                 log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
-                                 distance_method = input$BCheatmap_distance,
-                                 minkowski_power = input$BCmink_distance,
-                                 cellnote_option = input$BCheatmap_cellnote_option,
-                                 hclust_linkage = input$BCheatmap_hclust_linkage,
-                                 row_order = input$BCheatmap_row_order,
-                                 clusters = input$BCheatmap_clusters,
-                                 dendro = input$BCheatmap_dendrogram,
-                                 variable_log_min = input$BCheatmap_minimum
-        )
+        if(input$BCheatmap_cluster_tracker){
+          print(BC_clusters(your_data = BCheatmap_data(),
+                            names = paste0(colnames(BCheatmap_data()), "  "),
+                            n_clones = input$BCheatmap_top_clones,
+                            months = BCheatmap_months(),
+                            your_title = input$BCheatmap_title,
+                            log_transform = input$BCheatmap_log_transform,
+                            log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
+                            distance_method = input$BCheatmap_distance,
+                            minkowski_power = input$BCmink_distance,
+                            hclust_linkage = input$BCheatmap_hclust_linkage,
+                            clusters = input$BCheatmap_clusters,
+                            variable_log_min = input$BCheatmap_minimum,
+                            percent_scale = input$BCheatmap_clusterscale
+          ))
+        } else {
+          barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
+                                   names = paste0(colnames(BCheatmap_data()), "  "),
+                                   n_clones = input$BCheatmap_top_clones,
+                                   your_title = input$BCheatmap_title,
+                                   grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
+                                   star_size = input$BCheatmap_starsize, log_transform = input$BCheatmap_log_transform,
+                                   log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
+                                   distance_method = input$BCheatmap_distance,
+                                   minkowski_power = input$BCmink_distance,
+                                   cellnote_option = input$BCheatmap_cellnote_option,
+                                   hclust_linkage = input$BCheatmap_hclust_linkage,
+                                   row_order = input$BCheatmap_row_order,
+                                   clusters = input$BCheatmap_clusters,
+                                   dendro = input$BCheatmap_dendrogram,
+                                   variable_log_min = input$BCheatmap_minimum
+          )
+        }
       }
 
       output$downloadBCheatmapkey <- downloadHandler(
@@ -162,11 +179,16 @@ shinyServer(
 
       })
 
+      BCheatmap_months <- reactive({
+        return(as.numeric(unlist(strsplit(input$BCheatmap_months, split = ','))))
+      })
+
       fluidRow(
         column(3,
                wellPanel(
                  selectizeInput("BCheatmap_samples", label = "1. Which Samples to Use (in order)",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 textInput("BCheatmap_months", '(1.5). Enter months (in order) seperated by a comma: ', value = ""),
                  numericInput("BCheatmap_top_clones", "2. Number of top clones", value = 10),
                  textInput("BCheatmap_title", "3. Title for BCheatmap", value = ""),
                  strong("4. Options"),
@@ -174,6 +196,9 @@ shinyServer(
                  checkboxInput("BCheatmap_log_transform", label = "Log-Transform", value = TRUE),
                  checkboxInput("BCheatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
                  checkboxInput("BCheatmap_minimum", label = "Variable Minimum for Log", value = TRUE),
+                 checkboxInput("BCheatmap_cluster_tracker", label = "Show cluster-tracker (CT)", value = FALSE),
+                 checkboxInput("BCheatmap_clusterscale", label = "CT: percent scale", value = TRUE),
+                 checkboxInput("BCheatmap_cluster_error", label = "CT: use std_error", value = TRUE),
                  selectInput("BCheatmap_scale", "4. Select Log",
                              choices = c("2", "e", "10", "100"),
                              selected = "e"),
@@ -196,7 +221,9 @@ shinyServer(
                              selected = "percents"),
                  strong("13. Press button to download BCheatmap Key."),
                  br(),
-                 downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
+                 downloadButton('downloadBCheatmapkey', 'BCheatmap_key'),
+
+
 
 
                )
@@ -1093,7 +1120,11 @@ shinyServer(
         return()
 
       clonalbiasInput <- function(){
-        print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+        if(input$clonalbias_Type == "Dots"){
+          print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+        } else if(input$clonalbias_Type == "Bars"){
+          print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+        }
       }
 
       output$viewclonalbias<- renderPlot({
@@ -1126,7 +1157,9 @@ shinyServer(
                wellPanel(
                  selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
                              choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15)
+                 numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15),
+                 selectInput("clonalbias_Type", label = "3. Pick type of plot",
+                             choices = c("Dots", "Bars"))
                )),
 
 

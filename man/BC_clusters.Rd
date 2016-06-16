@@ -8,8 +8,7 @@ BC_clusters(your_data, names = colnames(your_data), n_clones = 10,
   months = 1:ncol(your_data), your_title = "", log_transform = TRUE,
   log_choice = exp(1), variable_log_min = TRUE,
   distance_method = "Euclidean", minkowski_power = 1,
-  hclust_linkage = "complete", clusters = 3, colors = "",
-  percent_scale = FALSE)
+  hclust_linkage = "complete", clusters = 3, percent_scale = TRUE)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -34,7 +33,7 @@ BC_clusters(your_data, names = colnames(your_data), n_clones = 10,
 
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
-\item{colors}{Which colors to plot (default to all, can choose using BCheatmap, unless using "BCheatmap")}
+\item{percent_scale}{Logical. Whether to display plot with percent scale rather than log scale.}
 }
 \value{
 Displays a line plot in the current plot window.
