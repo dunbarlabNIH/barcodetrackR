@@ -221,7 +221,7 @@ shinyServer(
                              selected = "percents"),
                  strong("13. Press button to download BCheatmap Key."),
                  br(),
-                 downloadButton('downloadBCheatmapkey', 'BCheatmap_key'),
+                 downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
 
 
 
