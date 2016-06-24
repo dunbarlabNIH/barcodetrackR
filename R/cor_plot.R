@@ -8,7 +8,7 @@
 #'        only barcodes whose sum in pair of samples being compared is greater than the average of each's
 #'        scaled threshold will be used for finding correlation.
 #'@param your_title Title for plot.
-#'@param method_corr Character. One of "pearson", "spearman", or "kendall".
+#'@param method_corr Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhatatn distance.
 #'@param labelsizes Numeric. Size of the plot labels.
 #'@param plottype Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".
 #'@param printtables Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
@@ -41,33 +41,40 @@ cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title
   ctab_ci_lo = matrix(nrow=ncol(your_data), ncol=ncol(your_data))
   ctab_ci_hi = matrix(nrow=ncol(your_data), ncol=ncol(your_data))
 
-  #compare each cell type, excluding any barcodes whose sum in the two samples being compared
-  #is less than the average of their two thresholds
-  for (i in 1:ncol(your_data)) {
-    for (j in 1:ncol(your_data)) {
-      tempdf <- data.frame(your_data[[i]],your_data[[j]])
-      tempdf <- tempdf[(tempdf[[1]] + tempdf[[2]]) > ((threshes[i] + threshes[j])/2), ]
-      ctab[i,j] <- cor(tempdf[[1]], tempdf[[2]], method = method_corr)
+
+  if(method_corr == "manhattan"){
+    ctab <- as.matrix(dist(t(your_data), method = "manhattan"))
+  } else {
+    #compare each cell type, excluding any barcodes whose sum in the two samples being compared
+    #is less than the average of their two thresholds
+    for (i in 1:ncol(your_data)) {
+      for (j in 1:ncol(your_data)) {
+        tempdf <- data.frame(your_data[[i]],your_data[[j]])
+        tempdf <- tempdf[(tempdf[[1]] + tempdf[[2]]) > ((threshes[i] + threshes[j])/2), ]
+        ctab[i,j] <- cor(tempdf[[1]], tempdf[[2]], method = method_corr)
 
 
-      ct_results <- cor.test(tempdf[[1]], tempdf[[2]], method = method_corr)
+        ct_results <- cor.test(tempdf[[1]], tempdf[[2]], method = method_corr)
 
-      if(is.null(ct_results$p.value)){
-        ctab_pval[i,j] <- "NA"
-      } else {
-        ctab_pval[i,j] <- ct_results$p.value
+        if(is.null(ct_results$p.value)){
+          ctab_pval[i,j] <- "NA"
+        } else {
+          ctab_pval[i,j] <- ct_results$p.value
+        }
+
+        if(is.null(ct_results$conf.int)){
+          ctab_ci_lo[i,j] = "NA"
+          ctab_ci_hi[i,j] = "NA"
+        } else {
+          ctab_ci_lo[i,j]=ct_results$conf.int[1]
+          ctab_ci_hi[i,j]=ct_results$conf.int[2]
+        }
+
       }
-
-      if(is.null(ct_results$conf.int)){
-        ctab_ci_lo[i,j] = "NA"
-        ctab_ci_hi[i,j] = "NA"
-      } else {
-        ctab_ci_lo[i,j]=ct_results$conf.int[1]
-        ctab_ci_hi[i,j]=ct_results$conf.int[2]
-      }
-
     }
+
   }
+
 
   ctab[is.na(ctab)] <- 0
   colorlimits = c(-1,1)
@@ -95,20 +102,36 @@ cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title
   }
 
   else{
-    corrplot::corrplot(ctab,
-                       tl.cex = labelsizes,
-                       method = plottype,
-                       title = title(your_title, line = -1, cex.main = 2),
-                       addgrid.col = gridcolor,
-                       tl.col="black",
-                       outline = TRUE,
-                       mar = c(1, 1, 3, 1),
-                       col = switch(colorscale,
-                                    default = NULL,
-                                    rainbow = colorRampPalette(rainbow(7))(100),
-                                    white_heat = colorRampPalette(col = c("black", "black", "black", "black", "black", "black","brown", "red", "orange", "yellow", "white"))(100)),
-                       cl.lim = colorlimits
-                       )
+    if(method_corr == "manhattan"){
+      corrplot::corrplot(ctab,
+                         tl.cex = labelsizes,
+                         method = plottype,
+                         title = title(your_title, line = -1, cex.main = 2),
+                         addgrid.col = gridcolor,
+                         tl.col="black",
+                         outline = TRUE,
+                         mar = c(1, 1, 3, 1),
+                         is.corr = FALSE,
+                         cl.lim = c(0,2),
+                         col = colorRampPalette(c(rep("black", 10),rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE","#4393C3", "#2166AC", "#053061")) ))(200))
+    } else {
+      corrplot::corrplot(ctab,
+                         tl.cex = labelsizes,
+                         method = plottype,
+                         title = title(your_title, line = -1, cex.main = 2),
+                         addgrid.col = gridcolor,
+                         tl.col="black",
+                         outline = TRUE,
+                         mar = c(1, 1, 3, 1),
+                         col = switch(colorscale,
+                                      default = NULL,
+                                      rainbow = colorRampPalette(rainbow(7))(100),
+                                      white_heat = colorRampPalette(col = c("black", "black", "black", "black", "black", "black","brown", "red", "orange", "yellow", "white"))(100)),
+                         cl.lim = colorlimits
+      )
+    }
+
+
 
   }
 

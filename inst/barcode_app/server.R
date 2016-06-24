@@ -315,7 +315,7 @@ shinyServer(
                  checkboxInput("corplot_excludeneg", "", value = FALSE),
                  strong("6. Grid ON/OFF"),
                  checkboxInput("corplot_Grid", "", value = TRUE),
-                 selectInput("corplot_Method", "7. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman"), selected = "pearson"),
+                 selectInput("corplot_Method", "7. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
                  selectInput("corplot_Colors", "8. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
                  numericInput("corplot_Labels", "9. Set Label Size", value = 2),
                  strong("10. Press button to downlaod CorPlot Files as .zip"),
