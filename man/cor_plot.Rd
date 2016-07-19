@@ -20,7 +20,7 @@ scaled threshold will be used for finding correlation.}
 
 \item{your_title}{Title for plot.}
 
-\item{method_corr}{Character. One of "pearson", "spearman", or "kendall".}
+\item{method_corr}{Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhatatn distance.}
 
 \item{labelsizes}{Numeric. Size of the plot labels.}
 
