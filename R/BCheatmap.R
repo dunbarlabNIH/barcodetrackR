@@ -22,6 +22,7 @@
 #'@param row_order Character. One of "hierarchical" or "emergence" to organize rows.
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
 #'@param angled Logical. Angle column names in display or not.
+#'@param bottom_margin The numerical size of bottom margin for labels.
 #'@return Displays a heatmap in the current plot window.
 #'@examples
 #'BCheatmap(your_data = zh33, names = colnames(zh33), n_clones = 10,
@@ -36,7 +37,7 @@ BCheatmap <- function(your_data, names = colnames(your_data), n_clones = 10,
                       variable_log_min = TRUE,
                       distance_method = "Euclidean", minkowski_power = 1,
                       cellnote_option = "stars", hclust_linkage = "complete",
-                      row_order = "hierarchical", clusters = 0, angled = TRUE) {
+                      row_order = "hierarchical", clusters = 0, angled = TRUE, bottom_margin = 15) {
 
   #scales all data to be a percentage of reads instead of number of reads and keeps copy of raw read number
   your_data_list <- list(raw_reads = your_data, prop_table = as.data.frame(prop.table(as.matrix(your_data),2)))

@@ -10,7 +10,8 @@ BCheatmap(your_data, names = colnames(your_data), n_clones = 10,
   log_transform = TRUE, log_choice = exp(1), variable_log_min = TRUE,
   distance_method = "Euclidean", minkowski_power = 1,
   cellnote_option = "stars", hclust_linkage = "complete",
-  row_order = "hierarchical", clusters = 0, angled = TRUE)
+  row_order = "hierarchical", clusters = 0, angled = TRUE,
+  bottom_margin = 15)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -52,6 +53,8 @@ BCheatmap(your_data, names = colnames(your_data), n_clones = 10,
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
 \item{angled}{Logical. Angle column names in display or not.}
+
+\item{bottom_margin}{The numerical size of bottom margin for labels.}
 }
 \value{
 Displays a heatmap in the current plot window.
