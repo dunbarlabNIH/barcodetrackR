@@ -1,7 +1,6 @@
 Package: barcodetrackR
 Type: Package
-Title: Functions for Analyzing Cellular Barcode Data Across Time Points and
-    Samples
+Title: Functions for Analyzing Cellular Barcoding Data
 Version: 0.1
 Date: 2015-12-04
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
@@ -11,14 +10,19 @@ License: CC0
 LazyData: TRUE
 Imports:
     corrplot,
+    dplyr,
     fmsb,
     ggplot2,
     ggtern,
+    gdata,
     gplots,
     gridExtra,
+    plyr,
+    proxy,
     reshape2,
     shiny,
     shinyBS,
+    stringr,
     treemap,
     vegan
 RoxygenNote: 5.0.1

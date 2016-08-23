@@ -4,39 +4,24 @@ shinyUI(
     titlePanel("Barcode App"),
     a(href="http://github.com/d93espinoza/", "Link to GitHub repository (source code, sample data, etc.)"),
     h5(""),
-    br(),
-    
     fluidRow(
-      column(3,
+      column(12,
              wellPanel(
-               width = 12,
-               fileInput('file1', '1. Choose Barcode OutFile')
-             ) 
-      ),
-      column(3,
-             wellPanel(
-               fileInput('file2', '2. Choose Your KeyFile')
-               
+               div(style="display:inline-block; width:15%;",fileInput('file1', '1. Upload outfile')),
+               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:15%;",fileInput('file2', '2. Upload keyfile')),
+               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:15%;",fileInput('file3', '3. Upload readme')),
+               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:15%;",numericInput("thresholdvalue", "4. Set threshold", value = 2000)),               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:15%;",uiOutput("thresholdPanel")),
+               div(style="display:inline-block; width:1%;", h5("")),
+               div(style="display:inline-block; width:15%;", uiOutput("thresholdInfo")),
+               style = "padding: 10px;"
              )
-      ), 
-      
-      column(3,
-             wellPanel(
-               numericInput("thresholdvalue", "3. Threshold Value to Apply", value = 2000)
-             )
-      ),
-      
-      uiOutput("thresholdPanel")
-      
-    ),#end of fluidRow
-    
-    
-    fluidRow(
-      
-      uiOutput("thresholdInfo")
-    
+      )
     ),
-    
     uiOutput("Panel")
   )
 )

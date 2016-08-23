@@ -2,19 +2,16 @@ options(shiny.maxRequestSize=1000*1024^2)
 
 shinyServer(
 
-  function(input, output) {
+  function(input, output, session) {
 
     #=========================================================================================================
 
     output$thresholdPanel <- renderUI({
-      if (is.null(input$file1) | is.null(input$file2))
+      if (is.null(input$file1) | is.null(input$file2) | is.null(input$file3))
         return()
+      strong("5. Press Button to Apply Threshold")
+      actionButton("threshybutton", "Apply Threshold",width="100%")
 
-      column(3,
-             wellPanel(
-               strong("4. Press Button to Apply Threshold"),
-               actionButton("threshybutton", "Apply Threshold")
-             ))
 
     })
 
@@ -23,7 +20,7 @@ shinyServer(
         df <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
         incProgress(0.5, detail = "Applying Threshold")
         tdf <- t(df)
-        keyfile <- read.delim(input$file2$datapath, row.names = 1)
+        keyfile <- read.delim(input$file2$datapath, row.names = 1, stringsAsFactors = FALSE)
         tdf <- tdf[rownames(tdf) %in% rownames(keyfile),]
         keyfile = keyfile[match(rownames(tdf), rownames(keyfile)),]
         df <- cbind(keyfile, tdf)
@@ -35,38 +32,48 @@ shinyServer(
 
 
     current_threshold <- eventReactive(input$threshybutton,{
-      return(paste("Current threshold applied is: ", input$thresholdvalue, sep = ""))
+      return(paste("Current threshold applied is:\n", input$thresholdvalue, sep = ""))
     })
 
 
     output$thresholdInfo <- renderUI({
       if (is.null(thresholded_data()))
         return()
-
-      column(3, align = "center",
-             wellPanel(
-               strong(current_threshold())
-             ))
-
-
+      strong(current_threshold())
     })
+
+    readme_data <- eventReactive(input$threshybutton,{
+      readme <- read.delim(input$file3$datapath, skip = 4, header = FALSE, stringsAsFactors = FALSE)
+      readme <- readme[1:(nrow(readme)-1),1:3]
+      colnames(readme) <- c("FILENAME", "MAPPED", "READS")
+      keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
+      readme$PERCENTAGE <- readme$MAPPED/readme$READS * 100
+      readme$GIVENNAME <- keyfile$GIVENNAME[match(readme$FILENAME, keyfile$FILENAME)]
+      return(readme)
+    })
+
+
+
     #======================================================================================================
 
     #TABPANEL
 
     output$Panel <- renderUI({
+
       if (is.null(thresholded_data()))
         return()
 
       tabsetPanel(
+        tabPanel("DataStatistics",
+                 uiOutput("DataStatistics")),
         tabPanel("BCheatmap",
                  uiOutput("BCheatmap")),
         tabPanel("CorPlot",
                  uiOutput("CorPlot")),
-        tabPanel("RadarChart",
-                 uiOutput("RadarChart")),
-        tabPanel("TopClonesBarChart",
-                 uiOutput("TopClonesBarChart")),
+        # tabPanel("RadarChart",
+        #          uiOutput("RadarChart")),
+        # tabPanel("TopClonesBarChart",
+        #          uiOutput("TopClonesBarChart")),
         tabPanel("TopClonesTracker",
                  uiOutput("TopClonesTracker")),
         tabPanel("Diversity & Richness",
@@ -84,9 +91,33 @@ shinyServer(
         tabPanel("UnilineageBias",
                  uiOutput("UnilineageBias")),
         tabPanel("ClonalBias",
-                 uiOutput("ClonalBias"))
+                 uiOutput("ClonalBias")),
+        tabPanel("SingleTracker",
+                 uiOutput("SingleTracker"))
       )
     })
+
+
+    #======================================================================================================
+
+    #DATASTATISTICS TAB
+
+    output$DataStatistics <- renderUI({
+      fluidRow(
+        column(7,dataTableOutput('renderedReadme')),
+        column(5, plotOutput('readmeHistogram'))
+      )
+    })
+
+    output$readmeHistogram <- renderPlot({
+      hist(readme_data()$MAPPED/readme_data()$READS * 100,
+           breaks = seq(0,100, by = 5),
+           xlim = c(0,100),
+           main = "MAPPING % HISTOGRAM",
+           col = "lightblue",
+           xlab = "PERCENTAGE MAPPED")
+    })
+    output$renderedReadme <- renderDataTable(readme_data(), options = list(scrollX=TRUE, pageLength = 10))
 
 
     #======================================================================================================
@@ -98,44 +129,44 @@ shinyServer(
       if (is.null(thresholded_data()))
         return()
 
-
-      #======================================================================================================
-
       BCheatmapInput <- function(){
-        if(input$BCheatmap_cluster_tracker){
-          print(BC_clusters(your_data = BCheatmap_data(),
-                            names = paste0(colnames(BCheatmap_data()), "  "),
-                            n_clones = input$BCheatmap_top_clones,
-                            months = BCheatmap_months(),
-                            your_title = input$BCheatmap_title,
-                            log_transform = input$BCheatmap_log_transform,
-                            log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
-                            distance_method = input$BCheatmap_distance,
-                            minkowski_power = input$BCmink_distance,
-                            hclust_linkage = input$BCheatmap_hclust_linkage,
-                            clusters = input$BCheatmap_clusters,
-                            variable_log_min = input$BCheatmap_minimum,
-                            percent_scale = input$BCheatmap_clusterscale
-          ))
-        } else {
-          barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
-                                   names = paste0(colnames(BCheatmap_data()), "  "),
-                                   n_clones = input$BCheatmap_top_clones,
-                                   your_title = input$BCheatmap_title,
-                                   grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
-                                   star_size = input$BCheatmap_starsize, log_transform = input$BCheatmap_log_transform,
-                                   log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
-                                   distance_method = input$BCheatmap_distance,
-                                   minkowski_power = input$BCmink_distance,
-                                   cellnote_option = input$BCheatmap_cellnote_option,
-                                   hclust_linkage = input$BCheatmap_hclust_linkage,
-                                   row_order = input$BCheatmap_row_order,
-                                   clusters = input$BCheatmap_clusters,
-                                   dendro = input$BCheatmap_dendrogram,
-                                   variable_log_min = input$BCheatmap_minimum
-          )
-        }
+        barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
+                                 names = colnames(BCheatmap_data()),
+                                 n_clones = input$BCheatmap_top_clones,
+                                 your_title = input$BCheatmap_title,
+                                 grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
+                                 star_size = input$BCheatmap_starsize, log_transform = input$BCheatmap_log_transform,
+                                 log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
+                                 distance_method = input$BCheatmap_distance,
+                                 minkowski_power = input$BCmink_distance,
+                                 cellnote_option = input$BCheatmap_cellnote_option,
+                                 hclust_linkage = input$BCheatmap_hclust_linkage,
+                                 row_order = input$BCheatmap_row_order,
+                                 clusters = input$BCheatmap_clusters,
+                                 dendro = input$BCheatmap_dendrogram,
+                                 variable_log_min = input$BCheatmap_minimum,
+                                 angled = input$BCheatmap_angled,
+                                 bottom_margin = 10)}
+
+      BCheatmapREADMEtable <- function(){
+        your_table <- readme_data()
+        your_table <- your_table[match(input$BCheatmap_samples,your_table$GIVENNAME),]
+        temp_names <- your_table$GIVENNAME
+        temp_clones <- colSums(BCheatmap_data() > 0)
+        your_table <- as.data.frame(rbind(your_table$MAPPED, your_table$READS, round(your_table$MAPPED/your_table$READS * 100,2), temp_clones))
+        colnames(your_table) <- temp_names
+        rownames(your_table) <- c("MAPPED", "READS", "MAP %", "CLONES")
+        return(as.matrix(your_table))
       }
+
+      output$viewBCheatmapSTATS <- renderPlot({
+        gplots::heatmap.2(x = BCheatmapREADMEtable(),dendro = 'none', Rowv = FALSE, Colv = FALSE,
+                          colsep= 0:(ncol(BCheatmapREADMEtable())+1), rowsep= 0:(1+nrow(BCheatmapREADMEtable())),
+                          notecol = 'black', sepcolor = 'black', margins = c(15,6), cexRow = 1.1, notecex = 1.4,
+                          cellnote = BCheatmapREADMEtable(), col = colorRampPalette(colors = c('white','white')),
+                          labels = colnames(BCheatmapREADMEtable()), symkey = FALSE, trace = "none", symm = FALSE,
+                          key = FALSE, keysize = 0.8, cexCol = input$BCheatmap_labels)
+      })
 
       output$downloadBCheatmapkey <- downloadHandler(
         filename = function() {paste(input$file1, "_BCheatmapkey.txt", sep = "")},
@@ -157,7 +188,6 @@ shinyServer(
 
       output$viewBCheatmap <- renderPlot({
         BCheatmapInput()
-        height = 700
       })
 
 
@@ -179,74 +209,63 @@ shinyServer(
 
       })
 
-      BCheatmap_months <- reactive({
-        return(as.numeric(unlist(strsplit(input$BCheatmap_months, split = ','))))
-      })
-
       fluidRow(
         column(3,
                wellPanel(
                  selectizeInput("BCheatmap_samples", label = "1. Which Samples to Use (in order)",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 textInput("BCheatmap_months", '(1.5). Enter months (in order) seperated by a comma: ', value = ""),
                  numericInput("BCheatmap_top_clones", "2. Number of top clones", value = 10),
-                 textInput("BCheatmap_title", "3. Title for BCheatmap", value = ""),
-                 strong("4. Options"),
+                 strong("3. Options"),
                  checkboxInput("BCheatmap_grid", label = "Grid", value = TRUE),
                  checkboxInput("BCheatmap_log_transform", label = "Log-Transform", value = TRUE),
                  checkboxInput("BCheatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
-                 checkboxInput("BCheatmap_minimum", label = "Variable Minimum for Log", value = TRUE),
-                 checkboxInput("BCheatmap_cluster_tracker", label = "Show cluster-tracker (CT)", value = FALSE),
-                 checkboxInput("BCheatmap_clusterscale", label = "CT: percent scale", value = TRUE),
-                 checkboxInput("BCheatmap_cluster_error", label = "CT: use std_error", value = TRUE),
-                 selectInput("BCheatmap_scale", "4. Select Log",
-                             choices = c("2", "e", "10", "100"),
-                             selected = "e"),
-                 selectInput("BCheatmap_distance", "5. Select Distance Metric/Function",
-                             choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
-                             selected = "Euclidean"),
-                 numericInput("BCmink_distance", "6. If Minkowski, choose Minkowski Power", value = 2, step = 1),
-                 selectInput("BCheatmap_cellnote_option", "7. Select Cell Display Option",
+                 checkboxInput("BCheatmap_minimum", label = "Variable Minimum for Log", value = FALSE),
+                 checkboxInput("BCheatmap_angled", label = "Angle colnames", value = TRUE),
+                 selectInput("BCheatmap_cellnote_option", "4. Select Cell Display Option",
                              choices = c("reads", "percents", "logs", "stars", "ranks"),
                              selected = "stars"),
-                 selectInput("BCheatmap_hclust_linkage", "8. Select Clustering Linkage",
+                 numericInput("BCheatmap_labels", "5. Set Column Label Size", value = 1.5),
+                 numericInput("BCheatmap_starsize", "6. Set Cell Label Size", value = 1.5),
+                 textInput("BCheatmap_title", "7. Title for BCheatmap", value = ""),
+                 selectInput("BCheatmap_distance", "8. Select Distance Metric/Function",
+                             choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
+                             selected = "Euclidean"),
+                 numericInput("BCmink_distance", "9. If Minkowski, choose Minkowski Power", value = 2, step = 1),
+                 selectInput("BCheatmap_hclust_linkage", "10. Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
-                 numericInput("BCheatmap_clusters", "9. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 9),
-                 selectInput("BCheatmap_row_order", "10. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
-                 numericInput("BCheatmap_labels", "10. Set Column Label Size", value = 3),
-                 numericInput("BCheatmap_starsize", "11. Set Cell Label Size", value = 1.5),
-                 selectInput("BCheatmap_table_option", "12. Select Format for Key (below)",
+                 selectInput("BCheatmap_scale", "11. Select Log",
+                             choices = c("2", "e", "10", "100"),
+                             selected = "e"),
+                 numericInput("BCheatmap_clusters", "12. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 9),
+                 selectInput("BCheatmap_row_order", "13. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
+                 selectInput("BCheatmap_table_option", "14. Select Format for Key (below)",
                              choices = c("logs", "reads", "percents", "ranks"),
                              selected = "percents"),
-                 strong("13. Press button to download BCheatmap Key."),
+                 strong("15. Press button to download BCheatmap Key."),
                  br(),
                  downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
-
-
-
-
                )
         ),
-        column(9,
-               plotOutput('viewBCheatmap', height = 900)
+        column(8,
+               plotOutput('viewBCheatmap', height = 800),
+               plotOutput('viewBCheatmapSTATS', height = 300)
         )
-
       )
-
-
-
     })
 
     #======================================================================================================
 
     #CORPLOT TAB
 
-
     output$CorPlot <- renderUI({
+
 
       if (is.null(thresholded_data()))
         return()
+
+      observeEvent(input$corplot_Copier, {updateSelectizeInput(session, inputId = 'corplot_Samples', selected = input$BCheatmap_samples)})
+
 
       corplotInput <- function(){
         barcodetrackR::cor_plot(your_data = corplot_data(), names = colnames(corplot_data()),
@@ -279,7 +298,6 @@ shinyServer(
 
       output$viewcorplot <- renderPlot({
         corplotInput()
-        height = 900
       })
 
       corplot_data <- reactive({
@@ -307,193 +325,29 @@ shinyServer(
         column(3,
                wellPanel(
                  selectizeInput("corplot_Samples", label = "1. Which Samples to Use (order matters)",
-                                choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("corplot_thresh", "2. Select Threshold (for Corrplot)", value = 0),
-                 textInput("corplot_Title", "3. Title for Corplot", value = ""),
+                                choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE, selected = ""),
+                 actionButton("corplot_Copier", label = "Copy BCHM Samples"),
+                 br(),
+                 br(),
+                 numericInput("corplot_thresh", "2. Reads threshold", value = 0),
+                 textInput("corplot_Title", "3. Title", value = ""),
                  selectInput("corplot_Type", '4. Choose Type of Plot', choices = c("circle", "square", "ellipse", "color", "number", "shade", "pie"), selected = "square"),
-                 strong("5. Exclude Negatives?"),
-                 checkboxInput("corplot_excludeneg", "", value = FALSE),
-                 strong("6. Grid ON/OFF"),
-                 checkboxInput("corplot_Grid", "", value = TRUE),
-                 selectInput("corplot_Method", "7. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
-                 selectInput("corplot_Colors", "8. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
-                 numericInput("corplot_Labels", "9. Set Label Size", value = 2),
-                 strong("10. Press button to downlaod CorPlot Files as .zip"),
+                 strong("5. Options"),
+                 checkboxInput("corplot_excludeneg", "Exclude negatives", value = FALSE),
+                 checkboxInput("corplot_Grid", "Grid ON/OFF", value = TRUE),
+                 selectInput("corplot_Method", "6. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
+                 selectInput("corplot_Colors", "7. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
+                 numericInput("corplot_Labels", "8. Set Label Size", value = 2),
+                 strong("9. Press button to downlaod CorPlot Files as .zip"),
                  br(),
                  downloadButton('downloadcorplotzip', 'corr_plot.zip')
                )
         ),
 
-        column(9,
-               plotOutput('viewcorplot', height = 1000)
+        column(8,
+               plotOutput('viewcorplot', height = 800)
         )
-
       )
-
-
-
-
-
-    })
-
-
-    #======================================================================================================
-
-
-
-
-    output$RadarChart <- renderUI({
-
-
-      radarchart_data <- reactive({
-
-        rf <- thresholded_data()
-        rf <- rf[rf$GIVENNAME %in% input$radar_Samples,] #subset samples
-        rf$GIVENNAME <- factor(rf$GIVENNAME, levels = input$radar_Samples)
-        rf <- rf[order(rf$GIVENNAME),]
-        newcolnames <- rf$GIVENNAME
-        rf$GIVENNAME <- NULL
-        rf$EXPERIMENT <- NULL
-        rf$CELLTYPE <- NULL
-        rf$MONTH <- NULL
-        rf$LOCATION <- NULL
-        rf$MISC <- NULL
-        rf <- data.frame(t(rf))
-        colnames(rf) <- newcolnames
-        return(rf)
-
-      })
-
-      radarInput <- function(){
-        barcodetrackR::radartopclones(your_data = radarchart_data(),
-                                      columnChoice_Name = input$radar_Choice,
-                                      n_clones = input$radar_Clones, your_title = input$radar_Title,
-                                      labelsize = input$radar_labelsize)
-      }
-      output$viewradarchart <- renderPlot({
-        radarInput()
-      })
-
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("radar_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-
-                 selectizeInput("radar_Choice", label = "2. Which Sample for Top Clones: ",
-                                choices = as.vector(unique(thresholded_data()$GIVENNAME))),
-
-                 numericInput("radar_Clones", "3. Select Number of Clones", value = 100, step = 10),
-
-                 textInput("radar_Title", "4. Title", value = ""),
-
-                 numericInput("radar_labelsize", "5. Enter Label Size: ", value = 1)
-
-
-
-               )),
-
-
-
-
-        column(9,
-               plotOutput('viewradarchart', height = 700)
-        )
-
-      )
-    })
-
-
-
-
-
-    #======================================================================================================
-
-    #TOPCLONESBARCHART TAB
-
-    output$TopClonesBarChart <- renderUI({
-
-      if (is.null(thresholded_data()))
-        return()
-
-      topclonesbarchartInput <- function(){
-        barcodetrackR::topclones_barchart(your_data = topclonesbarchart_data(),
-                                          top_clones_choice = topclonesbarchart_Choice(),
-                                          n_clones = input$topclonesbarchart_Clones,
-                                          text_size = input$topclonesbarchart_Textsize,
-                                          y_limit = input$topclonesbarchart_yLim,
-                                          other_color = input$topclonesbarchart_Othercolor,
-                                          your_title = input$topclonesbarchart_Title)
-      }
-
-
-      output$viewtopclonesbarchart <- renderPlot({
-        print(topclonesbarchartInput())
-        height = 700
-      })
-
-      topclonesbarchart_data <- reactive({
-        ef <- thresholded_data()
-        ef <- ef[ef$GIVENNAME %in% input$topclonesbarchart_Samples,] #subset samples
-        ef$GIVENNAME <- factor(ef$GIVENNAME, levels = input$topclonesbarchart_Samples)
-        ef <- ef[order(ef$GIVENNAME),]
-        newcolnames <- ef$GIVENNAME
-        ef$GIVENNAME <- NULL
-        ef$EXPERIMENT <- NULL
-        ef$CELLTYPE <- NULL
-        ef$MONTH <- NULL
-        ef$LOCATION <- NULL
-        ef$MISC <- NULL
-        ef <- data.frame(t(ef))
-        colnames(ef) <- newcolnames
-        return(ef)
-      })
-
-      topclonesbarchart_Choice <- reactive({
-        tcbchoice <- thresholded_data()
-        tcbchoice <- tcbchoice[tcbchoice$GIVENNAME == input$topclonesbarchart_Selected,,drop = FALSE]
-        newcolnames <- tcbchoice$GIVENNAME
-        tcbchoice$GIVENNAME <- NULL
-        tcbchoice$EXPERIMENT <- NULL
-        tcbchoice$CELLTYPE <- NULL
-        tcbchoice$MONTH <- NULL
-        tcbchoice$LOCATION <- NULL
-        tcbchoice$MISC <- NULL
-        tcbchoice <- data.frame(t(tcbchoice))
-        colnames(tcbchoice) <- newcolnames
-        return(tcbchoice)
-      })
-
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("topclonesbarchart_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 selectInput("topclonesbarchart_Selected", label = "2. Which Sample to Use for Top Clones",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
-                 numericInput("topclonesbarchart_Clones", "3. Select Number of Clones", value = 50),
-                 numericInput("topclonesbarchart_Textsize", "4. Enter Text Size: ", value = 15),
-                 numericInput("topclonesbarchart_yLim", "5. Enter Y Limit: ", value = 100),
-                 selectInput("topclonesbarchart_Othercolor", "6. Choose Other Color",
-                             choices = c("grey", "black", "white"), selected = "black"),
-                 textInput("topclonesbarchart_Title", "7. Title", value = "Bar Chart")
-
-
-
-               )),
-
-
-
-        column(9,
-               plotOutput('viewtopclonesbarchart', height = 700)
-        )
-
-      )
-
-
-
     })
 
 
@@ -746,7 +600,7 @@ shinyServer(
 
 
 
-        column(9,
+        column(7,
                plotOutput('viewscatter', height = 700)
         )
 
@@ -1138,20 +992,16 @@ shinyServer(
         cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
         cb_df <- cb_df[order(cb_df$GIVENNAME),]
         newcolnames <- cb_df$GIVENNAME
-
         cb_df$GIVENNAME <- NULL
         cb_df$EXPERIMENT <- NULL
         cb_df$CELLTYPE <- NULL
         cb_df$MONTH <- NULL
         cb_df$LOCATION <- NULL
         cb_df$MISC <- NULL
-
         cb_df <- data.frame(t(cb_df))
         colnames(cb_df) <- newcolnames
         return(cb_df)
-
       })
-
       fluidRow(
         column(3,
                wellPanel(
@@ -1161,23 +1011,65 @@ shinyServer(
                  selectInput("clonalbias_Type", label = "3. Pick type of plot",
                              choices = c("Dots", "Bars"))
                )),
-
-
-
         column(9,
                plotOutput('viewclonalbias', height = 700)
         )
-
       )
-
-
-
-
-
-
     })
 
+    #======================================================================================================
+    #SINGLECLONETRACKER TAB
 
+    output$SingleTracker <- renderUI({
+      if(is.null(thresholded_data()))
+        return()
+
+      singletrackerInput <- function(){
+        print(barcodetrackR::single_clone_tracker(singletracker_data(),
+                                                  n_clones = input$singletracker_Clones,
+                                                  y_max = input$singletracker_yMax,
+                                                  top_value = input$singletracker_Topvalue,
+                                                  line_size = input$singletracker_Linesize,
+                                                  text_size = input$singletracker_Textsize))
+      }
+
+      output$viewsingletracker<- renderPlot({
+        singletrackerInput()
+        height = 700
+      })
+
+      singletracker_data <- reactive({
+        st_df <- thresholded_data()
+        st_df <- st_df[st_df$GIVENNAME %in% input$singletracker_Samples,] #subset samples
+        st_df$GIVENNAME <- factor(st_df$GIVENNAME, levels = input$singletracker_Samples)
+        st_df <- st_df[order(st_df$GIVENNAME),]
+        newcolnames <- st_df$GIVENNAME
+        st_df$GIVENNAME <- NULL
+        st_df$EXPERIMENT <- NULL
+        st_df$CELLTYPE <- NULL
+        st_df$MONTH <- NULL
+        st_df$LOCATION <- NULL
+        st_df$MISC <- NULL
+        st_df <- data.frame(t(st_df))
+        colnames(st_df) <- newcolnames
+        return(st_df)
+      })
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("singletracker_Samples", label = "1. Which Samples to Use",
+                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 numericInput("singletracker_Clones", "2. Enter Number of Top Clones: ", value = 100),
+                 numericInput("singletracker_yMax", "3. Enter Y axis Limit: ", value = 1),
+                 numericInput("singletracker_Topvalue", "4. Enter Clone Peak Choice: ", value = .5),
+                 numericInput("singletracker_Linesize", "5. Enter Line Size: ", value = 2),
+                 numericInput("singletracker_Textsize", "6. Enter Text Size: ", value = 10)
+               )),
+        column(9,
+               plotOutput('viewsingletracker', height = 700)
+        )
+      )
+    })
 
 
 
