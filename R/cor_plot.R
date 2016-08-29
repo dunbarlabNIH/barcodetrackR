@@ -8,7 +8,7 @@
 #'        only barcodes whose sum in pair of samples being compared is greater than the average of each's
 #'        scaled threshold will be used for finding correlation.
 #'@param your_title Title for plot.
-#'@param method_corr Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhatatn distance.
+#'@param method_corr Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhattan distance.
 #'@param labelsizes Numeric. Size of the plot labels.
 #'@param plottype Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".
 #'@param printtables Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
