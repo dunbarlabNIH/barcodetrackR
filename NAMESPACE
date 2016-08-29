@@ -3,7 +3,7 @@
 export(BBHM)
 export(BCLH)
 export(BC_clusters)
-export(BCheatmap)
+export(barcode_ggheatmap)
 export(barcode_treemap)
 export(barcodecount)
 export(clonal_bias)

@@ -9,6 +9,7 @@ URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
 Imports:
+    caTools,
     corrplot,
     dplyr,
     fmsb,
@@ -17,6 +18,9 @@ Imports:
     gdata,
     gplots,
     gridExtra,
+    gtools,
+    htmltools,
+    httpuv,
     plyr,
     proxy,
     reshape2,
@@ -24,5 +28,6 @@ Imports:
     shinyBS,
     stringr,
     treemap,
-    vegan
+    vegan,
+    xtable
 RoxygenNote: 5.0.1
