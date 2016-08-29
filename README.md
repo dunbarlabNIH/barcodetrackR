@@ -24,11 +24,8 @@ barcodecount()
 BBHM()
 #shows the emergence of barcodes over time in a heatmap
 
-BCheatmap() #replacement for BCLH as of January 2016
+barcode_ggheatmap()
 #displays heatmap of the top N clones in selected samples
-
-BCLH() #deprecated as of January 2016
-#BCheatmap with less options
 
 clonaldiversity()
 #calcuate diversity indices for samples across time
@@ -42,14 +39,8 @@ diversity_plotter()
 gettopindices()
 #extracts the top N indices for a data frame per column, eliminating repeats
 
-hematoper()
-#shows the hematopoietic contribution of the top N barcodes over time
-
 launchApp()
 #launch the shiny app that eases the use of the majority these functions
-
-megatopclones()
-#see Figure 7 at http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3979461/
 
 merger()
 #merges list of matrices by rowname, including all entries
@@ -62,9 +53,6 @@ richness_plotter()
 
 threshold()
 #eliminates barcodes that aren't present X times in at least one sample
-
-topclonescontrib()
-#radartopclones() with the axis unraveled
 
 treemap()
 #tree map of a given sample
