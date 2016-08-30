@@ -20,10 +20,25 @@ shinyServer(
         df <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
         incProgress(0.5, detail = "Applying Threshold")
         tdf <- t(df)
-        keyfile <- read.delim(input$file2$datapath, row.names = 1, stringsAsFactors = FALSE)
-        tdf <- tdf[rownames(tdf) %in% rownames(keyfile),]
-        keyfile = keyfile[match(rownames(tdf), rownames(keyfile)),]
-        df <- cbind(keyfile, tdf)
+        keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
+        keyfile <- keyfile[,c("FILENAME", "GIVENNAME")]
+        if(any(duplicated(keyfile$FILENAME))){
+          stop("Keyfile contains duplicate FILENAME")
+        }
+        if(any(duplicated(keyfile$GIVENNAME))){
+          stop("Keyfile contains duplicate GIVENNAME")
+        }
+        if(length(setdiff(keyfile$FILENAME, rownames(tdf))) != 0){
+          stop("Number of samples in keyfile differs from number of samples in outfile")
+        }
+        if(!(all(rownames(tdf) %in% keyfile$FILENAME))){
+          stop("Missing certain files in keyfile")
+        }
+        if(!(all(keyfile$FILENAME %in% rownames(tdf)))){
+          stop("FILENAME in keyfile is not in outfile")
+        }
+        keyfile <- keyfile[match(rownames(tdf), keyfile$FILENAME),]
+        df <- data.frame(GIVENNAME = keyfile$GIVENNAME, tdf)
       })
       df <- data.frame(df)
       return(df)
@@ -66,16 +81,10 @@ shinyServer(
       tabsetPanel(
         tabPanel("DataStatistics",
                  uiOutput("DataStatistics")),
-        tabPanel("BCheatmap",
-                 uiOutput("BCheatmap")),
+        tabPanel("Heatmap",
+                 uiOutput("Heatmap")),
         tabPanel("CorPlot",
                  uiOutput("CorPlot")),
-        # tabPanel("RadarChart",
-        #          uiOutput("RadarChart")),
-        # tabPanel("TopClonesBarChart",
-        #          uiOutput("TopClonesBarChart")),
-        tabPanel("TopClonesTracker",
-                 uiOutput("TopClonesTracker")),
         tabPanel("Diversity & Richness",
                  uiOutput("Diversity")),
         tabPanel("Scatter Plot",
@@ -91,9 +100,7 @@ shinyServer(
         tabPanel("UnilineageBias",
                  uiOutput("UnilineageBias")),
         tabPanel("ClonalBias",
-                 uiOutput("ClonalBias")),
-        tabPanel("SingleTracker",
-                 uiOutput("SingleTracker"))
+                 uiOutput("ClonalBias"))
       )
     })
 
@@ -124,85 +131,73 @@ shinyServer(
 
     #HEATMAP TAB
 
-    output$BCheatmap <- renderUI({
+    output$Heatmap <- renderUI({
 
       if (is.null(thresholded_data()))
         return()
 
-      BCheatmapInput <- function(){
-        barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
-                                 names = colnames(BCheatmap_data()),
-                                 n_clones = input$BCheatmap_top_clones,
-                                 your_title = input$BCheatmap_title,
-                                 grid = input$BCheatmap_grid, columnLabels = input$BCheatmap_labels,
-                                 star_size = input$BCheatmap_starsize, log_transform = input$BCheatmap_log_transform,
-                                 log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
-                                 distance_method = input$BCheatmap_distance,
-                                 minkowski_power = input$BCmink_distance,
-                                 cellnote_option = input$BCheatmap_cellnote_option,
-                                 hclust_linkage = input$BCheatmap_hclust_linkage,
-                                 row_order = input$BCheatmap_row_order,
-                                 clusters = input$BCheatmap_clusters,
-                                 dendro = input$BCheatmap_dendrogram,
-                                 variable_log_min = input$BCheatmap_minimum,
-                                 angled = input$BCheatmap_angled,
-                                 bottom_margin = 10)}
+      HeatmapInput <- function(){
+        print(barcodetrackR::barcode_ggheatmap(your_data = Heatmap_data(),
+                                               n_clones = input$Heatmap_top_clones,
+                                               your_title = input$Heatmap_title,
+                                               grid = input$Heatmap_grid,
+                                               label_size = input$Heatmap_labels,
+                                               dendro = input$Heatmap_dendrogram,
+                                               cellnote_size = input$Heatmap_starsize,
+                                               log_transform = input$Heatmap_log_transform,
+                                               log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
+                                               distance_method = input$Heatmap_distance,
+                                               minkowski_power = input$Heatmap_mink_distance,
+                                               cellnote_option = input$Heatmap_cellnote_option,
+                                               hclust_linkage = input$Heatmap_hclust_linkage,
+                                               row_order = input$Heatmap_row_order,
+                                               clusters = input$Heatmap_clusters))}
 
-      BCheatmapREADMEtable <- function(){
+      HeatmapREADMEtable <- function(){
         your_table <- readme_data()
-        your_table <- your_table[match(input$BCheatmap_samples,your_table$GIVENNAME),]
+        your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
         temp_names <- your_table$GIVENNAME
-        temp_clones <- colSums(BCheatmap_data() > 0)
-        your_table <- as.data.frame(rbind(your_table$MAPPED, your_table$READS, round(your_table$MAPPED/your_table$READS * 100,2), temp_clones))
-        colnames(your_table) <- temp_names
-        rownames(your_table) <- c("MAPPED", "READS", "MAP %", "CLONES")
+        temp_clones <- colSums(Heatmap_data() > 0)
+        your_table <- as.data.frame(cbind(your_table$MAPPED, your_table$READS, round(your_table$MAPPED/your_table$READS * 100,2), temp_clones))
+        rownames(your_table) <- temp_names
+        colnames(your_table) <- c("MAPPED", "READS", "MAP %", "CLONES")
+
         return(as.matrix(your_table))
       }
 
-      output$viewBCheatmapSTATS <- renderPlot({
-        gplots::heatmap.2(x = BCheatmapREADMEtable(),dendro = 'none', Rowv = FALSE, Colv = FALSE,
-                          colsep= 0:(ncol(BCheatmapREADMEtable())+1), rowsep= 0:(1+nrow(BCheatmapREADMEtable())),
-                          notecol = 'black', sepcolor = 'black', margins = c(15,6), cexRow = 1.1, notecex = 1.4,
-                          cellnote = BCheatmapREADMEtable(), col = colorRampPalette(colors = c('white','white')),
-                          labels = colnames(BCheatmapREADMEtable()), symkey = FALSE, trace = "none", symm = FALSE,
-                          key = FALSE, keysize = 0.8, cexCol = input$BCheatmap_labels)
+
+
+      output$viewHeatmapSTATS <- renderPlot({
+        print(gridExtra::grid.table(HeatmapREADMEtable()))
       })
 
-      output$downloadBCheatmapkey <- downloadHandler(
+      output$downloadHeatmapkey <- downloadHandler(
         filename = function() {paste(input$file1, "_BCheatmapkey.txt", sep = "")},
         content = function(file){
-          write.table(barcodetrackR::BCheatmap(your_data = BCheatmap_data(),
-                                               names = colnames(BCheatmap_data()),
-                                               n_clones = input$BCheatmap_top_clones,
-                                               log_transform = input$BCheatmap_log_transform,
-                                               printtable = TRUE,
-                                               table_option = input$BCheatmap_table_option,
-                                               log_choice = switch(as.character(input$BCheatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
-                                               distance_method = input$BCheatmap_distance,
-                                               minkowski_power = input$BCmink_distance,
-                                               hclust_linkage = input$BCheatmap_hclust_linkage,
-                                               variable_log_min = input$BCheatmap_minimum
-          ), file, sep = '\t', quote = FALSE)
+          write.table(barcodetrackR::barcode_ggheatmap(your_data = Heatmap_data(),
+                                                       n_clones = input$Heatmap_top_clones,
+                                                       log_transform = input$Heatmap_log_transform,
+                                                       printtable = TRUE,
+                                                       table_option = input$Heatmap_table_option,
+                                                       log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
+                                                       distance_method = input$Heatmap_distance,
+                                                       minkowski_power = input$Heatmap_mink_distance,
+                                                       hclust_linkage = input$Heatmap_hclust_linkage), file, sep = '\t', quote = FALSE)
         }
       )
 
-      output$viewBCheatmap <- renderPlot({
-        BCheatmapInput()
+      output$viewHeatmap <- renderPlot({
+        HeatmapInput()
       })
 
 
-      BCheatmap_data <- reactive({
+      Heatmap_data <- reactive({
         df <- thresholded_data()
-        df <- df[df$GIVENNAME %in% input$BCheatmap_samples,] #subset samples
-        df$GIVENNAME <- factor(df$GIVENNAME, levels = input$BCheatmap_samples)
+        df <- df[df$GIVENNAME %in% input$Heatmap_samples,] #subset samples
+        df$GIVENNAME <- factor(df$GIVENNAME, levels = input$Heatmap_samples)
         df <- df[order(df$GIVENNAME),]
         newcolnames <- df$GIVENNAME
         df$GIVENNAME <- NULL
-        df$EXPERIMENT <- NULL
-        df$CELLTYPE <- NULL
-        df$MONTH <- NULL
-        df$LOCATION <- NULL
-        df$MISC <- NULL
         df <- data.frame(t(df))
         colnames(df) <- newcolnames
         return(df)
@@ -212,44 +207,42 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("BCheatmap_samples", label = "1. Which Samples to Use (in order)",
+                 selectizeInput("Heatmap_samples", label = "1. Which Samples to Use (in order)",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("BCheatmap_top_clones", "2. Number of top clones", value = 10),
+                 numericInput("Heatmap_top_clones", "2. Number of top clones", value = 10),
                  strong("3. Options"),
-                 checkboxInput("BCheatmap_grid", label = "Grid", value = TRUE),
-                 checkboxInput("BCheatmap_log_transform", label = "Log-Transform", value = TRUE),
-                 checkboxInput("BCheatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
-                 checkboxInput("BCheatmap_minimum", label = "Variable Minimum for Log", value = FALSE),
-                 checkboxInput("BCheatmap_angled", label = "Angle colnames", value = TRUE),
-                 selectInput("BCheatmap_cellnote_option", "4. Select Cell Display Option",
+                 checkboxInput("Heatmap_grid", label = "Grid", value = TRUE),
+                 checkboxInput("Heatmap_log_transform", label = "Log-Transform", value = TRUE),
+                 checkboxInput("Heatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
+                 selectInput("Heatmap_cellnote_option", "4. Select Cell Display Option",
                              choices = c("reads", "percents", "logs", "stars", "ranks"),
                              selected = "stars"),
-                 numericInput("BCheatmap_labels", "5. Set Column Label Size", value = 1.5),
-                 numericInput("BCheatmap_starsize", "6. Set Cell Label Size", value = 1.5),
-                 textInput("BCheatmap_title", "7. Title for BCheatmap", value = ""),
-                 selectInput("BCheatmap_distance", "8. Select Distance Metric/Function",
+                 numericInput("Heatmap_labels", "5. Set Column Label Size", value = 20),
+                 numericInput("Heatmap_starsize", "6. Set Cell Label Size", value = 15),
+                 textInput("Heatmap_title", "7. Title for Heatmap", value = ""),
+                 selectInput("Heatmap_distance", "8. Select Distance Metric/Function",
                              choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
                              selected = "Euclidean"),
-                 numericInput("BCmink_distance", "9. If Minkowski, choose Minkowski Power", value = 2, step = 1),
-                 selectInput("BCheatmap_hclust_linkage", "10. Select Clustering Linkage",
+                 numericInput("Heatmap_mink_distance", "9. If Minkowski, choose Minkowski Power", value = 2, step = 1),
+                 selectInput("Heatmap_hclust_linkage", "10. Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
-                 selectInput("BCheatmap_scale", "11. Select Log",
+                 selectInput("Heatmap_scale", "11. Select Log",
                              choices = c("2", "e", "10", "100"),
                              selected = "e"),
-                 numericInput("BCheatmap_clusters", "12. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 9),
-                 selectInput("BCheatmap_row_order", "13. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
-                 selectInput("BCheatmap_table_option", "14. Select Format for Key (below)",
+                 numericInput("Heatmap_clusters", "12. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 11),
+                 selectInput("Heatmap_row_order", "13. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
+                 selectInput("Heatmap_table_option", "14. Select Format for Key (below)",
                              choices = c("logs", "reads", "percents", "ranks"),
                              selected = "percents"),
-                 strong("15. Press button to download BCheatmap Key."),
+                 strong("15. Press button to download Heatmap Key."),
                  br(),
-                 downloadButton('downloadBCheatmapkey', 'BCheatmap_key')
+                 downloadButton('downloadHeatmapkey', 'Heatmap_key')
                )
         ),
         column(8,
-               plotOutput('viewBCheatmap', height = 800),
-               plotOutput('viewBCheatmapSTATS', height = 300)
+               plotOutput('viewHeatmap', height = 800),
+               plotOutput('viewHeatmapSTATS', height = 300)
         )
       )
     })
@@ -268,12 +261,16 @@ shinyServer(
 
 
       corplotInput <- function(){
-        barcodetrackR::cor_plot(your_data = corplot_data(), names = colnames(corplot_data()),
-                                thresh = input$corplot_thresh, your_title = input$corplot_Title,
-                                method_corr = input$corplot_Method, labelsizes = input$corplot_Labels,
+        barcodetrackR::cor_plot(your_data = corplot_data(),
+                                names = colnames(corplot_data()),
+                                thresh = input$corplot_thresh,
+                                your_title = input$corplot_Title,
+                                method_corr = input$corplot_Method,
+                                labelsizes = input$corplot_Labels,
                                 plottype = input$corplot_Type,
                                 no_negatives = input$corplot_excludeneg,
-                                show_grid = input$corplot_Grid, colorscale = input$corplot_Colors)
+                                show_grid = input$corplot_Grid,
+                                colorscale = input$corplot_Colors)
       }
 
       output$downloadcorplotzip <- downloadHandler(
@@ -307,11 +304,6 @@ shinyServer(
         cf <- cf[order(cf$GIVENNAME),]
         newcolnames <- cf$GIVENNAME
         cf$GIVENNAME <- NULL
-        cf$EXPERIMENT <- NULL
-        cf$CELLTYPE <- NULL
-        cf$MONTH <- NULL
-        cf$LOCATION <- NULL
-        cf$MISC <- NULL
         cf <- data.frame(t(cf))
         colnames(cf) <- newcolnames
         return(cf)
