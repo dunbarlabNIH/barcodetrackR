@@ -4,15 +4,18 @@
 \alias{barcode_ggheatmap}
 \title{barcode_ggheatmap (Barcode Heatmap using ggplot2)}
 \usage{
-barcode_ggheatmap(your_data, n_clones = 10, your_title = "", grid = TRUE,
-  label_size = 1, dendro = FALSE, cellnote_size = 4, printtable = FALSE,
-  table_option = "percents", log_transform = TRUE, log_choice = exp(1),
+barcode_ggheatmap(your_data, names = colnames(your_data), n_clones = 10,
+  your_title = "", grid = TRUE, label_size = 1, dendro = FALSE,
+  cellnote_size = 4, printtable = FALSE, table_option = "percents",
+  log_transform = TRUE, log_choice = exp(1),
   distance_method = "Euclidean", minkowski_power = 1,
   cellnote_option = "stars", hclust_linkage = "complete",
   row_order = "hierarchical", clusters = 0)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+
+\item{names}{Vector of x axis labels.}
 
 \item{n_clones}{The top 'n' clones to plot.}
 

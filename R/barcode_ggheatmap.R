@@ -3,6 +3,7 @@
 #'@description Creates a heatmap using the top 'n' rows from each column, using ggplot2!
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
+#'@param names Vector of x axis labels.
 #'@param n_clones The top 'n' clones to plot.
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
@@ -26,22 +27,23 @@
 #'BCheatmap(your_data = zh33, n_clones = 10, printtable = TRUE)
 #'@export
 barcode_ggheatmap <- function(your_data,
-                              n_clones = 10,
-                              your_title = "",
-                              grid = TRUE,
-                              label_size = 1,
-                              dendro = FALSE,
-                              cellnote_size = 4,
-                              printtable = FALSE,
-                              table_option = "percents",
-                              log_transform = TRUE,
-                              log_choice = exp(1),
-                              distance_method = "Euclidean",
-                              minkowski_power = 1,
-                              cellnote_option = "stars",
-                              hclust_linkage = "complete",
-                              row_order = "hierarchical",
-                              clusters = 0) {
+                                    names = colnames(your_data),
+                                    n_clones = 10,
+                                    your_title = "",
+                                    grid = TRUE,
+                                    label_size = 1,
+                                    dendro = FALSE,
+                                    cellnote_size = 4,
+                                    printtable = FALSE,
+                                    table_option = "percents",
+                                    log_transform = TRUE,
+                                    log_choice = exp(1),
+                                    distance_method = "Euclidean",
+                                    minkowski_power = 1,
+                                    cellnote_option = "stars",
+                                    hclust_linkage = "complete",
+                                    row_order = "hierarchical",
+                                    clusters = 0) {
   your_data_list <- list(raw_reads = your_data, prop_table = as.data.frame(prop.table(as.matrix(your_data),2)))
   your_data_list$prop_table[is.na(your_data)] <- 0
   if (any(colSums(your_data_list$prop_table) != 1)){
@@ -75,10 +77,10 @@ barcode_ggheatmap <- function(your_data,
 
   if(log_transform){
     plotting_data <- reshape2::melt(as.matrix(your_data_list$logged_data))
-    actual_scale <- c(log(100/4000000, log_choice) - 1, log(100/4000000, log_choice),log(0.005, log_choice), log(0.01,log_choice), log(0.1, log_choice), 0)
+    actual_scale <- c(log(100/4000000, log_choice) - 1, log(100/4000000, log_choice), log(0.001, log_choice), log(0.01,log_choice), log(0.1, log_choice), 0)
     your_scale <- scales::rescale(actual_scale, to = c(0,1))
     your_breaks <- c(actual_scale)
-    your_labels <- c("Defined 0", " ", "0.5%", "1%", "10%", "100%")
+    your_labels <- c("Defined 0", "0.0025% ", "0.1%", "1%", "10%", "100%")
     your_limits <- c(log(100/4000000, log_choice)-1,0)
     your_colors <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
   } else {
@@ -144,7 +146,7 @@ barcode_ggheatmap <- function(your_data,
         limits = your_limits,
         expand = c(0,0))+
       ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
-      ggplot2::scale_x_discrete(expand = c(0,0))+
+      ggplot2::scale_x_discrete(expand = c(0,0), labels = names)+
       ggplot2::ylab(NULL)+
       ggplot2::xlab(NULL)+
       ggplot2::ggtitle(paste0("\n", your_title, "\n"))+
@@ -179,7 +181,8 @@ barcode_ggheatmap <- function(your_data,
       if(dendro){
 
         if(clusters > 0){
-          custom_colors <- c(RColorBrewer::brewer.pal(8, 'Set1'), "cyan", "black", "grey")
+          # custom_colors <- c(RColorBrewer::brewer.pal(8, 'Set1'), "cyan", "black", "grey")
+          custom_colors <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588")
           clusters_df <-data.frame(CLUSTERS = cutree(hclustering, clusters), ASSIGNMENT=factor(hclustering$labels,levels=hclustering$labels[(hclustering$order)]))
           g3_clusters <-ggplot2::ggplot(clusters_df, ggplot2::aes(x =1,y=ASSIGNMENT,fill=factor(CLUSTERS)))+
             ggplot2::geom_tile()+
