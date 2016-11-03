@@ -46,7 +46,7 @@ barcode_ggheatmap <- function(your_data,
                                     clusters = 0) {
   your_data_list <- list(raw_reads = your_data, prop_table = as.data.frame(prop.table(as.matrix(your_data),2)))
   your_data_list$prop_table[is.na(your_data)] <- 0
-  if (any(colSums(your_data_list$prop_table) != 1)){
+  if (any(colSums(your_data_list$prop_table) == 0)){
     stop("One of your columns contained no data")
   }
   your_data_list$prop_table[your_data_list$prop_table == 0] <- NA
