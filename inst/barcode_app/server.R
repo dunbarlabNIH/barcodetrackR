@@ -210,11 +210,28 @@ shinyServer(
 
       })
 
+      output$Heatmap_download_samples <- downloadHandler(
+        filename = function() {paste("_samplelist.txt", sep = "\t")},
+        content = function(file){
+          write.table(input$Heatmap_samples, file, sep = '\t', quote = FALSE, row.names = FALSE, col.names = FALSE)
+        }
+      )
+
+      Heatmap_uploaded_samples <- reactive({
+        samples <- as.vector(t(read.delim(input$Heatmap_uploaded_samples$datapath, stringsAsFactors = FALSE)))
+        return(samples)
+      })
+
+      observeEvent(input$Heatmap_uploaded_samples, {updateSelectizeInput(session, inputId = 'Heatmap_samples', selected = Heatmap_uploaded_samples())})
+
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("Heatmap_samples", label = "1. Which Samples to Use (in order)",
-                                choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
+                 selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                 downloadButton("Heatmap_download_samples", "Download This Sample List"),
+                 br(),
+                 br(),
                  numericInput("Heatmap_top_clones", "2. Number of top clones", value = 10),
                  strong("3. Options"),
                  checkboxInput("Heatmap_grid", label = "Grid", value = TRUE),
