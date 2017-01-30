@@ -92,8 +92,8 @@ shinyServer(
                  uiOutput("ScatterPlot")),
         tabPanel("Tree Map",
                  uiOutput("TreeMap")),
-        tabPanel("BBHM",
-                 uiOutput("BBHM")),
+        tabPanel("Binary Heatmap",
+                 uiOutput("Binary Heatmap")),
         tabPanel("TernPlot",
                  uiOutput("TernPlot")),
         tabPanel("RankAbundance",
@@ -218,7 +218,7 @@ shinyServer(
       )
 
       Heatmap_uploaded_samples <- reactive({
-        samples <- as.vector(t(read.delim(input$Heatmap_uploaded_samples$datapath, stringsAsFactors = FALSE)))
+        samples <- as.vector(t(read.delim(input$Heatmap_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
         return(samples)
       })
 
@@ -577,7 +577,7 @@ shinyServer(
 
       scatterInput <- function(){
         normdata <- 100*prop.table(as.matrix(scatter_data()), margin = 2)
-        plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize)
+        plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize, pch = 20)
         legend("topright", legend = paste("Correlation (R) =", cor(normdata[,1], normdata[,2])))
       }
 
@@ -687,32 +687,32 @@ shinyServer(
     })
 
     #======================================================================================================
-    #BBHM TAB
+    #Binary Heatmap TAB
 
-    output$BBHM <- renderUI({
+    output$Binaryheatmap <- renderUI({
 
 
       if (is.null(thresholded_data()))
         return()
 
 
-      BBHMInput <- function(){
-        barcodetrackR::BBHM(your_data = BBHM_data(),
-                            col_labels = input$BBHM_labels,
-                            threshold = input$BBHM_threshold
+      BinaryheatmapInput <- function(){
+        barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
+                            label_size = input$Binaryheatmap_labels,
+                            percent_threshold = input$Binaryheatmap_threshold
         )
       }
 
-      output$viewBBHM <- renderPlot({
-        BBHMInput()
+      output$viewBinaryheatmap <- renderPlot({
+        BinaryheatmapInput()
         height = 900
       })
 
 
-      BBHM_data <- reactive({
+      Binaryheatmap_data <- reactive({
         BBdf <- thresholded_data()
-        BBdf <- BBdf[BBdf$GIVENNAME %in% input$BBHM_samples,] #subset samples
-        BBdf$GIVENNAME <- factor(BBdf$GIVENNAME, levels = input$BBHM_samples)
+        BBdf <- BBdf[BBdf$GIVENNAME %in% input$Binaryheatmap_samples,] #subset samples
+        BBdf$GIVENNAME <- factor(BBdf$GIVENNAME, levels = input$Binaryheatmap_samples)
         BBdf <- BBdf[order(BBdf$GIVENNAME),]
         newcolnames <- BBdf$GIVENNAME
         BBdf$GIVENNAME <- NULL
@@ -729,14 +729,14 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("BBHM_samples", label = "1. Which Samples to Use (in order)",
+                 selectizeInput("Binaryheatmap_samples", label = "1. Which Samples to Use (in order)",
                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("BBHM_threshold", "2. Set Threshold", value = 0),
-                 numericInput("BBHM_labels", "3. Set Column Label Size", value = 1.5)
+                 numericInput("Binaryheatmap_threshold", "2. Set Threshold", value = 0),
+                 numericInput("Binaryheatmap_labels", "3. Set Column Label Size", value = 1.5)
                )
         ),
         column(9,
-               plotOutput('viewBBHM', height = 700)
+               plotOutput('viewBinaryheatmap', height = 700)
         )
 
       )
