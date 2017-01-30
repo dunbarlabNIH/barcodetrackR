@@ -1,4 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
+.DS_Store
 graveyard
+inst/barcode_app/graveyard.R

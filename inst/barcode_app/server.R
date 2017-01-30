@@ -434,10 +434,10 @@ shinyServer(
 
 
       BinaryheatmapInput <- function(){
-        barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
-                            label_size = input$Binaryheatmap_labels,
-                            percent_threshold = input$Binaryheatmap_threshold
-        )
+        print(barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
+                                                    label_size = input$Binaryheatmap_labels,
+                                                    percent_threshold = input$Binaryheatmap_threshold
+        ))
       }
 
       output$viewBinaryheatmap <- renderPlot({
@@ -480,189 +480,189 @@ shinyServer(
 
     })
 
-    #======================================================================================================
-    #TERNPLOT TAB
+        #======================================================================================================
+        #TERNPLOT TAB
 
-    output$TernPlot <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
+        output$TernPlot <- renderUI({
+          if(is.null(thresholded_data()))
+            return()
 
-      ternplotInput <- function(){
-        print(barcodetrackR::ternary_plot(ternplot_data(),
-                                          dot_size = input$ternplot_Dotsize,
-                                          show_arrows = input$ternplot_Showarrows,
-                                          show_ticks = input$ternplot_Showticks,
-                                          density_mode = input$ternplot_Density))
+          ternplotInput <- function(){
+            print(barcodetrackR::ternary_plot(ternplot_data(),
+                                              dot_size = input$ternplot_Dotsize,
+                                              show_arrows = input$ternplot_Showarrows,
+                                              show_ticks = input$ternplot_Showticks,
+                                              density_mode = input$ternplot_Density))
 
-      }
+          }
 
-      output$viewternplot<- renderPlot({
-        ternplotInput()
-        height = 700
-      })
+          output$viewternplot<- renderPlot({
+            ternplotInput()
+            height = 700
+          })
 
-      ternplot_data <- reactive({
-        terndf <- thresholded_data()
+          ternplot_data <- reactive({
+            terndf <- thresholded_data()
 
-        terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
-        terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
-        terndf <- terndf[order(terndf$GIVENNAME),]
-        newcolnames <- terndf$GIVENNAME
+            terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
+            terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
+            terndf <- terndf[order(terndf$GIVENNAME),]
+            newcolnames <- terndf$GIVENNAME
 
-        terndf$GIVENNAME <- NULL
-        terndf$EXPERIMENT <- NULL
-        terndf$CELLTYPE <- NULL
-        terndf$MONTH <- NULL
-        terndf$LOCATION <- NULL
-        terndf$MISC <- NULL
+            terndf$GIVENNAME <- NULL
+            terndf$EXPERIMENT <- NULL
+            terndf$CELLTYPE <- NULL
+            terndf$MONTH <- NULL
+            terndf$LOCATION <- NULL
+            terndf$MISC <- NULL
 
-        terndf <- data.frame(t(terndf))
-        colnames(terndf) <- newcolnames
-        return(terndf)
+            terndf <- data.frame(t(terndf))
+            colnames(terndf) <- newcolnames
+            return(terndf)
 
-      })
+          })
 
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 strong("2. Options"),
-                 checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
-                 checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
-                 checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE),
-                 numericInput("ternplot_Dotsize", "3. Enter Dot Size: ", value = 1000)
-               )),
-
-
-
-        column(9,
-               plotOutput('viewternplot', height = 700)
-        )
-
-      )
+          fluidRow(
+            column(3,
+                   wellPanel(
+                     selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
+                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                     strong("2. Options"),
+                     checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
+                     checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
+                     checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE),
+                     numericInput("ternplot_Dotsize", "3. Enter Dot Size: ", value = 1000)
+                   )),
 
 
 
+            column(9,
+                   plotOutput('viewternplot', height = 700)
+            )
 
-
-
-    })
-
-
-    #======================================================================================================
-    #RANKABUNDANCE TAB
-
-    output$RankAbundance <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
-
-      rankabundanceInput <- function(){
-        print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
-                                                 dot_size = input$rankabundance_Dotsize,
-                                                 text_size = input$rankabundance_Textsize))
-
-      }
-
-      output$viewrankabundance<- renderPlot({
-        rankabundanceInput()
-        height = 700
-      })
-
-      rankabundance_data <- reactive({
-        rankabdf <- thresholded_data()
-        rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
-        rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
-        rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
-        newcolnames <- rankabdf$GIVENNAME
-
-        rankabdf$GIVENNAME <- NULL
-        rankabdf$EXPERIMENT <- NULL
-        rankabdf$CELLTYPE <- NULL
-        rankabdf$MONTH <- NULL
-        rankabdf$LOCATION <- NULL
-        rankabdf$MISC <- NULL
-
-        rankabdf <- data.frame(t(rankabdf))
-        colnames(rankabdf) <- newcolnames
-        return(rankabdf)
-
-      })
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
-                 numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
-               )),
-
-
-
-        column(9,
-               plotOutput('viewrankabundance', height = 700)
-        )
-
-      )
+          )
 
 
 
 
 
 
-    })
+        })
 
-    #======================================================================================================
-    #CLONALBIAS TAB
 
-    output$ClonalBias <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
+        #======================================================================================================
+        #RANKABUNDANCE TAB
 
-      clonalbiasInput <- function(){
-        if(input$clonalbias_Type == "Dots"){
-          print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
-        } else if(input$clonalbias_Type == "Bars"){
-          print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
-        }
-      }
+        output$RankAbundance <- renderUI({
+          if(is.null(thresholded_data()))
+            return()
 
-      output$viewclonalbias<- renderPlot({
-        clonalbiasInput()
-        height = 700
-      })
+          rankabundanceInput <- function(){
+            print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
+                                                     dot_size = input$rankabundance_Dotsize,
+                                                     text_size = input$rankabundance_Textsize))
 
-      clonalbias_data <- reactive({
-        cb_df <- thresholded_data()
-        cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
-        cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
-        cb_df <- cb_df[order(cb_df$GIVENNAME),]
-        newcolnames <- cb_df$GIVENNAME
-        cb_df$GIVENNAME <- NULL
-        cb_df$EXPERIMENT <- NULL
-        cb_df$CELLTYPE <- NULL
-        cb_df$MONTH <- NULL
-        cb_df$LOCATION <- NULL
-        cb_df$MISC <- NULL
-        cb_df <- data.frame(t(cb_df))
-        colnames(cb_df) <- newcolnames
-        return(cb_df)
-      })
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15),
-                 selectInput("clonalbias_Type", label = "3. Pick type of plot",
-                             choices = c("Dots", "Bars"))
-               )),
-        column(9,
-               plotOutput('viewclonalbias', height = 700)
-        )
-      )
-    })
+          }
+
+          output$viewrankabundance<- renderPlot({
+            rankabundanceInput()
+            height = 700
+          })
+
+          rankabundance_data <- reactive({
+            rankabdf <- thresholded_data()
+            rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
+            rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
+            rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
+            newcolnames <- rankabdf$GIVENNAME
+
+            rankabdf$GIVENNAME <- NULL
+            rankabdf$EXPERIMENT <- NULL
+            rankabdf$CELLTYPE <- NULL
+            rankabdf$MONTH <- NULL
+            rankabdf$LOCATION <- NULL
+            rankabdf$MISC <- NULL
+
+            rankabdf <- data.frame(t(rankabdf))
+            colnames(rankabdf) <- newcolnames
+            return(rankabdf)
+
+          })
+
+          fluidRow(
+            column(3,
+                   wellPanel(
+                     selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
+                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                     numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
+                     numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
+                   )),
+
+
+
+            column(9,
+                   plotOutput('viewrankabundance', height = 700)
+            )
+
+          )
+
+
+
+
+
+
+        })
+
+        #======================================================================================================
+        #CLONALBIAS TAB
+
+        output$ClonalBias <- renderUI({
+          if(is.null(thresholded_data()))
+            return()
+
+          clonalbiasInput <- function(){
+            if(input$clonalbias_Type == "Dots"){
+              print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+            } else if(input$clonalbias_Type == "Bars"){
+              print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+            }
+          }
+
+          output$viewclonalbias<- renderPlot({
+            clonalbiasInput()
+            height = 700
+          })
+
+          clonalbias_data <- reactive({
+            cb_df <- thresholded_data()
+            cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
+            cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
+            cb_df <- cb_df[order(cb_df$GIVENNAME),]
+            newcolnames <- cb_df$GIVENNAME
+            cb_df$GIVENNAME <- NULL
+            cb_df$EXPERIMENT <- NULL
+            cb_df$CELLTYPE <- NULL
+            cb_df$MONTH <- NULL
+            cb_df$LOCATION <- NULL
+            cb_df$MISC <- NULL
+            cb_df <- data.frame(t(cb_df))
+            colnames(cb_df) <- newcolnames
+            return(cb_df)
+          })
+          fluidRow(
+            column(3,
+                   wellPanel(
+                     selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
+                                 choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+                     numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15),
+                     selectInput("clonalbias_Type", label = "3. Pick type of plot",
+                                 choices = c("Dots", "Bars"))
+                   )),
+            column(9,
+                   plotOutput('viewclonalbias', height = 700)
+            )
+          )
+        })
 
 
 
@@ -670,7 +670,7 @@ shinyServer(
 
 
   }
-)
+    )
 
 
 
