@@ -4,13 +4,11 @@
 \alias{ternary_plot}
 \title{Ternary Plot}
 \usage{
-ternary_plot(your_data, dot_size = 2000, show_arrows = TRUE,
-  show_ticks = TRUE, density_mode = FALSE)
+ternary_plot(your_data, show_arrows = TRUE, show_ticks = TRUE,
+  density_mode = FALSE)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
-
-\item{dot_size}{The size of the dots (does not apply to density mode).}
 
 \item{show_arrows}{Logical. Display arrows or not.}
 
