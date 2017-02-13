@@ -529,8 +529,7 @@ shinyServer(
                  strong("2. Options"),
                  checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
                  checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
-                 checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE),
-                 numericInput("ternplot_Dotsize", "3. Enter Dot Size: ", value = 1000)
+                 checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE)
                )),
 
 

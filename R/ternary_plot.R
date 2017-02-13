@@ -37,9 +37,11 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
     ggtern::coord_tern(expand = TRUE)+
     ggtern::limit_tern(breaks = seq(0,1,by=.20), labels = paste0(c(0,20,40,60,80,100), "%"))+
     ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])+
+    ggtern::theme_light()+
     ggtern::theme(
       tern.axis.ticks.length.major = ggplot2::unit(30, units = "points"),
-      tern.axis.text =ggplot2::element_text(vjust=0.3, colour="black", size = 15)
+      tern.axis.text =ggplot2::element_text(vjust=0.3, colour="black", size = 15),
+      tern.axis.arrow = ggplot2::element_line(color = "black", size = 5)
 
     )
     if (show_arrows == TRUE)
@@ -49,16 +51,19 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
 
   if (density_mode == TRUE) {
     g <- g + ggtern::stat_density_tern(geom='polygon', ggtern::aes(fill=..level..), base="identity", colour = 'black') +
-      ggplot2::scale_fill_gradient(low='green',high='red', guide = FALSE)+
+      ggplot2::scale_fill_gradient(low='green', high='red', guide = FALSE)+
       ggtern::geom_mask()+
       ggplot2::geom_point(ggplot2::aes(size = ABUNDANCE), color = "black", show.legend = FALSE)
   } else {
     g <- g + ggtern::geom_mask()+
       ggplot2::geom_point(ggplot2::aes(size = ABUNDANCE, fill = MYCOLORS), shape = 21)+
-      ggplot2::scale_fill_discrete(guide = FALSE)
+      ggplot2::scale_fill_discrete(guide = FALSE)+
+      ggplot2::scale_size_continuous(breaks = c(0.0, 0.2, 0.4, 0.6, 0.8, 1),
+                                     limits = c(0,1),
+                                     range = c(0,10),
+                                     labels = c("0%", "20%", "40%", "60%", "80%", "100%"))
   }
 
-  par(mar=c(5,6,40,2))
   g
 
 
