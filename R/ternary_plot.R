@@ -37,7 +37,6 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
     ggtern::coord_tern(expand = TRUE)+
     ggtern::limit_tern(breaks = seq(0,1,by=.20), labels = paste0(c(0,20,40,60,80,100), "%"))+
     ggplot2::labs(x = label_names[1], y = label_names[2], z = label_names[3])+
-    ggtern::position
     ggtern::theme(
       tern.axis.ticks.length.major = ggplot2::unit(30, units = "points"),
       tern.axis.text =ggplot2::element_text(vjust=0.3, colour="black", size = 15)
