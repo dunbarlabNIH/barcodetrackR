@@ -32,6 +32,8 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
 
   your_data <- your_data[order(-your_data$ABUNDANCE),]
 
+  print(max(your_data$ABUNDANCE))
+
 
   g <- ggtern::ggtern(your_data, ggtern::aes(X1, X2, X3))+
     ggtern::coord_tern(expand = TRUE)+
@@ -58,10 +60,10 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
     g <- g + ggtern::geom_mask()+
       ggplot2::geom_point(ggplot2::aes(size = ABUNDANCE, fill = MYCOLORS), shape = 21)+
       ggplot2::scale_fill_discrete(guide = FALSE)+
-      ggplot2::scale_size_continuous(breaks = c(0.0, 0.2, 0.4, 0.6, 0.8, 1),
-                                     limits = c(0,1),
+      ggplot2::scale_size_continuous(breaks = c(0.0, 0.6, 1.2, 1.8, 2.4, 3.0),
+                                     limits = c(0,3),
                                      range = c(0,10),
-                                     labels = c("0%", "20%", "40%", "60%", "80%", "100%"))
+                                     labels = c("0%", "60%", "120%", "180%", "240%", "300%"))
   }
 
   g
