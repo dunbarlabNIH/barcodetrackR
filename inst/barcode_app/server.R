@@ -489,7 +489,6 @@ shinyServer(
 
       ternplotInput <- function(){
         print(barcodetrackR::ternary_plot(ternplot_data(),
-                                          dot_size = input$ternplot_Dotsize,
                                           show_arrows = input$ternplot_Showarrows,
                                           show_ticks = input$ternplot_Showticks,
                                           density_mode = input$ternplot_Density))
