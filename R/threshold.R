@@ -1,26 +1,25 @@
 #' Threshold
 #'
 #' This function takes in sequence data in table form, along with a threshold,
-#" and returns new table with the criteria that at least one cell type is above
-#' the threshold.
+#" and returns new table with the criteria that each row contains at least one element
+#" that registers above the threshold. Threshold here is defined as fractional contribution
+#' to each column (e.g. if threshold is set as 0.0005, only rows in which an element is above 0.05% of
+#' its column will be kept).
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
 #'@param thresh Numeric.
-#'@return A data frame where all rows (barcodes) that did not have at least one elemnt meet the threshold have been discarded.
+#'@return A data frame where all rows (barcodes) that did not have at least one element meet the threshold have been discarded.
 #'@examples
-#'threshold(zh33, thresh = 2000)
+#'threshold(zh33, thresh = 0.0005)
 #'@export
 
 
 
-threshold = function(your_data, thresh=2000) {
+threshold = function(your_data, thresh=0.0005) {
 
 #makes vector of thresholds for each fq file, assuming 4 million reads in original fq file
-#note, threshold given in arguments is scaled to number of actual reads...
-#here it's 2000 reads that should be present in 4000000, which is then made into a percentage and
-#scaled to the number of reads in a file
-#note that 2,000/4,000,000 is 0.0005, or 0.05%
-threshes <- (colSums(your_data)*(thresh/4000000))
+#note that s 0.0005, or 0.05%
+threshes <- (colSums(your_data)*(thresh))
 
 #keeps rows that have at least one element larger than thresh for that column
 thresholded_data <- your_data[apply(your_data, 1, function(x) {any(threshes < x)}),]
@@ -30,6 +29,6 @@ thresholded_data <- your_data[apply(your_data, 1, function(x) {any(threshes < x)
 thresholded_data[is.na(thresholded_data)] <- 0
 
 #returns subsetted data
-return(thresholded_data);
+return(thresholded_data)
 
 }

@@ -4,7 +4,7 @@
 \alias{threshold}
 \title{Threshold}
 \usage{
-threshold(your_data, thresh = 2000)
+threshold(your_data, thresh = 5e-04)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -12,13 +12,14 @@ threshold(your_data, thresh = 2000)
 \item{thresh}{Numeric.}
 }
 \value{
-A data frame where all rows (barcodes) that did not have at least one elemnt meet the threshold have been discarded.
+A data frame where all rows (barcodes) that did not have at least one element meet the threshold have been discarded.
 }
 \description{
 This function takes in sequence data in table form, along with a threshold,
-the threshold.
+to each column (e.g. if threshold is set as 0.0005, only rows in which an element is above 0.05% of
+its column will be kept).
 }
 \examples{
-threshold(zh33, thresh = 2000)
+threshold(zh33, thresh = 0.0005)
 }
 

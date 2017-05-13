@@ -7,20 +7,22 @@ shinyServer(
     #=========================================================================================================
 
     output$thresholdPanel <- renderUI({
-      if (is.null(input$file1) | is.null(input$file2) | is.null(input$file3))
+      if (is.null(input$file1) | is.null(input$file2)) #| is.null(input$file3))
         return()
-      strong("5. Press Button to Apply Threshold")
-      actionButton("threshybutton", "Apply Threshold",width="100%")
+      actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
 
 
     })
 
     thresholded_data <- eventReactive(input$threshybutton, {
-      withProgress(message = "Applying Threshold", value = 0, {
-        df <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
-        incProgress(0.5, detail = "Applying Threshold")
-        tdf <- t(df)
+      withProgress(message = "Loading outfile", value = 0, {
+        your_data <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
+        incProgress(0.5, detail = "Loading keyfile/readme and applying Threshold")
+        t_your_data <- t(your_data)
         keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
+        if(!(c("FILENAME", "GIVENNAME") %in% colnames(keyfile))){
+          stop("Keyfile missing FILENAME and/or GIVENNAME columns")
+        }
         keyfile <- keyfile[,c("FILENAME", "GIVENNAME")]
         if(any(duplicated(keyfile$FILENAME))){
           stop("Keyfile contains duplicate FILENAME")
@@ -28,27 +30,26 @@ shinyServer(
         if(any(duplicated(keyfile$GIVENNAME))){
           stop("Keyfile contains duplicate GIVENNAME")
         }
-        if(!(all(rownames(tdf) %in% keyfile$FILENAME))){
-          stop("Missing certain files in keyfile")
+        if(!(all(rownames(t_your_data) %in% keyfile$FILENAME))){
+          stop("Column in outfile is not a FILENAME in keyfile")
         }
-        if(!(all(keyfile$FILENAME %in% rownames(tdf)))){
-          stop("FILENAME in keyfile is not in outfile")
+        if(!(all(keyfile$FILENAME %in% rownames(t_your_data)))){
+          stop("FILENAME in keyfile is not a column in outfile")
         }
-        if(length(setdiff(keyfile$FILENAME, rownames(tdf))) != 0){
-          print(setdiff(keyfile$FILENAME, rownames(tdf)))
+        if(length(setdiff(keyfile$FILENAME, rownames(t_your_data))) != 0){
+          print(setdiff(keyfile$FILENAME, rownames(t_your_data)))
           stop("Number of samples in keyfile differs from number of samples in outfile")
         }
-        keyfile <- keyfile[match(rownames(tdf), keyfile$FILENAME),]
-        df <- data.frame(GIVENNAME = keyfile$GIVENNAME, tdf)
+        keyfile <- keyfile[match(colnames(your_data), keyfile$FILENAME),]
+        t_your_data <- data.frame(GIVENNAME = keyfile$GIVENNAME, t_your_data)
       })
-      df <- data.frame(df)
-      return(df)
+      return(t_your_data)
     }
     )
 
 
     current_threshold <- eventReactive(input$threshybutton,{
-      return(paste("Current threshold applied is:\n", input$thresholdvalue, sep = ""))
+      return(paste("Current threshold applied is:\n", paste0(input$thresholdvalue*100, "%"), sep = ""))
     })
 
 
@@ -59,12 +60,19 @@ shinyServer(
     })
 
     readme_data <- eventReactive(input$threshybutton,{
-      readme <- read.delim(input$file3$datapath, skip = 4, header = FALSE, stringsAsFactors = FALSE)
-      readme <- readme[1:(nrow(readme)-1),1:3]
+      if(is.null(thresholded_data()) | is.null(input$file3$datapath)){
+        return()
+      }
+      readme <- read.delim(input$file3$datapath, stringsAsFactors = FALSE, comment.char = "#")
+      if(!all(c("FILENAME", "MAPPED", "READS") %in% colnames(readme))){
+        stop("Uploaded readme must contain FILENAME, MAPPED, and READS columns")
+      }
+      readme <- readme[, c("FILENAME", "MAPPED", "READS")]
       colnames(readme) <- c("FILENAME", "MAPPED", "READS")
       keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
-      readme$PERCENTAGE <- readme$MAPPED/readme$READS * 100
+      readme$RAW_PERCENTAGE <- readme$MAPPED/readme$READS * 100
       readme$GIVENNAME <- keyfile$GIVENNAME[match(readme$FILENAME, keyfile$FILENAME)]
+      outfile_reads <- colSums(thresholded_data())
       return(readme)
     })
 
