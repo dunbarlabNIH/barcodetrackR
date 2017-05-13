@@ -4,16 +4,29 @@ This is an R package originally built for the use of cellular barcoding experime
 
 Code by Diego A. Espinoza and Samson J. Koelle.
 
+#Installation
+
 To install this package, try the following commands in R:
 ```
 install.packages("devtools") #or skip, if you already have it
 devtools::install_github("d93espinoza/barcodetrackR") #installs package from GitHub
 ```
 
+#Running the app
+
 After installation, use the following code to run the associated app:
 ```
 barcodetrackR::launchApp()
 ```
+
+Outfile must be in the following format:
+
+|   | Sample 1 | Sample 2 | Sample 3 | Sample 4 | ... |
+| ------------- | ------------- | ------------- | ------------- | ------------- | ----- |
+| Barcode 1 | 1000 | 934 | 955 | 20 | ... |
+| Barcode 2 | 450 | 90004 | 0 | 0 |... |
+| Barcode 3  | 300 | 5001 | 95 | 100000 |... |
+| ...  | ... | ... | ... | ... |... |
 
 The following R functions are included in this package:
 
