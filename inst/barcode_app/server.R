@@ -20,7 +20,7 @@ shinyServer(
         incProgress(0.5, detail = "Loading keyfile/readme and applying Threshold")
         t_your_data <- t(your_data)
         keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
-        if(!(c("FILENAME", "GIVENNAME") %in% colnames(keyfile))){
+        if(!(all(c("FILENAME", "GIVENNAME") %in% colnames(keyfile)))){
           stop("Keyfile missing FILENAME and/or GIVENNAME columns")
         }
         keyfile <- keyfile[,c("FILENAME", "GIVENNAME")]
@@ -68,11 +68,13 @@ shinyServer(
         stop("Uploaded readme must contain FILENAME, MAPPED, and READS columns")
       }
       readme <- readme[, c("FILENAME", "MAPPED", "READS")]
-      colnames(readme) <- c("FILENAME", "MAPPED", "READS")
+      colnames(readme) <- c("FILENAME", "READS_WITH_LIBID", "RAW_READS")
       keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
-      readme$RAW_PERCENTAGE <- readme$MAPPED/readme$READS * 100
       readme$GIVENNAME <- keyfile$GIVENNAME[match(readme$FILENAME, keyfile$FILENAME)]
-      outfile_reads <- colSums(thresholded_data())
+      readme$THRESHOLDED_READS <- rowSums(thresholded_data()[match(rownames(thresholded_data()), readme$FILENAME),-which(colnames(thresholded_data()) == "GIVENNAME")])
+      readme <- readme[,c("FILENAME", "GIVENNAME", "READS_WITH_LIBID", "THRESHOLDED_READS", "RAW_READS")]
+      readme$READS_WITH_LIBID_PERCENT <- round(readme$READS_WITH_LIBID/readme$RAW_READS * 100, digits = 2)
+      readme$THRESHOLDED_READS_PERCENT <- round(readme$THRESHOLDED_READS/readme$RAW_READS * 100, digits = 2)
       return(readme)
     })
 
@@ -120,12 +122,12 @@ shinyServer(
     })
 
     output$readmeHistogram <- renderPlot({
-      hist(readme_data()$MAPPED/readme_data()$READS * 100,
-           breaks = seq(0,100, by = 5),
+      hist(readme_data()$READS_WITH_LIBID_PERCENT,
+           breaks = seq(0,100, by = 1),
            xlim = c(0,100),
            main = "MAPPING % HISTOGRAM",
            col = "lightblue",
-           xlab = "PERCENTAGE MAPPED")
+           xlab = "PERCENTAGE RAW READS WITH LIBID")
     })
     output$renderedReadme <- renderDataTable(readme_data(), options = list(scrollX=TRUE, pageLength = 10))
 
@@ -161,9 +163,8 @@ shinyServer(
         your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
         temp_names <- your_table$GIVENNAME
         temp_clones <- colSums(Heatmap_data() > 0)
-        your_table <- as.data.frame(cbind(your_table$MAPPED, your_table$READS, round(your_table$MAPPED/your_table$READS * 100,2), temp_clones))
+        your_table <- data.frame(THRESHOLDED_READS = your_table$THRESHOLDED_READS, TOTAL_READS = your_table$RAW_READS, THRESHOLDED_READS_PERCENT = your_table$THRESHOLDED_READS_PERCENT, N_CLONES = temp_clones)
         rownames(your_table) <- temp_names
-        colnames(your_table) <- c("MAPPED", "READS", "MAP %", "CLONES")
         return(cbind(rownames(t(your_table)),t(your_table)))
       }
 
