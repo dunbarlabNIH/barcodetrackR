@@ -14,18 +14,11 @@ meta.df <- read.delim(meta_file)
 
 # Create summarized experiment
 bc.mat <- as.matrix(bc.df)
-bc.sparse <- Matrix::Matrix(bc.mat,sparse=TRUE)
 se <- SummarizedExperiment::SummarizedExperiment(assays = list(bc.mat = bc.mat),colData=meta.df)
-se.sparse <- SummarizedExperiment::SummarizedExperiment(assays = list(bc.mat = bc.sparse),colData=meta.df)
 
 # Heat map of just the B cells
 barcodetrackR::barcode_ggheatmap(your_data = SummarizedExperiment::assay(se)[,se$Cell_type == "B"],
                                 names = SummarizedExperiment::colData(se[,se$Cell_type == "B"])$Timepoint,
-                                 n_clones = 10, your_title = "ZG66 B cells", label_size = 12)
-
-# Same exact thing but data stored as sparse matrix - DOES NOT WORK
-# barcodetrackR::barcode_ggheatmap(your_data = SummarizedExperiment::assay(se.sparse)[,se.sparse$Cell_type == "B"],
-                                 names = SummarizedExperiment::colData(se.sparse[,se.sparse$Cell_type == "B"])$Timepoint,
                                  n_clones = 10, your_title = "ZG66 B cells", label_size = 12)
 
 # Ridge plot of T cells vs B cells
@@ -33,10 +26,6 @@ source('ridge_plot.R')
 source('ridge_plot_weighted.R')
 ridge_plot(your_data = SummarizedExperiment::assay(se))
 ridge_plot_weighted(your_data = SummarizedExperiment::assay(se))
-
-# Try with sparse - DOES NOT WORK AGAIN
-# ridge_plot(your_data = SummarizedExperiment::assay(se.sparse))
-
 
 # Correlation plot
 barcodetrackR::cor_plot(your_data = SummarizedExperiment::assay(se),
