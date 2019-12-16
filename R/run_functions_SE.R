@@ -33,3 +33,16 @@ barcodetrackR::cor_plot(your_data = SummarizedExperiment::assay(se),
                         your_title = "Correlation plot",
                         labelsizes = 1, plottype = "ellipse")
 
+# Calculate diversity
+source('clonal_diversity.R')
+my.div <- clonal_diversity(your_data = SummarizedExperiment::assay(se), divindex = "shannon")
+
+# Diversity plot
+source('diversity_plot.R')
+# Plot diversity
+diversity_plot(your_SE = se, index_type = "shannon", measure = "diversity", plot_by = "Timepoint", group_by = "Cell_type")
+# Plot Shannon count
+diversity_plot(your_SE = se, index_type = "shannon", measure = "count", plot_by = "Timepoint", group_by = "Cell_type")
+# Plot Shannon evenness
+diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_by = "Timepoint", group_by = "Cell_type")
+
