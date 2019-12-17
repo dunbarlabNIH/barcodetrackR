@@ -4,10 +4,19 @@
 \alias{cor_plot}
 \title{Correlation Plot}
 \usage{
-cor_plot(your_data, names = colnames(your_data), thresh = 0,
-  your_title = "", method_corr = "pearson", labelsizes = 1,
-  plottype = "color", printtables = FALSE, no_negatives = FALSE,
-  show_grid = TRUE, colorscale = "default")
+cor_plot(
+  your_data,
+  names = colnames(your_data),
+  thresh = 0,
+  your_title = "",
+  method_corr = "pearson",
+  labelsizes = 1,
+  plottype = "color",
+  printtables = FALSE,
+  no_negatives = FALSE,
+  show_grid = TRUE,
+  colorscale = "default"
+)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -45,4 +54,3 @@ Gives the pairwise correlation between each sample-sample pair in the data frame
 cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
 cor_plot(your_data = zh33, thresh = 874, printtables = TRUE)
 }
-

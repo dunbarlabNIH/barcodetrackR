@@ -4,8 +4,13 @@
 \alias{radartopclones}
 \title{Radar Top Clones}
 \usage{
-radartopclones(your_data, columnChoice_Name = "", n_clones = 10,
-  your_title = "", labelsize = 1)
+radartopclones(
+  your_data,
+  columnChoice_Name = "",
+  n_clones = 10,
+  your_title = "",
+  labelsize = 1
+)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -26,4 +31,3 @@ the top N clones from a specified column.
 radartopclones(your_data = zh33[,c(1:6)], columnChoice_Name = "zh331mT.fastq",
               your_title = "1m Radar Plot")
 }
-

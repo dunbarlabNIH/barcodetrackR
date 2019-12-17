@@ -4,8 +4,13 @@
 \alias{barcode_binary_heatmap}
 \title{Barcode Binary Heat Map}
 \usage{
-barcode_binary_heatmap(your_data, names = colnames(your_data),
-  your_title = "", label_size = 1, percent_threshold = 0)
+barcode_binary_heatmap(
+  your_data,
+  names = colnames(your_data),
+  your_title = "",
+  label_size = 1,
+  percent_threshold = 0
+)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -28,4 +33,3 @@ Creates a binary heatmap showing the presence of new clones from L to R in the d
 barcode_binary_heatmap(your_data = zh33, percent_threshold = 0.01, label_size = 3)
 BBHM(your_data = zh33)
 }
-

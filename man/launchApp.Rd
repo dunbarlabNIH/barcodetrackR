@@ -15,4 +15,3 @@ Launches the Shiny Barcode App.
 \examples{
 launchApp()
 }
-

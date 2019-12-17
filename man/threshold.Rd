@@ -22,4 +22,3 @@ its column will be kept).
 \examples{
 threshold(zh33, thresh = 0.0005)
 }
-

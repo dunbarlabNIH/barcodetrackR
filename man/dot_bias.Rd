@@ -22,4 +22,3 @@ Given a data frame organized with two alternating cell lineages, gives bias jitt
 \examples{
 clonal_bias(datum[,c("T 1m", "B 1m", "T 3m" "B 3m")])
 }
-

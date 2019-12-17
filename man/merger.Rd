@@ -18,4 +18,3 @@ Merges an arbitrary number of data frames together by row name, including all en
 \examples{
 merger(dataframe1, dataframe2, dataframe3)
 }
-

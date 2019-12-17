@@ -4,8 +4,12 @@
 \alias{ternary_plot}
 \title{Ternary Plot}
 \usage{
-ternary_plot(your_data, show_arrows = TRUE, show_ticks = TRUE,
-  density_mode = FALSE)
+ternary_plot(
+  your_data,
+  show_arrows = TRUE,
+  show_ticks = TRUE,
+  density_mode = FALSE
+)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -25,4 +29,3 @@ Creates a ternary plot showing the bias of clones towards one of three axes.
 \examples{
 ternary_plot(your_data = zh33, dot_size = 1000, density_mode = TRUE)
 }
-
