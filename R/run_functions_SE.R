@@ -46,3 +46,6 @@ diversity_plot(your_SE = se, index_type = "shannon", measure = "count", plot_by 
 # Plot Shannon evenness
 diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_by = "Timepoint", group_by = "Cell_type")
 
+# Clone bar plot
+source('clone_bar_plot.R')
+clone_bar_plot(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
