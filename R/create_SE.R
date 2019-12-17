@@ -36,8 +36,8 @@ create_SE <- function(your_data = NULL,
                                                                       normalized = your_data.normalized,
                                                                       logs = your_data.normalized),
                                                         colData=meta_data)
-  metadata(your_SE)$scale_factor <- scale_factor
-  metadata(your_SE)$log_base <- log_base
+  SummarizedExperiment::metadata(your_SE)$scale_factor <- scale_factor
+  SummarizedExperiment::metadata(your_SE)$log_base <- log_base
   return(your_SE)
 }
 
