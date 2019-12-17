@@ -1,4 +1,3 @@
-#'@importFrom SummarizedExperiment metadata SummarizedExperiment
 #'@title create_SE
 #'
 #'@description Creates a SummarizedExperiment object from a data frame and associated meta-data.
@@ -31,14 +30,14 @@ create_SE <- function(your_data = NULL,
   your_data.percentages <-  as.data.frame(prop.table(as.matrix(your_data),2))
   your_data.normalized <- your_data.percentages * scale_factor
   your_data.logged <- log(1+your_data.normalized, base = log_base)
-  your_SE <- SummarizedExperiment(assays = list(counts = your_data,
-                                                percentages = your_data.percentages,
-                                                ranks = your_data.ranks,
-                                                normalized = your_data.normalized,
-                                                logs = your_data.normalized),
-                                  colData=meta_data)
-  metadata(your_SE)$scale_factor <- scale_factor
-  metadata(your_SE)$log_base <- log_base
+  your_SE <- SummarizedExperiment::SummarizedExperiment(assays = list(counts = your_data,
+                                                                      percentages = your_data.percentages,
+                                                                      ranks = your_data.ranks,
+                                                                      normalized = your_data.normalized,
+                                                                      logs = your_data.normalized),
+                                                        colData=meta_data)
+  S4Vectors::metadata(your_SE)$scale_factor <- scale_factor
+  S4Vectors::metadata(your_SE)$log_base <- log_base
   return(your_SE)
 }
 
