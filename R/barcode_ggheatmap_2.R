@@ -1,5 +1,4 @@
-#'@importFrom SummarizedExperiment assays metadata
-#'
+#'@importFrom SummarizedExperiment assays
 #'@title barcode_ggheatmap (Barcode Heatmap using ggplot2)
 #'
 #'@description Creates a heatmap using the top 'n' rows from each column, using ggplot2!
@@ -31,7 +30,7 @@
 barcode_ggheatmap_2 <- function(your_SE,
                                 hclust_assay = "logs",
                                 visual_assay = "logs",
-                                selections = NULL,
+                                selections = list(),
                                 names = colData(your_SE),
                                 n_clones = 10,
                                 your_title = "",
@@ -49,7 +48,9 @@ barcode_ggheatmap_2 <- function(your_SE,
                                 clusters = 0) {
 
   #subset your SE based on your selections in selections (if any)
-  your_SE <- subset_SE(your_SE, selections)
+  if(length(selections) > 0){
+    your_SE <- subset_SE(your_SE, selections)
+  }
 
   #subsets those barcodes that have at least one top N clone
   top_clones_choices <- apply(assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
@@ -73,15 +74,17 @@ barcode_ggheatmap_2 <- function(your_SE,
   }
 
   #create scale for plotting
-  log_used <- metadata(your_SE)$log_base
-  scale_factor_used <- metadata(your_SE)$scale_factor
+  log_used <- S4Vectors::metadata(your_SE)$log_base
+  scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
   percent_scale <- c(0, 0.000025, 0.001, 0.01, 0.1, 1)
   percent_scale.labels <- c("0%", "0.0025% ", "0.1%", "1%", "10%", "100%")
   log_scale <- log(percent_scale*scale_factor_used + 1, log_used)
   color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
+  print("HEY")
   plotting_data <- dplyr::pivot_longer(assay(your_SE)[[visual_assay]], -religion, names_to = "income", values_to = "count")
 
+  return(plotting_data)
   colnames(plotting_data) <- c("BARCODE", "SAMPLE", "Size")
   plotting_data$BARCODE <- factor(plotting_data$BARCODE, levels = rev(rownames(your_data_list$prop_table)[barcode_order]))
 
