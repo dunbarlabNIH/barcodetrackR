@@ -12,23 +12,20 @@
 #'@examples
 #'threshold(zh33, thresh = 0.0005)
 #'@export
+threshold <- function(your_data, thresh=0.0005) {
 
+  #makes vector of thresholds for each fq file, assuming 4 million reads in original fq file
+  #note that s 0.0005, or 0.05%
+  threshes <- (colSums(your_data)*(thresh))
 
+  #keeps rows that have at least one element larger than thresh for that column
+  thresholded_data <- your_data[apply(your_data, 1, function(x) {any(threshes < x)}),]
 
-threshold = function(your_data, thresh=0.0005) {
+  #in the unlikely case that a file has 0 reads, this will prevent the phantom
+  #column from appearing in the final data frame
+  thresholded_data[is.na(thresholded_data)] <- 0
 
-#makes vector of thresholds for each fq file, assuming 4 million reads in original fq file
-#note that s 0.0005, or 0.05%
-threshes <- (colSums(your_data)*(thresh))
-
-#keeps rows that have at least one element larger than thresh for that column
-thresholded_data <- your_data[apply(your_data, 1, function(x) {any(threshes < x)}),]
-
-#in the unlikely case that a file has 0 reads, this will prevent the phantom
-#column from appearing in the final data frame
-thresholded_data[is.na(thresholded_data)] <- 0
-
-#returns subsetted data
-return(thresholded_data)
+  #returns subsetted data
+  return(thresholded_data)
 
 }
