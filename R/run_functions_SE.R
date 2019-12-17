@@ -50,3 +50,9 @@ diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_
 source('clonal_contribution.R')
 clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
 clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
+
+# Track top clones
+source('track_top_clones.R')
+track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 12, linesize = .4)
+track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 25, linesize = .4)
+track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 6, linesize = .4)
