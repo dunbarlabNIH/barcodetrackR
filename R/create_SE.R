@@ -4,7 +4,7 @@
 #'
 #'@param your_data A data frame. For cellular barcoding data, this will usually be individual barcodes in rows and samples in columns.
 #'@param meta_data A data frame containing all meta-data. Must, at the very least, include a column called "SAMPLENAME" that contains all the colnames within the data frame passed as  `your_data` and only those colnames.
-#'@param threshold Optional. A numeric indicating which reads to filter out (only those matrix entries that compose higher than `threshold` percentage within a sample will be kept as non-zero) prior to creating the SE object.
+#'@param threshold Optional. A numeric indicating which reads to filter out (only those matrix entries that compose higher than `threshold` percentage of reads within a sample will be kept as non-zero) prior to creating the SE object.
 #'@param log_base A numeric indicating which base to use when logging the percentages.
 #'@examples
 #'create_SE(your_data = ZH33_file, meta_data = ZH33_meta_data)
