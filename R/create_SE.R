@@ -11,8 +11,9 @@
 #'@export
 create_SE <- function(your_data = NULL,
                       meta_data = NULL,
-                      threshold = 0,
-                      log_base = exp(1)){
+                      threshold = 0.0005,
+                      log_base = exp(1),
+                      scale_factor = 4e6){
   if(is.null(your_data) | is.null(meta_data)){
     stop("NEITHER `your_data` NOR `meta_data` can be NULL")
   }
@@ -22,14 +23,21 @@ create_SE <- function(your_data = NULL,
   if(threshold > 0){
     your_data <- barcodetrackR::threshold(your_data, thresh = threshold)
   }
+  if(any(colSums(your_data) == 0)){
+    stop("One of your samples has no data after thresholding")
+  }
   your_data.ranks <-  apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
   your_data.percentages <-  as.data.frame(prop.table(as.matrix(your_data),2))
-  your_data.percentages_logged <- log(your_data.percentages, base = log_base)
+  your_data.normalized <- your_data.percentages * scale_factor
+  your_data.logged <- log(1+your_data.normalized, base = log_base)
   your_SE <- SummarizedExperiment::SummarizedExperiment(assays = list(counts = your_data,
                                                                       percentages = your_data.percentages,
                                                                       ranks = your_data.ranks,
-                                                                      logged_percentages = your_data.percentages_logged),
+                                                                      normalized = your_data.normalized,
+                                                                      logs = your_data.normalized),
                                                         colData=meta_data)
+  metadata(your_SE)$scale_factor <- scale_factor
+  metadata(your_SE)$log_base <- log_base
   return(your_SE)
 }
 
