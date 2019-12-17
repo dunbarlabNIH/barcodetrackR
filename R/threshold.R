@@ -12,8 +12,7 @@
 #'@examples
 #'threshold(zh33, thresh = 0.0005)
 #'@export
-
-threshold = function(your_data, thresh=0.0005) {
+threshold <- function(your_data, thresh=0.0005) {
 
   #makes vector of thresholds for each fq file, assuming 4 million reads in original fq file
   #note that s 0.0005, or 0.05%
