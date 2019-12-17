@@ -21,7 +21,7 @@ create_SE <- function(your_data = NULL,
     stop("The SAMPLENAME column in meta_data must only contain ALL columns in your_data")
   }
   if(threshold > 0){
-    your_data <- barcodetrackR::threshold(your_data, thresh = threshold)
+    your_data <- threshold(your_data, thresh = threshold)
   }
   if(any(colSums(your_data) == 0)){
     stop("One of your samples has no data after thresholding")

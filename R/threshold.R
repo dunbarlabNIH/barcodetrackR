@@ -27,5 +27,4 @@ threshold <- function(your_data, thresh=0.0005) {
 
   #returns subsetted data
   return(thresholded_data)
-
 }
