@@ -6,3 +6,4 @@ graveyard
 inst/barcode_app/graveyard.R
 R/run_functions_diego.R
 R/run_functions_SE.R
+data
