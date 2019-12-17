@@ -1,5 +1,4 @@
-#'@importFrom proxy dist
-#'@importFrom SummarizedExperiment assays
+#'@importFrom SummarizedExperiment assays metadata
 #'
 #'@title barcode_ggheatmap (Barcode Heatmap using ggplot2)
 #'
@@ -42,9 +41,8 @@ barcode_ggheatmap_2 <- function(your_SE,
                                 cellnote_size = 4,
                                 printtable = FALSE,
                                 table_option = "percents",
-                                log_transform = TRUE,
                                 distance_method = "Euclidean",
-                                minkowski_power = 1,
+                                minkowski_power = 2,
                                 cellnote_option = "stars",
                                 hclust_linkage = "complete",
                                 row_order = "hierarchical",
@@ -52,6 +50,7 @@ barcode_ggheatmap_2 <- function(your_SE,
 
   #subset your SE based on your selections in selections (if any)
   your_SE <- subset_SE(your_SE, selections)
+
   #subsets those barcodes that have at least one top N clone
   top_clones_choices <- apply(assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
   your_SE <- your_SE[top_clones_choices,]
@@ -61,12 +60,11 @@ barcode_ggheatmap_2 <- function(your_SE,
   cellnote_matrix[cellnote_matrix > n_clones] <- NA
   cellnote_matrix[cellnote_matrix <= n_clones] <- "*"
 
+  #get the ordering of barcodes within the hematmap for plotting
   if(row_order == "hierarchical") {
-    if(distance_method == "Minkowski"){
-      hclustering <- hclust(proxy::dist((if (log_transform) assays(your_SE)$logs else assays(your_SE)$percentages), method = distance_method, p = minkowski_power), method = hclust_linkage)
-    } else {
-      hclustering <- hclust(proxy::dist((if (log_transform) assays(your_SE)$logs else assays(your_SE)$percentages), method = distance_method), method = hclust_linkage)
-    }
+    clustering_data <- assays(your_SE)[[hclust_assay]]
+    clustering_data.dist <- proxy::dist(clustering_data, method = distance_method, p = minkowski_power)
+    hclustering <- hclust(clustering_data.dist, method = hclust_linkage)
     barcode_order <- rev(hclustering$order)
   } else if(row_order == "emergence") {
     barcode_order <- do.call(order, assays(your_SE)$percentages)
@@ -74,27 +72,15 @@ barcode_ggheatmap_2 <- function(your_SE,
     stop("row_order must be one of \" hierarchical\" or \"emergence\"")
   }
 
+  #create scale for plotting
+  log_used <- metadata(your_SE)$log_base
+  scale_factor_used <- metadata(your_SE)$scale_factor
+  percent_scale <- c(0, 0.000025, 0.001, 0.01, 0.1, 1)
+  percent_scale.labels <- c("0%", "0.0025% ", "0.1%", "1%", "10%", "100%")
+  log_scale <- log(percent_scale*scale_factor_used + 1, log_used)
+  color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
-
-
-  if(v){
-    plotting_data <- reshape2::melt(as.matrix(your_data_list$logged_data))
-    actual_scale <- c(log(100/4000000, log_choice) - 1, log(100/4000000, log_choice), log(0.001, log_choice), log(0.01,log_choice), log(0.1, log_choice), 0)
-    your_scale <- scales::rescale(actual_scale, to = c(0,1))
-    your_breaks <- c(actual_scale)
-    your_labels <- c("Defined 0", "0.0025% ", "0.1%", "1%", "10%", "100%")
-    your_limits <- c(log(100/4000000, log_choice)-1,0)
-    your_colors <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
-  } else {
-    plotting_data <- reshape2::melt(as.matrix(your_data_list$prop_table))
-    your_scale <- c(0, 100/4000000, 0.005, 0.01, 0.1, 1)
-    your_breaks <- c(0, 100/4000000, 0.005, 0.01, 0.1, 1)
-    your_labels <- c("0%", "0.0025%", "0.5%", "1%", "10%", "100%")
-    your_limits <- c(0,1)
-    your_colors <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
-  }
-
-
+  plotting_data <- dplyr::pivot_longer(assay(your_SE)[[visual_assay]], -religion, names_to = "income", values_to = "count")
 
   colnames(plotting_data) <- c("BARCODE", "SAMPLE", "Size")
   plotting_data$BARCODE <- factor(plotting_data$BARCODE, levels = rev(rownames(your_data_list$prop_table)[barcode_order]))
