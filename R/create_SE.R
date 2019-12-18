@@ -34,7 +34,7 @@ create_SE <- function(your_data = NULL,
                                                                       percentages = your_data.percentages,
                                                                       ranks = your_data.ranks,
                                                                       normalized = your_data.normalized,
-                                                                      logs = your_data.normalized),
+                                                                      logs = your_data.logged),
                                                         colData=meta_data)
   S4Vectors::metadata(your_SE)$scale_factor <- scale_factor
   S4Vectors::metadata(your_SE)$log_base <- log_base
