@@ -8,8 +8,8 @@ barcode_ggheatmap_2(
   your_SE,
   hclust_assay = "logs",
   visual_assay = "logs",
-  selections = NULL,
-  names = colData(your_SE),
+  selections = list(),
+  names = colData(your_SE)$SAMPLENAME,
   n_clones = 10,
   your_title = "",
   grid = TRUE,
@@ -20,7 +20,7 @@ barcode_ggheatmap_2(
   table_option = "percents",
   distance_method = "Euclidean",
   minkowski_power = 2,
-  cellnote_option = "stars",
+  cellnote_assay = "stars",
   hclust_linkage = "complete",
   row_order = "hierarchical",
   clusters = 0
@@ -53,8 +53,6 @@ barcode_ggheatmap_2(
 
 \item{minkowski_power}{The power of the Minkowski distance (if minkowski is used).}
 
-\item{cellnote_option}{Character. One of "stars", "reads", or "percents"}
-
 \item{hclust_linkage}{Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).}
 
 \item{row_order}{Character. One of "hierarchical" or "emergence" to organize rows.}
@@ -62,6 +60,8 @@ barcode_ggheatmap_2(
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+
+\item{cellnote_option}{Character. One of "stars", "reads", or "percents"}
 }
 \value{
 Displays a heatmap in the current plot window.

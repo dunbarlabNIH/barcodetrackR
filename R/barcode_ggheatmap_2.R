@@ -31,7 +31,7 @@ barcode_ggheatmap_2 <- function(your_SE,
                                 hclust_assay = "logs",
                                 visual_assay = "logs",
                                 selections = list(),
-                                names = colData(your_SE),
+                                names = colData(your_SE)$SAMPLENAME,
                                 n_clones = 10,
                                 your_title = "",
                                 grid = TRUE,
@@ -42,7 +42,7 @@ barcode_ggheatmap_2 <- function(your_SE,
                                 table_option = "percents",
                                 distance_method = "Euclidean",
                                 minkowski_power = 2,
-                                cellnote_option = "stars",
+                                cellnote_assay = "stars",
                                 hclust_linkage = "complete",
                                 row_order = "hierarchical",
                                 clusters = 0) {
@@ -60,15 +60,16 @@ barcode_ggheatmap_2 <- function(your_SE,
   cellnote_matrix = assays(your_SE)$ranks
   cellnote_matrix[cellnote_matrix > n_clones] <- NA
   cellnote_matrix[cellnote_matrix <= n_clones] <- "*"
+  assays(your_SE)$stars <- as.data.frame(cellnote_matrix)
 
   #get the ordering of barcodes within the hematmap for plotting
   if(row_order == "hierarchical") {
     clustering_data <- assays(your_SE)[[hclust_assay]]
     clustering_data.dist <- proxy::dist(clustering_data, method = distance_method, p = minkowski_power)
     hclustering <- hclust(clustering_data.dist, method = hclust_linkage)
-    barcode_order <- rev(hclustering$order)
+    barcode_order <- rownames(your_SE)[rev(hclustering$order)]
   } else if(row_order == "emergence") {
-    barcode_order <- do.call(order, assays(your_SE)$percentages)
+    barcode_order <- rownames(your_SE)[do.call(order, assays(your_SE)$percentages)]
   } else {
     stop("row_order must be one of \" hierarchical\" or \"emergence\"")
   }
@@ -78,138 +79,111 @@ barcode_ggheatmap_2 <- function(your_SE,
   scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
   percent_scale <- c(0, 0.000025, 0.001, 0.01, 0.1, 1)
   percent_scale.labels <- c("0%", "0.0025% ", "0.1%", "1%", "10%", "100%")
-  log_scale <- log(percent_scale*scale_factor_used + 1, log_used)
+  log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
+  print(log_scale)
   color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
-  print("HEY")
-  plotting_data <- dplyr::pivot_longer(assay(your_SE)[[visual_assay]], -religion, names_to = "income", values_to = "count")
+  #organizing data for plotting
+  plotting_data <- tibble::rownames_to_column(assays(your_SE)[[visual_assay]], var = "sequence")
+  plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
+  plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
 
-  return(plotting_data)
-  colnames(plotting_data) <- c("BARCODE", "SAMPLE", "Size")
-  plotting_data$BARCODE <- factor(plotting_data$BARCODE, levels = rev(rownames(your_data_list$prop_table)[barcode_order]))
-
-  if (cellnote_option %in% c("logs", "ranks", "stars", "percents", "reads")){
-    if(cellnote_option == "logs"){
-      plotting_data$CELLNOTE <- round(reshape2::melt(as.matrix(your_data_list$logged_data))$value, 2)
-      cellnote_vjust = 0.5
-    }
-    if(cellnote_option == "ranks"){
-      plotting_data$CELLNOTE <- reshape2::melt(as.matrix(your_data_list$ranks))$value
-      cellnote_vjust = 0.5
-    }
-    if(cellnote_option == "stars"){
-      plotting_data$CELLNOTE <- reshape2::melt(as.matrix(your_data_list$cellnote_matrix))$value
-      cellnote_vjust = 0.75
-    }
-    if(cellnote_option == "percents"){
-      plotting_data$CELLNOTE <- paste0(round(reshape2::melt(as.matrix(your_data_list$prop_table))$value*100,2), "%")
-      cellnote_vjust = 0.5
-    }
-    if(cellnote_option == "reads"){
-      plotting_data$CELLNOTE <- reshape2::melt(as.matrix(your_data_list$raw_reads))$value
-      cellnote_vjust = 0.5
-    }
-  } else {
-    stop("cellnote_option must be one of c(\"logs\", \"ranks\", \"stars\", \"percents\", \"reads\")")
-  }
-
-  if(grid)gridColor = "black" else gridColor = NA
+  #organizing labels for plotting overlay
+  plotting_cellnote <- tibble::rownames_to_column(assays(your_SE)[[cellnote_assay]], var = "sequence")
+  plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
+  plotting_data$cellnote <- plotting_cellnote$label
 
 
-  false_column_label <- unique(colnames(your_data_list$logged_data))[which(max(nchar(unique(colnames(your_data_list$logged_data)))) == nchar(unique(colnames(your_data_list$logged_data))))[1]]
-
-  if(printtable == TRUE){
-    switch(table_option,
-           reads = return(your_data_list$raw_reads[barcode_order,]),
-           percents = return(your_data_list$prop_table[barcode_order,]),
-           logs = return(your_data_list$logged_data[barcode_order,]),
-           ranks = return(your_data_list$ranks[barcode_order,]))
-  } else {
-
-    g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = SAMPLE, y = BARCODE))+
-      ggplot2::geom_tile(ggplot2::aes(fill = Size), color = gridColor)+
-      ggplot2::geom_text(ggplot2::aes(label = CELLNOTE), vjust = cellnote_vjust, size = cellnote_size)+
-      ggplot2::scale_fill_gradientn(
-        colors = your_colors,
-        values = your_scale,
-        breaks = your_breaks,
-        labels = your_labels,
-        limits = your_limits,
-        expand = c(0,0))+
-      ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
-      ggplot2::scale_x_discrete(expand = c(0,0), labels = names)+
-      ggplot2::ylab(NULL)+
-      ggplot2::xlab(NULL)+
-      ggplot2::ggtitle(paste0("\n", your_title, "\n"))+
-      ggplot2::theme(
-        plot.title = ggplot2::element_text(size = 20),
-        axis.text.x = ggplot2::element_text(angle=90, hjust = 1, vjust = 0.5, size = label_size),
-        legend.text = ggplot2::element_text(size =  15, face = 'bold'),
-        legend.title = ggplot2::element_text(size =  15),
-        axis.ticks = ggplot2::element_blank(),
-        legend.key.height=ggplot2::unit(5,"line"))
+  if(grid) grid_color = "black" else grid_color = NA
 
 
-    if(row_order == 'emergence'){
-      g1_heatmap
-    } else {
-      dendro_data <- ggdendro::dendro_data(hclustering, type = 'rectangle')
-      g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
-        ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
-        ggplot2::scale_x_discrete(expand = c(.5/nrow(your_data_list$logged_data),0.01))+
-        ggplot2::scale_y_reverse(expand = c(0.01,0), labels = false_column_label, breaks = if(row_order == 'emergence') NULL else mean(hclustering$height))+
-        ggplot2::coord_flip()+
-        ggplot2::ylab(NULL)+
-        ggplot2::xlab(NULL)+
-        ggplot2::ggtitle("\n \n")+
-        ggplot2::theme(
-          plot.title = ggplot2::element_text(size = 20),
-          axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
-          panel.background = ggplot2::element_rect(fill = "white",colour = "white"),
-          axis.ticks = ggplot2::element_blank()
-        )
+  color_scale <- viridis::viridis(6)
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size)+
+    ggplot2::scale_fill_gradientn(
+      colors = color_scale,
+      values = scales::rescale(log_scale, to = c(0,1)),
+      breaks = log_scale,
+      limits = c(min(log_scale), max(log_scale)),
+      labels = percent_scale.labels,
+      expand = c(0,0)
+      )+
+    ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
+    ggplot2::scale_x_discrete(expand = c(0,0), labels = names)+
+    ggplot2::ylab(NULL)+
+    ggplot2::xlab(NULL)+
+    ggplot2::ggtitle(paste0("\n", your_title, "\n"))+
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 20),
+      axis.text.x = ggplot2::element_text(angle=90, hjust = 1, vjust = 0.5, size = label_size),
+      #legend.text = ggplot2::element_text(size =  15, face = 'bold'),
+      legend.title = ggplot2::element_text(size =  15),
+      axis.ticks = ggplot2::element_blank())
 
-      if(dendro){
-
-        if(clusters > 0){
-          # custom_colors <- c(RColorBrewer::brewer.pal(8, 'Set1'), "cyan", "black", "grey")
-          custom_colors <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588")
-          clusters_df <-data.frame(CLUSTERS = cutree(hclustering, clusters), ASSIGNMENT=factor(hclustering$labels,levels=hclustering$labels[(hclustering$order)]))
-          g3_clusters <-ggplot2::ggplot(clusters_df, ggplot2::aes(x =1,y=ASSIGNMENT,fill=factor(CLUSTERS)))+
-            ggplot2::geom_tile()+
-            ggplot2::ggtitle("\n \n")+
-            ggplot2::scale_fill_manual(values = custom_colors[1:clusters])+
-            ggplot2::scale_x_continuous(expand=c(0,0), labels = false_column_label, breaks = 1)+
-            ggplot2::theme(
-              plot.title = ggplot2::element_text(size = 20),
-              axis.title=ggplot2::element_blank(),
-              axis.ticks=ggplot2::element_blank(),
-              axis.text.y=ggplot2::element_blank(),
-              axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
-              legend.position="none")
-          gridExtra::grid.arrange(g2_dendrogram,
-                                  g3_clusters,
-                                  g1_heatmap,
-                                  ncol = 3,
-                                  widths = c(1,.2,4))
-
-        } else {
-          gridExtra::grid.arrange(g2_dendrogram,
-                                  g1_heatmap,
-                                  ncol = 2,
-                                  widths = c(1,4))
-        }
-
-
-      } else {
-        g1_heatmap
-      }
-    }
-
-
-
-
-  }
+  g1_heatmap
+  #
+  #
+  #     if(row_order == 'emergence'){
+  #       g1_heatmap
+  #     } else {
+  #       # dendro_data <- ggdendro::dendro_data(hclustering, type = 'rectangle')
+  #       # g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
+  #       #   ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
+  #       #   ggplot2::scale_x_discrete(expand = c(.5/nrow(your_SE),0.01))+
+  #       #   ggplot2::scale_y_reverse(expand = c(0.01,0), labels = "false_column_label", breaks = if(row_order == 'emergence') NULL else mean(hclustering$height))+
+  #       #   ggplot2::coord_flip()+
+  #       #   ggplot2::ylab(NULL)+
+  #       #   ggplot2::xlab(NULL)+
+  #       #   ggplot2::ggtitle("\n \n")+
+  #       #   ggplot2::theme(
+  #       #     plot.title = ggplot2::element_text(size = 20),
+  #       #     axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
+  #       #     panel.background = ggplot2::element_rect(fill = "white",colour = "white"),
+  #       #     axis.ticks = ggplot2::element_blank()
+  #       #   )
+  #
+  #       if(dendro){
+  #
+  #         if(clusters > 0){
+  #           # custom_colors <- c(RColorBrewer::brewer.pal(8, 'Set1'), "cyan", "black", "grey")
+  #           custom_colors <- c("#89C5DA", "#DA5724", "#74D944", "#CE50CA", "#3F4921", "#C0717C", "#CBD588")
+  #           clusters_df <-data.frame(CLUSTERS = cutree(hclustering, clusters), ASSIGNMENT=factor(hclustering$labels,levels=hclustering$labels[(hclustering$order)]))
+  #           g3_clusters <-ggplot2::ggplot(clusters_df, ggplot2::aes(x =1,y=ASSIGNMENT,fill=factor(CLUSTERS)))+
+  #             ggplot2::geom_tile()+
+  #             ggplot2::ggtitle("\n \n")+
+  #             ggplot2::scale_fill_manual(values = custom_colors[1:clusters])+
+  #             ggplot2::scale_x_continuous(expand=c(0,0), labels = false_column_label, breaks = 1)+
+  #             ggplot2::theme(
+  #               plot.title = ggplot2::element_text(size = 20),
+  #               axis.title=ggplot2::element_blank(),
+  #               axis.ticks=ggplot2::element_blank(),
+  #               axis.text.y=ggplot2::element_blank(),
+  #               axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
+  #               legend.position="none")
+  #           gridExtra::grid.arrange(g2_dendrogram,
+  #                                   g3_clusters,
+  #                                   g1_heatmap,
+  #                                   ncol = 3,
+  #                                   widths = c(1,.2,4))
+  #
+  #         } else {
+  #           gridExtra::grid.arrange(g2_dendrogram,
+  #                                   g1_heatmap,
+  #                                   ncol = 2,
+  #                                   widths = c(1,4))
+  #         }
+  #
+  #
+  #       } else {
+  #         g1_heatmap
+  #       }
+  #     }
+  #
+  #
+  #
+  #
+  #   }
 
 }
 
