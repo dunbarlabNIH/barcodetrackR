@@ -97,7 +97,7 @@ barcode_ggheatmap_2 <- function(your_SE,
   if(grid) grid_color = "black" else grid_color = NA
 
 
-  color_scale <- viridis::viridis(6)
+  color_scale <- viridis::viridis(5) %>% c(., .[5])
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
     ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size)+
