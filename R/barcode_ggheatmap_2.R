@@ -86,6 +86,7 @@ barcode_ggheatmap_2 <- function(your_SE,
   #organizing data for plotting
   plotting_data <- tibble::rownames_to_column(assays(your_SE)[[visual_assay]], var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
+  plotting_data$sample_name <- factor(plotting_data$sample_name, levels = names)
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
 
   #organizing labels for plotting overlay
@@ -97,7 +98,9 @@ barcode_ggheatmap_2 <- function(your_SE,
   if(grid) grid_color = "black" else grid_color = NA
 
 
-  color_scale <- viridis::viridis(5) %>% c(., .[5])
+
+  color_scale <- c("#4575B4", "#5F8DC0", "lightblue", "#fefeb9", "#D73027", "red4")
+  print(str(plotting_data))
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
     ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size)+
@@ -110,7 +113,7 @@ barcode_ggheatmap_2 <- function(your_SE,
       expand = c(0,0)
       )+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
-    ggplot2::scale_x_discrete(expand = c(0,0), labels = names)+
+    ggplot2::scale_x_discrete(expand = c(0,0))+
     ggplot2::ylab(NULL)+
     ggplot2::xlab(NULL)+
     ggplot2::ggtitle(paste0("\n", your_title, "\n"))+

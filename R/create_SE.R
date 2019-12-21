@@ -26,7 +26,7 @@ create_SE <- function(your_data = NULL,
   if(any(colSums(your_data) == 0)){
     stop("One of your samples has no data after thresholding")
   }
-  your_data.ranks <-  apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
+  your_data.ranks <-  as.data.frame(apply(-your_data, 2, rank, ties.method = "min", na.last = "keep"))
   your_data.percentages <-  as.data.frame(prop.table(as.matrix(your_data),2))
   your_data.normalized <- your_data.percentages * scale_factor
   your_data.logged <- log(1+your_data.normalized, base = log_base)
