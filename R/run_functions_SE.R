@@ -2,17 +2,17 @@
 # Purpose: to load barcode data and associated metadata into SummarizedExperiment
 # to call our different visualization functions on data stored in this object
 
-# Load and threshold data
-file <- '/Users/mortlockrd/Desktop/GitHub/barcodetrackR/data/ZG66_simple_data.txt'
-meta_file <- '/Users/mortlockrd/Desktop/GitHub/barcodetrackR/data/ZG66_simple_metadata.txt'
-bc.df <- barcodetrackR::threshold(read.delim(file, row.names = 1),thresh = 0.0005)
+require(tidyverse)
 
-# Load metadata
-meta.df <- read.delim(meta_file)
+# Load barcode and meta data
+barcode.file <- read.delim("/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/ZG66_simple_data.txt", row.names = 1)
+meta.file <- read.delim("/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/ZG66_simple_metadata.txt") %>% dplyr::mutate(SAMPLENAME = FILENAME)
 
 # Create summarized experiment
-bc.mat <- as.matrix(bc.df)
-se <- SummarizedExperiment::SummarizedExperiment(assays = list(bc.mat = bc.mat),colData=meta.df)
+source('create_SE.R')
+source('subset_SE.R')
+source('threshold.R')
+se <- create_SE(your_data = barcode.file, meta_data = meta.file, threshold = 5e-4)
 
 # Heat map of just the B cells
 barcodetrackR::barcode_ggheatmap(your_data = SummarizedExperiment::assay(se)[,se$Cell_type == "B"],
@@ -21,9 +21,15 @@ barcodetrackR::barcode_ggheatmap(your_data = SummarizedExperiment::assay(se)[,se
 
 # Ridge plot of T cells vs B cells
 source('ridge_plot.R')
-source('ridge_plot_weighted.R')
-ridge_plot(your_data = SummarizedExperiment::assay(se))
-ridge_plot_weighted(your_data = SummarizedExperiment::assay(se))
+# If plot_by is a factor, it will follow the order it appears in colData
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Timepoint")
+# If plot_by is numeric, it will sort from smallest to largest but still plot as categorical
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "T", cell_2 = "B", plot_by = "Months", scale = 1.5)
+
+# Weighted by overall contribution of each barcode
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Timepoint", weighted = T)
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "T", cell_2 = "B", plot_by = "Months", weighted = T,scale = 1.5)
+
 
 # Correlation plot
 barcodetrackR::cor_plot(your_data = SummarizedExperiment::assay(se),
@@ -47,7 +53,7 @@ diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_
 # Clonal contribution
 source('clonal_contribution.R')
 clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
-clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", n_clones = 15, linesize = .4)
+clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", n_clones = 100, linesize = .1)
 
 # Track top clones
 source('track_top_clones.R')

@@ -1,7 +1,0 @@
-FILENAME	Monkey	Timepoint	Cell_type	MAP	GIVENNAME
-B_2m	ZG66	2m	B	80	ZG66 2m B   
-T_2m	ZG66	2m	T	40	ZG66 2m T   
-B_3m	ZG66	3m	B	80	ZG66 3m B   
-T_3m	ZG66	3m	T	40	ZG66 3m T   
-B_82hm	ZG66	82hm	B	80	ZG66 82hm B
-T_82hm	ZG66	82hm	T	40	ZG66 82hm T
