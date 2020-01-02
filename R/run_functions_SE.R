@@ -57,7 +57,10 @@ diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_
 # Clonal contribution
 source('clonal_contribution.R')
 clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
-clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", n_clones = 100, linesize = .1)
+# Categorical plot_by
+clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
+# Numeric plot_by
+clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Months", n_clones = 20, linesize = .4)
 
 # Track top clones
 source('track_top_clones.R')

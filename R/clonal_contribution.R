@@ -22,8 +22,20 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
   # Only keep data that matches filter
   your_data <- your_data[,meta_data[,filter_by] == filter_selection]
   meta_data <- meta_data[meta_data[,filter_by] == filter_selection,]
+  # Order data columns based on meta data to plot by
+  if (class(meta_data[,plot_by]) == "numeric"){
+    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
+    # Change to factor
+    meta_ordered[,plot_by] <- factor(meta_ordered[,plot_by])
+    your_data <- your_data[,order(meta_data[,plot_by])]
+  } else {
+    # Order meta_data based on the order of the data not alphabetically
+    meta_data[,plot_by] <- factor(meta_data[,plot_by], levels = unique(meta_data[,plot_by]))
+    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
+    your_data <- your_data[,order(meta_data[,plot_by])]
+  }
   # Name data columns based on meta data to plot by
-  colnames(your_data) <- meta_data[,plot_by]
+  colnames(your_data) <- meta_ordered[,plot_by]
   # Take proportion and rank the barcodes
   your_data <- as.data.frame(100*prop.table(as.matrix(your_data), margin = 2))
   your_data[your_data == 0] <- NA
@@ -38,7 +50,26 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
   melty <- reshape2::melt(your_data, id.vars = c("EMERGENCE", "ID"), value.name = "PERCENTAGE", variable.name = "Sample")
   # melty$MONTH = as.numeric(as.character(melty$MONTH))
   melty$EMERGENCE = as.factor(melty$EMERGENCE)
+  # melty$EMERGENCE = factor(melty$EMERGENCE, levels = unique(melty$EMERGENCE[order(melty$EMERGENCE)]))
   
+  # return(colnames(your_data))
+  # Substitute the numbers 1,2,3... in EMERGENCE with the names of plot_by variable 1,2,3...
+  # for (i in 1:(length(levels(melty$EMERGENCE))-1)){
+ # return(as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
+    melty$EMERGENCE <- mapvalues(melty$EMERGENCE, from = as.character(levels(melty$EMERGENCE)), to = as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
+    # levels(melty$EMERGENCE)[i+1] <- as.character(colnames(your_data)[i])
+  # }
+  
+  # return(melty)
+  # return(colnames(your_data))
+  # for (i in 1:(length(unique(melty$EMERGENCE))-1)){
+  #   melty$EMERGENCE[melty$EMERGENCE == as.character(i)] <- colnames(your_data)[i]
+  # }
+  
+
+  # melty$EMERGENCE = as.factor(melty$EMERGENCE)
+  # return(melty)
+
   if (graph_type == "bar"){
       ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = EMERGENCE))+
       ggplot2::geom_bar(stat = "identity", colour = "black",size=linesize)+
@@ -50,7 +81,8 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
       #switch(ggplot2::plot_theme, BW = ggplot2::theme_bw(), classic = ggplot2::theme_classic(), original = ggplot2::theme_grey())+
       ggplot2::scale_fill_manual(values = c("grey", rainbow(length(unique(melty$EMERGENCE))-1,
                                                             s = 1, v = 1, start = 0, end = 0.75, alpha = 1)))+
-      ggplot2::theme(text = ggplot2::element_text(size=text_size))
+      ggplot2::theme(text = ggplot2::element_text(size=text_size)) +
+      ggplot2::scale_x_discrete(name = plot_by)
     # ggplot2::coord_cartesian(ylim = c(0, y_limit))
   }
 
@@ -64,7 +96,8 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
     #switch(ggplot2::plot_theme, BW = ggplot2::theme_bw(), classic = ggplot2::theme_classic(), original = ggplot2::theme_grey())+
     ggplot2::scale_fill_manual(values = c("grey", rainbow(length(unique(melty$EMERGENCE))-1,
                                        s = 1, v = 1, start = 0, end = 0.75, alpha = 1)))+
-    ggplot2::theme(text = ggplot2::element_text(size=text_size))
+    ggplot2::theme(text = ggplot2::element_text(size=text_size)) +
+    ggplot2::scale_x_discrete(name = plot_by)
     # ggplot2::coord_cartesian(ylim = c(0, y_limit))
   }
 
