@@ -64,7 +64,11 @@ clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", f
 
 # Track top clones
 source('track_top_clones.R')
+# Categorical
 track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 12, linesize = .4)
+# Numeric
+track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Months", chosen_sample = "82.5", n_clones = 12, linesize = .4)
+
 track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 25, linesize = .4)
 track_top_clones(your_SE = se, filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", chosen_sample = "82hm", n_clones = 6, linesize = .4)
 

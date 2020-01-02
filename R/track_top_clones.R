@@ -23,14 +23,31 @@ track_top_clones <- function(your_SE, filter_by, filter_selection, plot_by, chos
   # Only keep data that matches filter
   your_data <- your_data[,meta_data[,filter_by] == filter_selection]
   meta_data <- meta_data[meta_data[,filter_by] == filter_selection,]
+  # Order data columns based on meta data to plot by
+  if (class(meta_data[,plot_by]) == "numeric"){
+    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
+    # Change to factor
+    meta_ordered[,plot_by] <- factor(meta_ordered[,plot_by])
+    your_data <- your_data[,order(meta_data[,plot_by])]
+  } else {
+    # Order meta_data based on the order of the data not alphabetically
+    meta_data[,plot_by] <- factor(meta_data[,plot_by], levels = unique(meta_data[,plot_by]))
+    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
+    your_data <- your_data[,order(meta_data[,plot_by])]
+  }
+  # One basic error checking step
+  if (length(which(meta_ordered[,plot_by] == chosen_sample)) == 0){
+    stop("Chosen sample must be found in plot_by")
+  }
   # Name data columns based on meta data to plot by
-  colnames(your_data) <- meta_data[,plot_by]
+  colnames(your_data) <- meta_ordered[,plot_by]
   # Take proportion
   your_data <- as.data.frame(100*prop.table(as.matrix(your_data), margin = 2))
   your_data[your_data == 0] <- NA
   # Rank based on chosen sample
-  ref <- which(meta_data[,plot_by] == chosen_sample)
+  ref <- which(meta_ordered[,plot_by] == chosen_sample)
   your_data_ordered <- your_data[order(-your_data[,ref]),]
+  # return(ref)
   # return(your_data_ordered)
   #your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
   #return(your_data_ranked)
