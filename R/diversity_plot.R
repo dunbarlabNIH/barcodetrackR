@@ -19,6 +19,15 @@ diversity_plot <- function(your_SE, index_type = "shannon", measure = "diversity
   # Extract bc data and metadata
   your_data <- SummarizedExperiment::assay(your_SE)
   meta_data <- SummarizedExperiment::colData(your_SE)
+  
+  # Make plot_by an ordered factor if it's categorical
+  if (class(meta_data[,plot_by]) == "factor") {
+    # Order meta_data based on the order of the data not alphabetically
+    meta_data[,plot_by] <- factor(meta_data[,plot_by], levels = unique(meta_data[,plot_by]))
+    meta_data <- meta_data[order(meta_data[,plot_by]),]
+    your_data <- your_data[,order(meta_data[,plot_by])]
+  }
+  
   # Calculate diversity based on specified index
   herfindahl = FALSE
   if(index_type == "herfindahl-hirschman"){
@@ -37,10 +46,19 @@ diversity_plot <- function(your_SE, index_type = "shannon", measure = "diversity
   if (measure == "evenness"){
     div_data <- div_data / log2(colSums(your_data))
   }
+  
   # Create dataframe for plotting
   plot.df <- data.frame(div_data=div_data,
                         x_data = meta_data[,plot_by],
                         group_data = meta_data[,group_by])
+  
+  # Correct ordering of plot_by variable
+  if (class(meta_data[,plot_by]) == "numeric"){
+    plot.df <- plot.df[order(plot.df$x_data),]
+    # Change to factor
+    plot.df$x_data <- factor(plot.df$x_data)
+  } 
+  
   # Create ggplot
   ggplot2::ggplot(data=plot.df, ggplot2::aes(x=x_data, y=div_data, group=group_data, colour=group_data)) +
     ggplot2::geom_line(size = line_size)+

@@ -44,7 +44,11 @@ my.div <- clonal_diversity(your_data = SummarizedExperiment::assay(se), divindex
 # Diversity plot
 source('diversity_plot.R')
 # Plot diversity
+# Categorical x axis
 diversity_plot(your_SE = se, index_type = "shannon", measure = "diversity", plot_by = "Timepoint", group_by = "Cell_type")
+# Numeric x axis
+diversity_plot(your_SE = se, index_type = "shannon", measure = "diversity", plot_by = "Months", group_by = "Cell_type")
+
 # Plot Shannon count
 diversity_plot(your_SE = se, index_type = "shannon", measure = "count", plot_by = "Timepoint", group_by = "Cell_type")
 # Plot Shannon evenness
