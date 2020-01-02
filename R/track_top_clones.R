@@ -70,6 +70,7 @@ track_top_clones <- function(your_SE, filter_by, filter_selection, plot_by, chos
   # Make plot
   ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = ID))+
     ggplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
+    ggplot2::theme_classic() +
     ggplot2::labs(title = paste(filter_by,"=",filter_selection))+
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
     # ggplot2::scale_x_continuous(breaks = seq(1, months[length(months)], by = 0.5), name = "Month")+

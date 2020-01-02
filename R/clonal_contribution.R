@@ -56,7 +56,7 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
   # Substitute the numbers 1,2,3... in EMERGENCE with the names of plot_by variable 1,2,3...
   # for (i in 1:(length(levels(melty$EMERGENCE))-1)){
  # return(as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
-    melty$EMERGENCE <- mapvalues(melty$EMERGENCE, from = as.character(levels(melty$EMERGENCE)), to = as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
+   melty$EMERGENCE <- mapvalues(melty$EMERGENCE, from = as.character(levels(melty$EMERGENCE)), to = as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
     # levels(melty$EMERGENCE)[i+1] <- as.character(colnames(your_data)[i])
   # }
   
@@ -74,6 +74,7 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
       ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = EMERGENCE))+
       ggplot2::geom_bar(stat = "identity", colour = "black",size=linesize)+
       ggplot2::labs(title = paste(filter_by,"=",filter_selection))+
+      ggplot2::theme_classic() +
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
       # gplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
       # ggplot2::scale_x_continuous(breaks = seq(1, months[length(months)], by = 0.5), name = "Month")+
@@ -90,6 +91,7 @@ clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_s
     ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = EMERGENCE))+
     ggplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
     ggplot2::labs(title = paste(filter_by,"=",filter_selection))+
+    ggplot2::theme_classic() +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
     # ggplot2::scale_x_continuous(breaks = seq(1, months[length(months)], by = 0.5), name = "Month")+
     ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10), name = "Clonal Contribution %")+

@@ -63,6 +63,7 @@ diversity_plot <- function(your_SE, index_type = "shannon", measure = "diversity
   ggplot2::ggplot(data=plot.df, ggplot2::aes(x=x_data, y=div_data, group=group_data, colour=group_data)) +
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+ ggplot2::labs(y = measure, x = plot_by, col = group_by)+
-    ggplot2::theme_classic() + ggplot2::theme(axis.text.x = ggplot2::element_text(face="bold", size=10,color = "black"),
-                            axis.text.y = ggplot2::element_text(face="bold", size=10, color = "black"))
+    ggplot2::theme_classic() + ggplot2::theme(axis.text.x = ggplot2::element_text(face="bold", size=14,color = "black"),
+                            axis.text.y = ggplot2::element_text(face="bold", size=14, color = "black"))+
+    ggplot2::theme(text = ggplot2::element_text(size=20))
 }
