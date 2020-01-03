@@ -12,11 +12,11 @@
 #'@param scale Sets the overlap between ridges. Larger values give more overlap. 
 #'@return Bias plot for two lineages over time.
 #'@examples
-#'ridge_plot(your_se = SE, cell_var = "Cell_Type", cell_1 = "B", cell_2 = "T", plot_by = "Timepoint")
+#'ridge_plot(your_se = SE, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", plot_by = "Timepoint")
 #'@export
 ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F, text_size = 20, scale = 1){
   
-  # Only include data from SE for the specified cell types
+  # Load data
   your_data <- SummarizedExperiment::assays(your_SE)$counts
   meta_data <- SummarizedExperiment::colData(your_SE)
   
@@ -63,7 +63,7 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
   if (weighted == T){
     as.data.frame(your_data) %>% group_by(TP) %>%
       do(ggplot2:::compute_density(.$log_bias, .$added_prop)) %>%
-      rename(log_bias = x) -> your_data_densities
+      dplyr::rename(log_bias = x) -> your_data_densities
     
     p <- ggplot2::ggplot(your_data_densities, ggplot2::aes(x = log_bias, y = TP, fill = TP, group = TP, height = density)) +
       ggridges::geom_density_ridges(stat="identity") +
@@ -86,8 +86,9 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
                 panel.background = ggplot2::element_rect(fill = "white"),
                 axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
                 legend.position = "none") + ggplot2::scale_y_discrete(name = plot_by) +
-                ggplot2::annotate("text",x = Inf, y = 0.6, label = cell_1, size = 8,hjust = 5)+
-                ggplot2::annotate("text",x = -Inf, y = 0.6, label = cell_2, size = 8, hjust = -5)
+                ggplot2::coord_cartesian(clip = "off")+
+                ggplot2::annotate("text",x = Inf, y = -Inf, label = cell_1, size = 8,hjust = 5, vjust = -1)+
+                ggplot2::annotate("text",x = -Inf, y = -Inf, label = cell_2, size = 8, hjust = -5, vjust = -1)
                 # The hjust above needs to be able to scale to different x limits
   }
   

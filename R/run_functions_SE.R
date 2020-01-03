@@ -4,6 +4,7 @@
 
 require(tidyverse)
 require(plyr)
+require(dplyr)
 
 # Load barcode and meta data
 barcode.file <- read.delim("/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/ZG66_simple_data.txt", row.names = 1)
@@ -30,6 +31,34 @@ ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "T", cell_2 = "B", plot
 # Weighted by overall contribution of each barcode
 ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Timepoint", weighted = T)
 ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "T", cell_2 = "B", plot_by = "Months", weighted = T,scale = 1.5)
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Months", weighted = T,scale = 1.5)
+
+
+# Comparing ridge plot to clonal_bias and dot_bias
+# Ridge plot
+source('ridge_plot.R')
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Timepoint")
+ridge_plot(your_SE = se, cell_var = "Cell_type",cell_1 = "B", cell_2 = "T", plot_by = "Timepoint", weighted = T)
+
+# Histogram
+source('bias_histogram.R')
+bias_histogram(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "3m",linesize = 0.3)
+bias_histogram(your_SE = se, cell_var = "Cell_type", cell_1 = "T", cell_2 = "B", filter_by = "Timepoint", filter_selection = "2m",linesize = 0.5)
+
+# Dot Bias
+
+
+
+# The old scripts
+bc_data <- barcodetrackR::threshold(read.delim("/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/ZG66_simple_data.txt", row.names = 1),thresh = 0.0005)
+bc_data_3m <- bc_data[,1:2]
+bc_data_2m <- bc_data[,3:4]
+source('clonal_bias.R')
+source('dot_bias.R')
+clonal_bias(bc_data)
+dot_bias(bc_data)
+dot_bias(bc_data_2m)
+dot_bias(bc_data_3m)
 
 
 # Correlation plot
@@ -57,7 +86,7 @@ diversity_plot(your_SE = se, index_type = "shannon", measure = "evenness", plot_
 
 # Clonal contribution
 source('clonal_contribution.R')
-clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
+clonal_contribution(your_SE = se, graph_type = "bar", filter_by = "Cell_type", filter_selection = "T", plot_by = "Months", n_clones = 20, linesize = .4)
 # Categorical plot_by
 clonal_contribution(your_SE = se, graph_type = "line", filter_by = "Cell_type", filter_selection = "T", plot_by = "Timepoint", n_clones = 20, linesize = .4)
 # Numeric plot_by
