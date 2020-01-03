@@ -1,6 +1,6 @@
-#' Bias histogram
+#' Bias dot plot
 #'
-#' Given a summarized experiment, gives histogram of log biases for 2 cell types
+#' Given a summarized experiment, gives dot plot of log biases for 2 cell types
 # '
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
 #'@param cell_var The column of metadata corresponding to cell types
@@ -9,12 +9,12 @@
 #'@param filter_by The column of metadata to filter by. e.g. Timepoint
 #'@param filter_selection The value of filter_by you want to create histogram for e.g. 2 months
 #'@param text_size The size of the text in the plot.
-#'@param linesize The linewidth of the stacked bars which represent individual barcodes
+#'@param alpha The transparency of the dots. Lower is more translucent, 1 is completely opaque
 #'@return Histogram of log bias for two lineages over time.
 #'@examples
-#'bias_histogram(your_SE = SE, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "3m")
+#'bias_dot(your_SE = SE, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "3m")
 #'@export
-bias_histogram <- function(your_SE, cell_var, cell_1, cell_2, filter_by, filter_selection, text_size = 20, linesize = .4){
+bias_dot <- function(your_SE, cell_var, cell_1, cell_2, filter_by, filter_selection, text_size = 20, alpha = 0.5){
   # Load data
   your_data <- SummarizedExperiment::assays(your_SE)$counts
   meta_data <- SummarizedExperiment::colData(your_SE)
@@ -44,32 +44,31 @@ bias_histogram <- function(your_SE, cell_var, cell_1, cell_2, filter_by, filter_
     temp$added_prop <- rowSums(temp)
     temp$bias <- temp[,1]/temp[,2]
     temp$log_bias <- log2(temp$bias)
-    # xmin <- min(temp$log_bias)
-    # xmax <- max(temp$log(bias))
-    # my_span <- c(xmin,xmin + (xmax-xmin)*1/12,xmin + (xmax-xmin)*2/12,xmin + (xmax-xmin)*3/12,xmin + (xmax-xmin)*4/12,xmin + (xmax-xmin)*5/12,xmin + (xmax-xmin)*6/12,xmin + (xmax-xmin)*7/12,xmin + (xmax-xmin)*8/12,xmin + (xmax-xmin)*9/12,xmin + (xmax-xmin)*10/12,xmin + (xmax-xmin)*11/12,xmax)
-    temp$cuts <- cut(temp$log_bias, breaks = seq(from = floor(min(temp$log_bias)),to = ceiling(max(temp$log_bias)),by = (ceiling(max(temp$log_bias))-floor(min(temp$log_bias)))*1/10), include.lowest = TRUE)
+    temp$cuts <- cut(temp$log_bias, breaks = seq(from = floor(min(as.numeric(temp$log_bias))),to = ceiling(max(as.numeric(temp$log_bias))),by = (ceiling(max(as.numeric(temp$log_bias)))-floor(min(as.numeric((temp$log_bias)))))*1/10), include.lowest = TRUE)
     temp$TP <- i/2
     return(temp)
   })
   your_data <- do.call(rbind, your_data_list)
-  ggplot2::ggplot(your_data[order(your_data$added_prop),], ggplot2::aes(x = cuts, y = added_prop, color = cuts))+
-    # ggplot2::facet_wrap(~ TP)+
-    ggplot2::scale_color_manual(values = colorRampPalette(c("navyblue", "springgreen", "navyblue"))(length(unique(your_data$cuts))))+
-    ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize)+
-    ggplot2::scale_x_discrete(name = "log_bias")+
+
+  # return(floor(min(your_data$log_bias)))
+  ggplot2::ggplot(your_data, ggplot2::aes(x = TP, y = log_bias))+
+    ggplot2::geom_jitter(ggplot2::aes(size = added_prop), color = "blue", fill = "blue", alpha = alpha) +
+  #  ggplot2::scale_size(range = c(floor(min(your_data$log_bias)),ceiling(max(your_data$log_bias))), guide = FALSE)+
+    # ggplot2::scale_y_continuous(breaks = your_data$cuts)+
+    # ggplot2::scale_x_continuous(breaks = 1:length(unique(your_data$TP)))+
+    ggplot2::ylab("log_bias")+
     ggplot2::theme(text = ggplot2::element_text(size = text_size),
                    panel.grid.major.x = ggplot2::element_blank(),
                    panel.grid.major.y = ggplot2::element_line(colour = "grey"),
                    panel.background = ggplot2::element_rect(fill = "white", colour = "black"),
-                   panel.spacing = ggplot2::unit(2, "lines"),
-                   axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90))+
-                   ggplot2::labs(color = "", y = "Proportion",title = paste(filter_by,"=",filter_selection))+
-                   ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
-                   ggplot2::coord_cartesian(clip = "off")+
-                   ggplot2::annotate("text",x = Inf, y = -Inf, label = cell_1, size = 8,hjust = -1, vjust = 2)+
-                   ggplot2::annotate("text",x = -Inf, y = -Inf, label = cell_2, size = 8, hjust = 1, vjust = 2)
-
-
+                   panel.spacing = ggplot2::unit(2,"lines"),
+                   axis.text.x = element_blank(),
+                   axis.ticks.x = element_blank()) +
+    ggplot2::labs(size = "Proportion", x = "", title = paste(filter_by,"=",filter_selection))+
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
+    ggplot2::coord_cartesian(clip = "off")+
+    ggplot2::annotate("text",x = Inf, y = Inf, label = cell_1, size = 8,hjust = -1, vjust = 1)+
+    ggplot2::annotate("text",x = Inf, y = -Inf, label = cell_2, size = 8, hjust = -1, vjust = 0)
 
 
 }

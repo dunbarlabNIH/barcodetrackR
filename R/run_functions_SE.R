@@ -46,7 +46,16 @@ bias_histogram(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T",
 bias_histogram(your_SE = se, cell_var = "Cell_type", cell_1 = "T", cell_2 = "B", filter_by = "Timepoint", filter_selection = "2m",linesize = 0.5)
 
 # Dot Bias
-
+source('bias_dot.R')
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "2m")
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "3m")
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "82hm")
+# Switch cell types
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "T", cell_2 = "B", filter_by = "Timepoint", filter_selection = "82hm")
+# Lower alpha
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "82hm", alpha = 0.2)
+# Higher alpha
+bias_dot(your_SE = se, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "82hm", alpha = 0.6)
 
 
 # The old scripts
