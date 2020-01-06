@@ -6,10 +6,11 @@
 #'@param metadata_stat The column of metadata to display in a histogram. Must be numeric.
 #'@param group_by Group and color the histogram by another column of metadat. If NULL, no grouping applied
 #'@param text_size Size of text.
+#'@param alpha The transparency of the histograms if group_by is provided. Lower = more transparent. 1 = opaque
 #'@examples
 #'stat_hist(your_se = SE, metadata_stat = "GFP_percent")
 #'@export
-stat_hist <- function(your_SE, metadata_stat, group_by = NULL, text_size = 20){
+stat_hist <- function(your_SE, metadata_stat, group_by = NULL, text_size = 20, alpha = 0.5){
   
   # Load data
   # your_data <- SummarizedExperiment::assays(your_SE)$counts
@@ -33,7 +34,7 @@ stat_hist <- function(your_SE, metadata_stat, group_by = NULL, text_size = 20){
   # Grouped histogram
   if (is.null(group_by) == FALSE){
     p <- ggplot2::ggplot(meta_data, aes(x = meta_data[,metadata_stat], color = meta_data[,group_by], fill = meta_data[,group_by]))+
-      ggplot2::geom_histogram()+
+      ggplot2::geom_histogram(alpha = alpha)+
       ggplot2::theme_classic()+
       ggplot2::labs(x = metadata_stat, fill = group_by) +
       ggplot2::guides(color = FALSE)+
@@ -41,9 +42,10 @@ stat_hist <- function(your_SE, metadata_stat, group_by = NULL, text_size = 20){
     
   } else {   # Regular histogram
     p <- ggplot2::ggplot(meta_data, aes(x = meta_data[,metadata_stat]))+
-      ggplot2::geom_histogram()+
+      ggplot2::geom_histogram(color = "darkblue", fill = "lightblue")+
       ggplot2::theme_classic()+
       ggplot2::labs(x = metadata_stat)+
+      # ggplot2::guides(fill= FALSE, color = FALSE)+
       ggplot2::theme(text = ggplot2::element_text(size = text_size))
     
   }
