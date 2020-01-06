@@ -1,7 +1,7 @@
-FILENAME	Monkey	Timepoint	Months	Cell_type	GIVENNAME
-B_3m	ZG66	3m	3	B	ZG66 3m    B   
-T_3m	ZG66	3m	3	T	ZG66 3m    T   
-B_2m	ZG66	2m	2	B	ZG66 2m    B   
-T_2m	ZG66	2m	2	T	ZG66 2m    T   
-B_82hm	ZG66	82hm	82.5	B	ZG66 82hm 20191024 B  PB CD181
-T_82hm	ZG66	82hm	82.5	T	ZG66 82hm 20191024 T  PB CD181
+FILENAME	Monkey	Timepoint	Months	Cell_type	GFP_percent	GIVENNAME
+B_3m	ZG66	3m	3	B	34	ZG66 3m    B   
+T_3m	ZG66	3m	3	T	14	ZG66 3m    T   
+B_2m	ZG66	2m	2	B	35	ZG66 2m    B   
+T_2m	ZG66	2m	2	T	16	ZG66 2m    T   
+B_82hm	ZG66	82hm	82.5	B	40	ZG66 82hm 20191024 B  PB CD181
+T_82hm	ZG66	82hm	82.5	T	15	ZG66 82hm 20191024 T  PB CD181

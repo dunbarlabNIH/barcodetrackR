@@ -16,6 +16,11 @@ source('subset_SE.R')
 source('threshold.R')
 se <- create_SE(your_data = barcode.file, meta_data = meta.file, threshold = 5e-4)
 
+# Metadata histogram
+source("stat_hist.R")
+stat_hist(your_SE = se, metadata_stat = "GFP_percent")
+stat_hist(your_SE = se, group_by = "Cell_type", metadata_stat = "GFP_percent", text_size = 12)
+
 # Heat map of just the B cells
 barcodetrackR::barcode_ggheatmap(your_data = SummarizedExperiment::assay(se)[,se$Cell_type == "B"],
                                  names = SummarizedExperiment::colData(se[,se$Cell_type == "B"])$Timepoint,
