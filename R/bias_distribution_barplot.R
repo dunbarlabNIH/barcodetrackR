@@ -1,10 +1,39 @@
-barcode_bias_distribution <- function(your_data, breaks = c(10,5,2,1,0), CT, TP, your_title = "", bias_choice = CT) {
+#'@title bias_distribution_barplot
+#'
+#'@description Plots each clone as a stacked bar, binned according to how biased it is towards one factor or the other..
+#'
+#'@importFrom rlang %||%
+#'
+#'@param your_SE A summarized experiment object.
+#'@param split_bias_on The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen
+#'@param bias_1 The factor you wish to plot on the left side of the plots.
+#'@param bias_2 The factor you wish to plot on the right side of the plots.
+#'@param split_bias_over The column in `colData(your_SE)` that you wish to observe the bias split on. Defaults to all.
+#'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting.
+#'@param breaks The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).
+#'@examples
+#' bias_distribution_barplot(your_SE = ZH33_SE, split_bias_on = "celltype", bias_1 = "T", bias_2 = "B", split_bias_over = "timepoints", bias_over = c(1,2,3,4,5))
+#'@export
+bias_distribution_barplot <- function(your_SE,
+                                      split_bias_on,
+                                      bias_1,
+                                      bias_2,
+                                      split_bias_over,
+                                      bias_over = NULL,
+                                      breaks = c(10,5,2,1,0),
+                                      your_title = "") {
   if(length(breaks) != length(unique(breaks))){
     stop("breaks must be unique")
   }
-  if(any(breaks[order(-breaks)] != breaks)){
-    stop("breaks must be provided from greatest to least")
+  coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
+  if(any(! c(split_bias_on, split_bias_over) %in% coldata_names)){
+    stop("split_bias_on and split_bias_over must both match a column name in colData(your_SE)")
   }
+  if(any(! c(bias_1, bias_2) %in% levels(SummarizedExperiment::colData(your_SE)[[split_bias_on]]))){
+    stop("bias_1 and bias_2 must both be levels in the colData column specified with split_bias_on")
+  }
+  bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
+
   your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 2))
   your_data[is.na(your_data)] <- 0
   listy <- list()

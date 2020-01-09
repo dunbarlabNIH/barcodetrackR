@@ -40,13 +40,6 @@ create_SE <- function(your_data = NULL,
   S4Vectors::metadata(your_SE)$scale_factor <- scale_factor
   S4Vectors::metadata(your_SE)$log_base <- log_base
 
-  # SummarizedExperiment::metadata(your_SE)$scale_factor <- scale_factor
-  # SummarizedExperiment::metadata(your_SE)$log_base <- log_base
-
-  # This annoying error keeps occuring even though metadata should be in namespace of SummarizedExperiment
-  # Error: 'metadata' is not an exported object from 'namespace:SummarizedExperiment'
-    # So I commented out the addition to the SE metadata for now. Not sure why this is happening on my computer.
-
 
   return(your_SE)
 }

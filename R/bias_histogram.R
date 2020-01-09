@@ -3,33 +3,57 @@
 #' Given a summarized experiment, gives histogram of log biases for 2 cell types
 # '
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
-#'@param cell_var The column of metadata corresponding to cell types
-#'@param cell_1 The first cell type to be compared
-#'@param cell_2 The second cell type to be compared
-#'@param filter_by The column of metadata to filter by. e.g. Timepoint
-#'@param filter_selection The value of filter_by you want to create histogram for e.g. 2 months
+#'@param split_bias_on The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen
+#'@param bias_1 The factor you wish to plot on the left side of the plots.
+#'@param bias_2 The factor you wish to plot on the right side of the plots.
+#'@param split_bias_over The column in `colData(your_SE)` that you wish to observe the bias split on. Defaults to all.
+#'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting.
+#'@param breaks Numeric. The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).
 #'@param text_size The size of the text in the plot.
 #'@param linesize The linewidth of the stacked bars which represent individual barcodes
 #'@return Histogram of log bias for two lineages over time.
 #'@examples
-#'bias_histogram(your_SE = SE, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", filter_by = "Timepoint", filter_selection = "3m")
+#'bias_histogram(your_SE = SE, split_bias_on = "Cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint", bias_over = "3m")
 #'@export
-bias_histogram <- function(your_SE, cell_var, cell_1, cell_2, filter_by, filter_selection, text_size = 20, linesize = .4){
-  # Load data
-  your_data <- SummarizedExperiment::assays(your_SE)$counts
+bias_histogram <- function(your_SE, split_bias_on, bias_1, bias_2, split_bias_over, bias_over = NULL, breaks = c(10,5,2,1), text_size = 20, linesize = .4){
+
+  # Some basic error checking before running the function
+  if(length(breaks) != length(unique(breaks))){
+    stop("breaks must be unique")
+  }
+  coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
+  if(any(! c(split_bias_on, split_bias_over) %in% coldata_names)){
+    stop("split_bias_on and split_bias_over must both match a column name in colData(your_SE)")
+  }
+  if(any(! c(bias_1, bias_2) %in% levels(SummarizedExperiment::colData(your_SE)[[split_bias_on]]))){
+    stop("bias_1 and bias_2 must both be levels in the colData column specified with split_bias_on")
+  }
+  bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
+
+
+  plot_list <- lapply(1:length(bias_over), function(i){
+    temp_bias_over <- bias_over[i]
+    temp_subset <- your_SE[,(your_SE$split_bias_over %in% temp_bias_over) & (your_SE$split_bias_on %in% c(bias_1, bias_2))]
+    print(temp_subset)
+  })
+
+
+
+  # Load data]
+  your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
   meta_data <- SummarizedExperiment::colData(your_SE)
   # Only keep data that matches filter
-  your_data <- your_data[,meta_data[,filter_by] == filter_selection]
-  meta_data <- meta_data[meta_data[,filter_by] == filter_selection,]
+  your_data <- your_data[,meta_data[,split_bias_over] == bias_over]
+  meta_data <- meta_data[meta_data[,split_bias_over] == bias_over,]
   # Only keep desired cell types
-  your_data <- your_data[,meta_data[,cell_var] == cell_1 | meta_data[,cell_var] == cell_2]
-  meta_data <- meta_data[meta_data[,cell_var] == cell_1 | meta_data[,cell_var] == cell_2,]
-  # Make the cell_var an ordered factor
-  meta_data[,cell_var] <- factor(meta_data[,cell_var], levels = c(cell_1,cell_2))
+  your_data <- your_data[,meta_data[,split_bias_on] == bias_1 | meta_data[,split_bias_on] == bias_2]
+  meta_data <- meta_data[meta_data[,split_bias_on] == bias_1 | meta_data[,split_bias_on] == bias_2,]
+  # Make the split_bias_on an ordered factor
+  meta_data[,split_bias_on] <- factor(meta_data[,split_bias_on], levels = c(bias_1,bias_2))
   # Order data correctly
-  your_data <- your_data[,order(meta_data[,cell_var])]
-  meta_data <- meta_data[order(meta_data[,cell_var]),]
-  
+  your_data <- your_data[,order(meta_data[,split_bias_on])]
+  meta_data <- meta_data[order(meta_data[,split_bias_on]),]
+
   # Basic error handling
   if(ncol(your_data)%% 2 != 0){
     stop("Data frame must be divisible by 2.")
@@ -63,11 +87,11 @@ bias_histogram <- function(your_SE, cell_var, cell_1, cell_2, filter_by, filter_
                    panel.background = ggplot2::element_rect(fill = "white", colour = "black"),
                    panel.spacing = ggplot2::unit(2, "lines"),
                    axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90))+
-                   ggplot2::labs(color = "", y = "Proportion",title = paste(filter_by,"=",filter_selection))+
+                   ggplot2::labs(color = "", y = "Proportion",title = paste(split_bias_over,"=",bias_over))+
                    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
                    ggplot2::coord_cartesian(clip = "off")+
-                   ggplot2::annotate("text",x = Inf, y = -Inf, label = cell_1, size = 8,hjust = -1, vjust = 2)+
-                   ggplot2::annotate("text",x = -Inf, y = -Inf, label = cell_2, size = 8, hjust = 1, vjust = 2)
+                   ggplot2::annotate("text",x = Inf, y = -Inf, label = bias_1, size = 8,hjust = -1, vjust = 2)+
+                   ggplot2::annotate("text",x = -Inf, y = -Inf, label = bias_2, size = 8, hjust = 1, vjust = 2)
 
 
 
