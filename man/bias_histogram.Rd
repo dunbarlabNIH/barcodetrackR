@@ -11,9 +11,11 @@ bias_histogram(
   bias_2,
   split_bias_over,
   bias_over = NULL,
-  breaks = c(10, 5, 2, 1),
-  text_size = 20,
-  linesize = 0.4
+  breaks = c(10, 2, 1, 0.5),
+  text_size = 10,
+  linesize = 0.4,
+  ncols = 1,
+  scale_all_y = TRUE
 )
 }
 \arguments{
@@ -25,22 +27,26 @@ bias_histogram(
 
 \item{bias_2}{The factor you wish to plot on the right side of the plots.}
 
-\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on. Defaults to all.}
+\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on.}
 
-\item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting.}
+\item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
 \item{breaks}{Numeric. The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).}
 
 \item{text_size}{The size of the text in the plot.}
 
 \item{linesize}{The linewidth of the stacked bars which represent individual barcodes}
+
+\item{ncols}{Numeric. Number of columns to plot on using plot_grid from cowplot.}
+
+\item{same_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
 }
 \value{
-Histogram of log bias for two lineages over time.
+Histogram of log bias for two factors over another set of factors.
 }
 \description{
 Given a summarized experiment, gives histogram of log biases for 2 cell types
 }
 \examples{
-bias_histogram(your_SE = SE, split_bias_on = "Cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint", bias_over = "3m")
+bias_histogram(your_SE = SE, split_bias_on = "Cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint", bias_over = c(1,2,4.5,12))
 }
