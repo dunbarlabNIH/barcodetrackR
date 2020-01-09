@@ -80,7 +80,6 @@ barcode_ggheatmap_2 <- function(your_SE,
   percent_scale <- c(0, 0.000025, 0.001, 0.01, 0.1, 1)
   percent_scale.labels <- c("0%", "0.0025% ", "0.1%", "1%", "10%", "100%")
   log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
-  print(log_scale)
   color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
   #organizing data for plotting
@@ -93,17 +92,22 @@ barcode_ggheatmap_2 <- function(your_SE,
   plotting_cellnote <- tibble::rownames_to_column(assays(your_SE)[[cellnote_assay]], var = "sequence")
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
-
+  if(is.numeric(plotting_data$cellnote)){
+    if(cellnote_assay == "percentages"){
+      plotting_data$cellnote <- paste0(round(plotting_data$cellnote*100, digits = 2), "%")
+    } else {
+      plotting_data$cellnote <- round(plotting_data$cellnote, digits = 2)
+    }
+  }
 
   if(grid) grid_color = "black" else grid_color = NA
 
 
 
   color_scale <- c("#4575B4", "#5F8DC0", "lightblue", "#fefeb9", "#D73027", "red4")
-  print(str(plotting_data))
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size)+
+    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
     ggplot2::scale_fill_gradientn(
       colors = color_scale,
       values = scales::rescale(log_scale, to = c(0,1)),
