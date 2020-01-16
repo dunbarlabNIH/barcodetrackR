@@ -49,7 +49,7 @@ bias_distribution_barplot <- function(your_SE,
   plot_list <- lapply(1:length(bias_over), function(i){
     temp_subset <- your_SE[,(your_SE[[split_bias_over]] %in% bias_over[i]) & (your_SE[[split_bias_on]] %in% c(bias_1, bias_rest))]
     temp_bias_1 <- SummarizedExperiment::assays(temp_subset[, temp_subset[[split_bias_on]] == bias_1])[["percentages"]]
-    temp_bias_rest <- rowMax SummarizedExperiment::assays(temp_subset[, temp_subset[[split_bias_on]] == bias_rest])[["percentages"]]
+    temp_bias_rest <- rowMax(SummarizedExperiment::assays(temp_subset[, temp_subset[[split_bias_on]] == bias_rest])[["percentages"]]) #WRONGGG!!!!
     your_data <- cbind(SummarizedExperiment::assays(temp_subset[, temp_subset[[split_bias_on]] == bias_1])[["percentages"]],
                        SummarizedExperiment::assays(temp_subset[, temp_subset[[split_bias_on]] == bias_2])[["percentages"]])
     colnames(your_data) <- c("bias_1", "bias_2")
