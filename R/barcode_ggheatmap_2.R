@@ -1,4 +1,5 @@
 #'@importFrom rlang %||%
+#'
 #'@title barcode_ggheatmap (Barcode Heatmap using ggplot2)
 #'
 #'@description Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
@@ -19,6 +20,7 @@
 #'@param hclust_linkage Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
 #'@param row_order Character; "hierarchical" to perform hierarchical clustering on the output and order in that manner, "emergence" to organize rows  by order of presence in data (from left to right), or a character vector of rows within the summarized experiment to plot.
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
+#'@param percent_scale A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Defaults to c(0, 0.000025, 0.001, 0.01, 0.1, 1).
 #'@return Displays a heatmap in the current plot window.
 #'@examples
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
@@ -97,11 +99,13 @@ barcode_ggheatmap_2 <- function(your_SE,
 
 
   #create scale for plotting
+  if(length(percent_scale) != 6){
+    stop("percent_scale must be a numeric vector of length 5.")
+  }
   log_used <- S4Vectors::metadata(your_SE)$log_base
   scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
   percent_scale_labels <- paste0(percent_scale * 100, "%")
   log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
-  #need to fix this if percent scale is larger than 6 numbers
   color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
 

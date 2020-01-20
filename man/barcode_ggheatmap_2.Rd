@@ -55,6 +55,8 @@ barcode_ggheatmap_2(
 
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
+\item{percent_scale}{A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Defaults to c(0, 0.000025, 0.001, 0.01, 0.1, 1).}
+
 \item{cellnote_option}{Character. One of "stars", "reads", or "percents"}
 }
 \value{

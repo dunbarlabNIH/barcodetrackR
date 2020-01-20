@@ -1,9 +1,9 @@
-#' Bias histogram
-#'
-#' Given a summarized experiment, gives histogram of log biases for 2 cell types
-#'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
+#'
+#'@title Bias histogram
+#'
+#'@description Given a summarized experiment, gives histogram of log biases for 2 cell types
 #'
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
 #'@param split_bias_on The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen
