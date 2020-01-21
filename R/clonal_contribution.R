@@ -1,106 +1,131 @@
-#' Bar or line Plot of Hematopoietic Contribution from top n clones
+#'@importFrom rlang %||%
+#'@importFrom magrittr %>%
 #'
-#' Usually used for tracking a cell lineage's top clones over time.
+#'@title Clonal contribution plot
 #'
-#'@param your_SE A summarized experiment. With barcode data stored in the 1st assay and metadata stored in colData.
+#'@description Bar or line plot of percentage contribution from a selected choice or number of elements in the rows of the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
+#'
+#'@param your_SE A Summarized Experiment object.
+#'@param SAMPLENAME_choice The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.
+#'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.
+#'@param clones_sequences The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.
 #'@param graph_type Choice of "bar" or "line" for how to display the clonal contribution data
-#'@param filter_by Name of metadata column to filter by e.g. Cell_type
-#'@param filter_selection The value of the filter column to display e.g. T cells
-#'@param plot_by The column of metadata that you want to be the x-axis of the plot. e.g. Timepoint
-#'@param n_clones Numeric. Number of top clones from each sample that should be displayed.
-#'@param linesize Numeric. Thickness of the lines. OPTIONAL
-#'@param text_size Numeric. Size of text in plot. OPTIONAL
-#'@return Displays a stacked area plot (made by ggplot2) of the samples' top clones.
+#'@param filter_by Name of metadata column to filter by e.g. Lineage
+#'@param filter_selection The value of the filter column to display e.g. "T" (within Lineage)
+#'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. Month
+#'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.
+#'@param keep_numeric If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.
+#'@param plot_non_selected Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice
+#'@param linesize Numeric. Thickness of the lines.
+#'@param text_size Numeric. Size of text in plot.
+#'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
 #'@examples
-#'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", n_clones = 20)
+#'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  filter_by = "Cell_type", filter_selection = "B", plot_over = "Timepoint", n_clones = 20)
 #'@export
 
-clonal_contribution <- function(your_SE, graph_type = "bar", filter_by, filter_selection, plot_by, n_clones = 10, linesize = 0.5, text_size = 15){
-  # Extract bc data and metadata
-  your_data <- SummarizedExperiment::assay(your_SE)
-  meta_data <- SummarizedExperiment::colData(your_SE)
-  # Only keep data that matches filter
-  your_data <- your_data[,meta_data[,filter_by] == filter_selection]
-  meta_data <- meta_data[meta_data[,filter_by] == filter_selection,]
-  # Order data columns based on meta data to plot by
-  if (class(meta_data[,plot_by]) == "numeric"){
-    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
-    # Change to factor
-    meta_ordered[,plot_by] <- factor(meta_ordered[,plot_by])
-    your_data <- your_data[,order(meta_data[,plot_by])]
-  } else {
-    # Order meta_data based on the order of the data not alphabetically
-    meta_data[,plot_by] <- factor(meta_data[,plot_by], levels = unique(meta_data[,plot_by]))
-    meta_ordered <- meta_data[order(meta_data[,plot_by]),]
-    your_data <- your_data[,order(meta_data[,plot_by])]
-  }
-  # Name data columns based on meta data to plot by
-  colnames(your_data) <- meta_ordered[,plot_by]
-  # Take proportion and rank the barcodes
-  your_data <- as.data.frame(100*prop.table(as.matrix(your_data), margin = 2))
-  your_data[your_data == 0] <- NA
-  your_data_ranked <- apply(-your_data, 2, rank, ties.method = "min", na.last = "keep")
-  your_data$EMERGENCE <- apply(your_data_ranked, 1, function(x){return(which(x <= n_clones)[1])})
-  your_data[is.na(your_data)] <- 0
-  # Make a row of data with the rest of the clones
-  your_data <- rbind(your_data[your_data$EMERGENCE != 0,], colSums(your_data[your_data$EMERGENCE == 0,]))
-  your_data <- your_data[order(-your_data$EMERGENCE),]
-  your_data$ID <- rownames(your_data)
-  # Melt dataframe
-  melty <- reshape2::melt(your_data, id.vars = c("EMERGENCE", "ID"), value.name = "PERCENTAGE", variable.name = "Sample")
-  # melty$MONTH = as.numeric(as.character(melty$MONTH))
-  melty$EMERGENCE = as.factor(melty$EMERGENCE)
-  # melty$EMERGENCE = factor(melty$EMERGENCE, levels = unique(melty$EMERGENCE[order(melty$EMERGENCE)]))
-  
-  # return(colnames(your_data))
-  # Substitute the numbers 1,2,3... in EMERGENCE with the names of plot_by variable 1,2,3...
-  # for (i in 1:(length(levels(melty$EMERGENCE))-1)){
- # return(as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
-   melty$EMERGENCE <- mapvalues(melty$EMERGENCE, from = as.character(levels(melty$EMERGENCE)), to = as.character(c(0,colnames(your_data)[1:length(levels(melty$EMERGENCE))-1])))
-    # levels(melty$EMERGENCE)[i+1] <- as.character(colnames(your_data)[i])
-  # }
-  
-  # return(melty)
-  # return(colnames(your_data))
-  # for (i in 1:(length(unique(melty$EMERGENCE))-1)){
-  #   melty$EMERGENCE[melty$EMERGENCE == as.character(i)] <- colnames(your_data)[i]
-  # }
-  
+clonal_contribution <- function(your_SE,
+                                SAMPLENAME_choice = NULL,
+                                clone_sequences = NULL,
+                                n_clones = 10,
+                                graph_type = "bar",
+                                filter_by,
+                                filter_selection,
+                                plot_over,
+                                plot_over_display_choices = NULL,
+                                keep_numeric = TRUE,
+                                plot_non_selected = TRUE,
+                                linesize = 0.5,
+                                text_size = 15){
 
-  # melty$EMERGENCE = as.factor(melty$EMERGENCE)
-  # return(melty)
+
+  # Some basic error checking before running the function
+  coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
+  if(any(! c(filter_by, plot_over) %in% coldata_names)){
+    stop("filter_by and plot_over must both match a column name in colData(your_SE)")
+  }
+  if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
+    stop("filter_selection must be an element in the colData column specified with filter_by")
+  }
+  if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
+    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(SE)[[plot_over]]))
+  } else {
+    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
+  }
+  if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) != 1){
+    stop("please specify only ONE of SAMPLENAME_choice or clone_sequences")
+  }
+
+  #get appropriate rows to use in plotting
+  if(!is.null(SAMPLENAME_choice)){
+    selected_sequences <- get_top_clones(your_SE = your_SE, SAMPLENAME_choice = SAMPLENAME_choice, n_clones = n_clones)
+  } else if(!is.null(clone_sequences)){
+    selected_sequences <- clone_sequences
+  } else {
+    stop("one of SAMPLENAME_choice or clone_sequences must be not-NULL")
+  }
+
+
+  #select those samples which to plot_over and to filter_by
+  temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices) & (your_SE[[filter_by]] == filter_selection)]
+  temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
+
+  #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
+  if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
+    stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
+  }
+
+  #fetch percentages and turn sample_name into the plot_over equivalents
+  your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
+  your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]
+  plotting_data <- tibble::rownames_to_column(your_data, var = "sequence") %>%
+    tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%
+    dplyr::mutate(fill_label = ifelse(sequence %in% selected_sequences, sequence, "other")) %>%
+    dplyr::mutate(fill_label = factor(fill_label, levels = c(selected_sequences, "other"))) %>%
+    dplyr::mutate(sample_name = plyr::mapvalues(sample_name, rownames(temp_subset_coldata), temp_subset_coldata[[plot_over]]))
+  if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(sample_name)))
+  } else {
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
+  }
+
+
+
+  #set up appropriate levels in plotting the selected elements and specify the colors
+  if(plot_non_selected){
+    non_selected_sequences <- plotting_data %>%
+      dplyr::arrange(desc(value)) %>%
+      dplyr::pull(sequence) %>%
+      unique() %>%
+      .[!(. %in% selected_sequences)]
+    plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences, non_selected_sequences)))
+    color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences)), "grey"), c(selected_sequences, "other"))
+  } else {
+    plotting_data <- dplyr::filter(plotting_data, sequence %in% selected_sequences)
+    plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences)))
+    color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences))), selected_sequences)
+  }
+
 
   if (graph_type == "bar"){
-      ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = EMERGENCE))+
-      ggplot2::geom_bar(stat = "identity", colour = "black",size=linesize)+
-      ggplot2::labs(title = paste(filter_by,"=",filter_selection))+
-      ggplot2::theme_classic() +
-      ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
-      # gplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
-      # ggplot2::scale_x_continuous(breaks = seq(1, months[length(months)], by = 0.5), name = "Month")+
-      ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10), name = "Clonal Contribution %")+
-      #switch(ggplot2::plot_theme, BW = ggplot2::theme_bw(), classic = ggplot2::theme_classic(), original = ggplot2::theme_grey())+
-      ggplot2::scale_fill_manual(values = c("grey", rainbow(length(unique(melty$EMERGENCE))-1,
-                                                            s = 1, v = 1, start = 0, end = 0.75, alpha = 1)))+
-      ggplot2::theme(text = ggplot2::element_text(size=text_size)) +
-      ggplot2::scale_x_discrete(name = plot_by)
-    # ggplot2::coord_cartesian(ylim = c(0, y_limit))
+    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
+      ggplot2::geom_col(colour = "black",  size= linesize)+
+      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
+      ggplot2::theme(text = ggplot2::element_text(size=text_size),
+                     plot.title = ggplot2::element_text(hjust = 0.5))
+
+  } else if (graph_type == "line"){
+    g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
+      ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
+      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
+      ggplot2::theme(text = ggplot2::element_text(size=text_size),
+                     plot.title = ggplot2::element_text(hjust = 0.5))
   }
 
-  else if (graph_type == "line"){
-    ggplot2::ggplot(melty, ggplot2::aes(x=Sample, y = PERCENTAGE, group = ID, fill = EMERGENCE))+
-    ggplot2::geom_area(position = "stack", linetype = 1, size = linesize, colour = "black")+
-    ggplot2::labs(title = paste(filter_by,"=",filter_selection))+
-    ggplot2::theme_classic() +
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))+
-    # ggplot2::scale_x_continuous(breaks = seq(1, months[length(months)], by = 0.5), name = "Month")+
-    ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10), name = "Clonal Contribution %")+
-    #switch(ggplot2::plot_theme, BW = ggplot2::theme_bw(), classic = ggplot2::theme_classic(), original = ggplot2::theme_grey())+
-    ggplot2::scale_fill_manual(values = c("grey", rainbow(length(unique(melty$EMERGENCE))-1,
-                                       s = 1, v = 1, start = 0, end = 0.75, alpha = 1)))+
-    ggplot2::theme(text = ggplot2::element_text(size=text_size)) +
-    ggplot2::scale_x_discrete(name = plot_by)
-    # ggplot2::coord_cartesian(ylim = c(0, y_limit))
+  if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
+    g + ggplot2::scale_x_continuous(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices)
+  } else {
+    g + ggplot2::scale_x_discrete(paste0(plot_over), labels = plot_over_display_choices)
   }
-
 }

@@ -2,13 +2,13 @@
 % Please edit documentation in R/bias_distribution_barplot.R
 \name{bias_distribution_barplot}
 \alias{bias_distribution_barplot}
-\title{bias_distribution_barplot}
+\title{Bias Distribution Barplot}
 \usage{
 bias_distribution_barplot(
   your_SE,
   split_bias_on,
   bias_1,
-  bias_2,
+  bias_rest,
   split_bias_over,
   bias_over = NULL,
   breaks = c(10, 5, 2, 1, 0),
@@ -18,20 +18,20 @@ bias_distribution_barplot(
 \arguments{
 \item{your_SE}{A summarized experiment object.}
 
-\item{split_bias_on}{The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen}
+\item{split_bias_on}{The column in `colData(your_SE)` from which `bias_1` and `bias_rest` will be chosen}
 
-\item{bias_1}{The factor you wish to plot on the left side of the plots.}
+\item{bias_1}{The factor you wish to check bias towards within split_bias_on.}
 
-\item{bias_2}{The factor you wish to plot on the right side of the plots.}
+\item{bias_rest}{The factor(s) you wish to check bias against within split_bias_on. Defaults to all.}
 
-\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on. Defaults to all.}
+\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on.}
 
-\item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting.}
+\item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
 \item{breaks}{The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).}
 }
 \description{
-Plots each clone as a stacked bar, binned according to how biased it is towards one factor or the other..
+Plots each clone as a stacked bar, binned according to how biased it is towards one factor when compared to other factors.
 }
 \examples{
 bias_distribution_barplot(your_SE = ZH33_SE, split_bias_on = "celltype", bias_1 = "T", bias_2 = "B", split_bias_over = "timepoints", bias_over = c(1,2,3,4,5))

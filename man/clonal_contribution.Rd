@@ -2,42 +2,57 @@
 % Please edit documentation in R/clonal_contribution.R
 \name{clonal_contribution}
 \alias{clonal_contribution}
-\title{Bar or line Plot of Hematopoietic Contribution from top n clones}
+\title{Clonal contribution plot}
 \usage{
 clonal_contribution(
   your_SE,
+  SAMPLENAME_choice = NULL,
+  clone_sequences = NULL,
+  n_clones = 10,
   graph_type = "bar",
   filter_by,
   filter_selection,
-  plot_by,
-  n_clones = 10,
+  plot_over,
+  plot_over_display_choices = NULL,
+  keep_numeric = TRUE,
+  plot_non_selected = TRUE,
   linesize = 0.5,
   text_size = 15
 )
 }
 \arguments{
-\item{your_SE}{A summarized experiment. With barcode data stored in the 1st assay and metadata stored in colData.}
+\item{your_SE}{A Summarized Experiment object.}
+
+\item{SAMPLENAME_choice}{The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.}
+
+\item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.}
 
 \item{graph_type}{Choice of "bar" or "line" for how to display the clonal contribution data}
 
-\item{filter_by}{Name of metadata column to filter by e.g. Cell_type}
+\item{filter_by}{Name of metadata column to filter by e.g. Lineage}
 
-\item{filter_selection}{The value of the filter column to display e.g. T cells}
+\item{filter_selection}{The value of the filter column to display e.g. "T" (within Lineage)}
 
-\item{plot_by}{The column of metadata that you want to be the x-axis of the plot. e.g. Timepoint}
+\item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. Month}
 
-\item{n_clones}{Numeric. Number of top clones from each sample that should be displayed.}
+\item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.}
 
-\item{linesize}{Numeric. Thickness of the lines. OPTIONAL}
+\item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
 
-\item{text_size}{Numeric. Size of text in plot. OPTIONAL}
+\item{plot_non_selected}{Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice}
+
+\item{linesize}{Numeric. Thickness of the lines.}
+
+\item{text_size}{Numeric. Size of text in plot.}
+
+\item{clones_sequences}{The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.}
 }
 \value{
-Displays a stacked area plot (made by ggplot2) of the samples' top clones.
+Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
 }
 \description{
-Usually used for tracking a cell lineage's top clones over time.
+Bar or line plot of percentage contribution from a selected choice or number of elements in the rows of the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
-clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",filter_by = "Cell_type", filter_selection = "B", plot_by = "Timepoint", n_clones = 20)
+clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  filter_by = "Cell_type", filter_selection = "B", plot_over = "Timepoint", n_clones = 20)
 }

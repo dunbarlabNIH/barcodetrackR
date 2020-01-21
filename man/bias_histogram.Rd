@@ -48,5 +48,5 @@ Histogram of log bias for two factors over another set of factors.
 Given a summarized experiment, gives histogram of log biases for 2 cell types
 }
 \examples{
-bias_histogram(your_SE = SE, split_bias_on = "Cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint", bias_over = c(1,2,4.5,12))
+bias_histogram(your_SE = SE, split_bias_on = "Lineage", bias_1 = "B", bias_2 = "T", split_bias_over = "Month", bias_over = c(1,2,4.5,12))
 }

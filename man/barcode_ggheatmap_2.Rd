@@ -6,32 +6,32 @@
 \usage{
 barcode_ggheatmap_2(
   your_SE,
-  hclust_assay = "logs",
-  visual_assay = "logs",
+  assay = "logs",
   selections = list(),
-  names = colData(your_SE)$SAMPLENAME,
+  plot_labels = NULL,
   n_clones = 10,
   your_title = "",
   grid = TRUE,
   label_size = 1,
   dendro = FALSE,
   cellnote_size = 4,
-  printtable = FALSE,
-  table_option = "percents",
   distance_method = "Euclidean",
   minkowski_power = 2,
   cellnote_assay = "stars",
   hclust_linkage = "complete",
   row_order = "hierarchical",
-  clusters = 0
+  clusters = 0,
+  percent_scale = c(0, 2.5e-05, 0.001, 0.01, 0.1, 1)
 )
 }
 \arguments{
-\item{hclust_assay}{Perform hierarchical clustering on this assay.}
+\item{your_SE}{A Summarized Experiment object.}
 
-\item{visual_assay}{Use this assay for visualization.}
+\item{assay}{Perform visualization and clustering on this assay.}
 
-\item{names}{Vector of x axis labels.}
+\item{selections}{A list of selections to use leveraging the metadata information (see subset_SE for the necessary formatting, e.g selections = list("month" > 1, "celltype" = c("T", "B")))}
+
+\item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{n_clones}{The top 'n' clones to plot.}
 
@@ -41,25 +41,21 @@ barcode_ggheatmap_2(
 
 \item{label_size}{The size of the column labels.}
 
-\item{dendro}{Logical. Whether or not to show row dendrogram for hierarchical clustering.}
+\item{dendro}{Logical. Whether or not to show row dendrogram when hierarchical clustering.}
 
 \item{cellnote_size}{The numerical size of the cell note labels.}
 
-\item{printtable}{Logical. Prints percent contribution as a table instead of plotting it.}
+\item{distance_method}{Character. Use summary(proxy::pr_DB) to see all possible options for distance metrics in clustering.}
 
-\item{table_option}{Character. One of "logs", "reads", or "percents" for printing.}
-
-\item{distance_method}{Character. Use summary(proxy::pr_DB) to see all options.}
-
-\item{minkowski_power}{The power of the Minkowski distance (if minkowski is used).}
+\item{minkowski_power}{The power of the Minkowski distance (if minkowski is the distance method used).}
 
 \item{hclust_linkage}{Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).}
 
-\item{row_order}{Character. One of "hierarchical" or "emergence" to organize rows.}
+\item{row_order}{Character; "hierarchical" to perform hierarchical clustering on the output and order in that manner, "emergence" to organize rows  by order of presence in data (from left to right), or a character vector of rows within the summarized experiment to plot.}
 
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
-\item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+\item{percent_scale}{A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Defaults to c(0, 0.000025, 0.001, 0.01, 0.1, 1).}
 
 \item{cellnote_option}{Character. One of "stars", "reads", or "percents"}
 }
@@ -67,10 +63,8 @@ barcode_ggheatmap_2(
 Displays a heatmap in the current plot window.
 }
 \description{
-Creates a heatmap using the top 'n' rows from each column, using ggplot2!
+Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 }
 \examples{
-BCheatmap(your_data = zh33, names = colnames(zh33), n_clones = 10,
-      your_title = "First Time Point", grid = TRUE, columnLabels = 3)
-BCheatmap(your_data = zh33, n_clones = 10, printtable = TRUE)
+barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
 }
