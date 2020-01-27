@@ -19,14 +19,14 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
   # Load data
   your_data <- SummarizedExperiment::assays(your_SE)$counts
   meta_data <- SummarizedExperiment::colData(your_SE)
-  
+
   # Only keep data that matches filter
   your_data <- your_data[,meta_data[,cell_var] == cell_1 | meta_data[,cell_var] == cell_2]
-  meta_data <- meta_data[,meta_data[,cell_var] == cell_1 | meta_data[,cell_var] == cell_2]
-  
+  meta_data <- meta_data[meta_data[,cell_var] == cell_1 | meta_data[,cell_var] == cell_2,]
+
   # Make the cell_var an ordered factor
   meta_data[,cell_var] <- factor(meta_data[,cell_var], levels = c(cell_1,cell_2))
-  
+
   # Order data columns based on meta data to plot by
   if (class(meta_data[,plot_by]) == "numeric"){
     meta_ordered <- meta_data[order(meta_data[,plot_by],meta_data[,cell_var]),]
@@ -43,9 +43,9 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
   if(ncol(data_ordered)%% 2 != 0){
     stop("Data frame must be divisible by 2.")
   }
-  
+
   your_data <- data_ordered[rowSums(data_ordered) > 0,]
-  
+
   your_data_list <- lapply(2*(1:(ncol(your_data)/2)), function(i){
     temp <- as.data.frame(as.matrix(your_data[,c(i-1,i)])) #subset the data
     temp <- temp[rowSums(temp) > 0,] # only keep barcodes with non-zero values for this pair
@@ -58,13 +58,13 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
     return(temp)
   })
   your_data <- do.call(rbind, your_data_list)
-  
+
   # Weighted ridge plot
   if (weighted == T){
     as.data.frame(your_data) %>% group_by(TP) %>%
       do(ggplot2:::compute_density(.$log_bias, .$added_prop)) %>%
       dplyr::rename(log_bias = x) -> your_data_densities
-    
+
     p <- ggplot2::ggplot(your_data_densities, ggplot2::aes(x = log_bias, y = TP, fill = TP, group = TP, height = density)) +
       ggridges::geom_density_ridges(stat="identity") +
       ggplot2::theme(text = ggplot2::element_text(size = text_size),
@@ -76,7 +76,7 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
                      ggplot2::annotate("text",x = Inf, y = 0.6, label = cell_1, size = 8,hjust = 5)+
                      ggplot2::annotate("text",x = -Inf, y = 0.6, label = cell_2, size = 8, hjust = -5)
   } else {
- 
+
   # Normal ridge plot
   p <- ggplot2::ggplot(your_data[order(your_data$added_prop),], ggplot2::aes(x = log_bias, y = TP, fill = TP, group = TP)) +
     ggridges::geom_density_ridges(scale = scale) +
@@ -88,10 +88,10 @@ ridge_plot <- function(your_SE, cell_var, cell_1, cell_2, plot_by, weighted = F,
                 legend.position = "none") + ggplot2::scale_y_discrete(name = plot_by) +
                 ggplot2::coord_cartesian(clip = "off")+
                 ggplot2::annotate("text",x = Inf, y = -Inf, label = cell_1, size = 8,hjust = 5, vjust = -1)+
-                ggplot2::annotate("text",x = -Inf, y = -Inf, label = cell_2, size = 8, hjust = -5, vjust = -1)
+                ggplot2::annotate("text",x = -Inf, y = -Inf, label = cell_2, size = 8, hjust = -7, vjust = -1)
                 # The hjust above needs to be able to scale to different x limits
   }
-  
+
 p
-  
+
 }
