@@ -6,7 +6,6 @@
 \usage{
 barcode_ggheatmap_2(
   your_SE,
-  assay = "logs",
   selections = list(),
   plot_labels = NULL,
   n_clones = 10,
@@ -21,15 +20,12 @@ barcode_ggheatmap_2(
   hclust_linkage = "complete",
   row_order = "hierarchical",
   clusters = 0,
-  percent_scale = c(0, 2.5e-05, 0.001, 0.01, 0.1, 1)
+  percent_scale = c(0, 2.5e-05, 0.001, 0.01, 0.1, 1),
+  color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 )
 }
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
-
-\item{assay}{Perform visualization and clustering on this assay.}
-
-\item{selections}{A list of selections to use leveraging the metadata information (see subset_SE for the necessary formatting, e.g selections = list("month" > 1, "celltype" = c("T", "B")))}
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
@@ -55,7 +51,9 @@ barcode_ggheatmap_2(
 
 \item{clusters}{How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".}
 
-\item{percent_scale}{A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Defaults to c(0, 0.000025, 0.001, 0.01, 0.1, 1).}
+\item{percent_scale}{A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.}
+
+\item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
 
 \item{cellnote_option}{Character. One of "stars", "reads", or "percents"}
 }
@@ -67,4 +65,5 @@ Creates a heatmap using the top 'n' rows from each column in the Summarized Expe
 }
 \examples{
 barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+
 }

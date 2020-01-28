@@ -3,7 +3,6 @@
 #'@description Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param selections A list of selections to use leveraging the metadata information (see subset_SE for the necessary formatting, e.g selections = list("month" > 1, "celltype" = c("T", "B")))
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param percent_threshold A chosen (percentage) threshold that decides whether a feature entry is set to 0. Defaults to 0.
 #'@param your_title The title for the plot.
@@ -15,16 +14,10 @@
 
 
 barcode_binary_heatmap <- function(your_SE,
-                                   selections = list(),
                                    plot_labels = NULL,
                                    percent_threshold = 0,
                                    your_title = "",
                                    label_size = 1) {
-
-  #subset your SE based on your selections in selections (if any)
-  if(length(selections) > 0){
-    your_SE <- subset_SE(your_SE, selections)
-  }
 
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)

@@ -6,7 +6,6 @@
 \usage{
 barcode_binary_heatmap(
   your_SE,
-  selections = list(),
   plot_labels = NULL,
   percent_threshold = 0,
   your_title = "",
@@ -15,8 +14,6 @@ barcode_binary_heatmap(
 }
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
-
-\item{selections}{A list of selections to use leveraging the metadata information (see subset_SE for the necessary formatting, e.g selections = list("month" > 1, "celltype" = c("T", "B")))}
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
