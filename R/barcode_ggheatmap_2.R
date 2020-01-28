@@ -1,8 +1,6 @@
-#'@importFrom rlang %||%
+#' barcode_ggheatmap (Barcode Heatmap using ggplot2)
 #'
-#'@title barcode_ggheatmap (Barcode Heatmap using ggplot2)
-#'
-#'@description Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
+#' Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param assay Perform visualization and clustering using this assay.
@@ -19,12 +17,18 @@
 #'@param hclust_linkage Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
 #'@param row_order Character; "hierarchical" to perform hierarchical clustering on the output and order in that manner, "emergence" to organize rows  by order of presence in data (from left to right), or a character vector of rows within the summarized experiment to plot.
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
-#'@param percent_scale A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Must be same length as color_scale.
+#'@param percent_scale A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.
 #'@param color_scale A character vector which indicates the colors of the color scale. Must be same length as percent_scale.
+#'
 #'@return Displays a heatmap in the current plot window.
+#'
+#'@importFrom rlang %||%
+#'
+#'@export
+#'
 #'@examples
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
-#'@export
+#'
 barcode_ggheatmap_2 <- function(your_SE,
                                 assay = "logs",
                                 selections = list(),
