@@ -3,7 +3,6 @@
 #' Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param assay Perform visualization and clustering using this assay.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
 #'@param your_title The title for the plot.
@@ -30,7 +29,6 @@
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
 #'
 barcode_ggheatmap_2 <- function(your_SE,
-                                assay = "logs",
                                 selections = list(),
                                 plot_labels = NULL,
                                 n_clones = 10,
@@ -75,7 +73,7 @@ barcode_ggheatmap_2 <- function(your_SE,
 
     #this does the heavy duty plotting set-up. It sets the order of the data on the heatmap and the dendrogram/cluster cuts
     if(row_order == "hierarchical"){
-      clustering_data <- SummarizedExperiment::assays(your_SE)[[assay]]
+      clustering_data <- SummarizedExperiment::assays(your_SE)[["logs"]]
       clustering_data.dist <- proxy::dist(clustering_data, method = distance_method, p = minkowski_power)
       hclustering <- hclust(clustering_data.dist, method = hclust_linkage)
       barcode_order <- rownames(your_SE)[hclustering$order]
@@ -101,8 +99,13 @@ barcode_ggheatmap_2 <- function(your_SE,
   }
 
 
+  #create scale for plotting
+  log_used <- S4Vectors::metadata(your_SE)$log_base
+  scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
+  log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
+
   #organizing data for plotting
-  plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[["percentages"]], var = "sequence")
+  plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[["logs"]], var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
   plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
@@ -131,12 +134,12 @@ barcode_ggheatmap_2 <- function(your_SE,
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
     ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
     ggplot2::scale_fill_gradientn(
-      "Percent\nContribution",
+      paste0("Percentage\nContribution"),
       colors = color_scale,
-      values = percent_scale,
-      breaks = percent_scale,
-      limits = c(min(percent_scale), max(percent_scale)),
-      labels = paste0(percent_scale * 100, "%"),
+      values = scales::rescale(log_scale, to = c(0,1)),
+      breaks = log_scale,
+      limits = c(min(log_scale), max(log_scale)),
+      labels = paste0(percent_scale*100, "%"),
       expand = c(0,0))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
     ggplot2::scale_x_discrete(expand = c(0,0))+
