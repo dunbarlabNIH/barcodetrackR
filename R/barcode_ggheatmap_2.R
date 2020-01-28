@@ -5,8 +5,7 @@
 #'@description Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param assay Perform visualization and clustering on this assay.
-#'@param selections A list of selections to use leveraging the metadata information (see subset_SE for the necessary formatting, e.g selections = list("month" > 1, "celltype" = c("T", "B")))
+#'@param assay Perform visualization and clustering using this assay.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
 #'@param your_title The title for the plot.
@@ -20,7 +19,8 @@
 #'@param hclust_linkage Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
 #'@param row_order Character; "hierarchical" to perform hierarchical clustering on the output and order in that manner, "emergence" to organize rows  by order of presence in data (from left to right), or a character vector of rows within the summarized experiment to plot.
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
-#'@param percent_scale A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Defaults to c(0, 0.000025, 0.001, 0.01, 0.1, 1).
+#'@param percent_scale A numeric vector of length 5 through which to spread the color scale (from 0% to 100%). Must be same length as color_scale.
+#'@param color_scale A character vector which indicates the colors of the color scale. Must be same length as percent_scale.
 #'@return Displays a heatmap in the current plot window.
 #'@examples
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
@@ -41,12 +41,8 @@ barcode_ggheatmap_2 <- function(your_SE,
                                 hclust_linkage = "complete",
                                 row_order = "hierarchical",
                                 clusters = 0,
-                                percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1)) {
-
-  #subset your SE based on your selections in selections (if any)
-  if(length(selections) > 0){
-    your_SE <- subset_SE(your_SE, selections)
-  }
+                                percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
+                                color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
 
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
@@ -54,9 +50,7 @@ barcode_ggheatmap_2 <- function(your_SE,
     stop("plot_labels must be same length as number of columns being plotted")
   }
 
-
-
-  #subset the rows of the summarized experiment and get the ordering of barcodes within the hematmap for plotting
+  #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
   if(row_order == "hierarchical" | row_order == "emergence") {
 
     #subsets those barcodes that have at least one top N clone
@@ -99,25 +93,20 @@ barcode_ggheatmap_2 <- function(your_SE,
 
 
   #create scale for plotting
-  if(length(percent_scale) != 6){
-    stop("percent_scale must be a numeric vector of length 5.")
+  if(length(percent_scale) != length(color_scale)){
+    stop("percent_scale and color_scale must be vectors of the same length.")
   }
   log_used <- S4Vectors::metadata(your_SE)$log_base
   scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
   percent_scale_labels <- paste0(percent_scale * 100, "%")
   log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
-  color_scale <- c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
 
 
   #organizing data for plotting
   plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[[assay]], var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
-
   plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
-
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
-
-
 
   #organizing labels for plotting overlay
   plotting_cellnote <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[[cellnote_assay]], var = "sequence")
