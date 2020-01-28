@@ -34,7 +34,6 @@ barcode_binary_heatmap <- function(your_SE,
 
   #organizing data for plotting
   plotting_data <- tibble::rownames_to_column(plotting_data, var = "sequence")
-  print(head(plotting_data))
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
   plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
   plotting_data$value <- factor(plotting_data$value, levels = c(0,1))
