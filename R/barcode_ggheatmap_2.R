@@ -50,6 +50,12 @@ barcode_ggheatmap_2 <- function(your_SE,
     stop("plot_labels must be same length as number of columns being plotted")
   }
 
+  #error checking
+  if(length(percent_scale) != length(color_scale)){
+    stop("percent_scale and color_scale must be vectors of the same length.")
+  }
+
+
   #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
   if(row_order == "hierarchical" | row_order == "emergence") {
 
@@ -68,7 +74,7 @@ barcode_ggheatmap_2 <- function(your_SE,
       clustering_data <- SummarizedExperiment::assays(your_SE)[[assay]]
       clustering_data.dist <- proxy::dist(clustering_data, method = distance_method, p = minkowski_power)
       hclustering <- hclust(clustering_data.dist, method = hclust_linkage)
-      barcode_order <- rownames(your_SE)[rev(hclustering$order)]
+      barcode_order <- rownames(your_SE)[hclustering$order]
 
       if(dendro){
         dendro_data <- ggdendro::dendro_data(hclustering, type = 'rectangle')
@@ -76,7 +82,7 @@ barcode_ggheatmap_2 <- function(your_SE,
 
       if(clusters>0){
         clustercuts_data <-data.frame(clusters = cutree(hclustering, clusters),
-                                      assignment = factor(hclustering$labels,levels = hclustering$labels[(hclustering$order)]))
+                                      assignment = factor(hclustering$labels, levels = hclustering$labels[(hclustering$order)]))
       }
 
 
@@ -91,19 +97,8 @@ barcode_ggheatmap_2 <- function(your_SE,
   }
 
 
-
-  #create scale for plotting
-  if(length(percent_scale) != length(color_scale)){
-    stop("percent_scale and color_scale must be vectors of the same length.")
-  }
-  log_used <- S4Vectors::metadata(your_SE)$log_base
-  scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
-  percent_scale_labels <- paste0(percent_scale * 100, "%")
-  log_scale <- log(percent_scale*scale_factor_used + 1, base = log_used)
-
-
   #organizing data for plotting
-  plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[[assay]], var = "sequence")
+  plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[["percentages"]], var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
   plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
@@ -132,11 +127,12 @@ barcode_ggheatmap_2 <- function(your_SE,
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
     ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
     ggplot2::scale_fill_gradientn(
+      "Percent\nContribution",
       colors = color_scale,
-      values = scales::rescale(log_scale, to = c(0,1)),
-      breaks = log_scale,
-      limits = c(min(log_scale), max(log_scale)),
-      labels = percent_scale_labels,
+      values = percent_scale,
+      breaks = percent_scale,
+      limits = c(min(percent_scale), max(percent_scale)),
+      labels = paste0(percent_scale * 100, "%"),
       expand = c(0,0))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
     ggplot2::scale_x_discrete(expand = c(0,0))+
@@ -171,7 +167,7 @@ barcode_ggheatmap_2 <- function(your_SE,
         )
     }
     if(clusters > 0){
-      g3_clusters <-ggplot2::ggplot(clustercuts_data, ggplot2::aes(x =1,y=assignment,fill=factor(clusters)))+
+      g3_clusters <-ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
         ggplot2::ggtitle("\n \n")+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
