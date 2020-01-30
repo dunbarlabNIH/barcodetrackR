@@ -2,7 +2,7 @@
 % Please edit documentation in R/barcode_ggheatmap_2.R
 \name{barcode_ggheatmap_2}
 \alias{barcode_ggheatmap_2}
-\title{barcode_ggheatmap (Barcode Heatmap using ggplot2)}
+\title{Barcode Top Clone Heatmap}
 \usage{
 barcode_ggheatmap_2(
   your_SE,

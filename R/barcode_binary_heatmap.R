@@ -1,6 +1,6 @@
-#'@title Barcode Binary Heatmap
+#' Barcode Binary Heatmap
 #'
-#'@description Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
+#' Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).

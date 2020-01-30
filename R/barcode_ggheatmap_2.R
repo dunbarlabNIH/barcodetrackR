@@ -1,4 +1,4 @@
-#' barcode_ggheatmap (Barcode Heatmap using ggplot2)
+#' Barcode Top Clone Heatmap
 #'
 #' Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 #'
