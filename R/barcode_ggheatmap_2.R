@@ -12,8 +12,8 @@
 #'@param cellnote_size The numerical size of the cell note labels.
 #'@param distance_method Character. Use summary(proxy::pr_DB) to see all possible options for distance metrics in clustering.
 #'@param minkowski_power The power of the Minkowski distance (if minkowski is the distance method used).
-#'@param cellnote_option Character. One of "stars", "reads", or "percents"
-#'@param hclust_linkage Character. One of one of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
+#'@param cellnote_option Character. One of "stars", "reads", or "percentages"
+#'@param hclust_linkage Character. One of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
 #'@param row_order Character; "hierarchical" to perform hierarchical clustering on the output and order in that manner, "emergence" to organize rows  by order of presence in data (from left to right), or a character vector of rows within the summarized experiment to plot.
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
 #'@param percent_scale A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.
