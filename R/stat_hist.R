@@ -34,7 +34,7 @@ stat_hist <- function(your_SE, metadata_stat, group_by = NULL, text_size = 20, a
   # Grouped histogram
   if (is.null(group_by) == FALSE){
     p <- ggplot2::ggplot(meta_data, aes(x = meta_data[,metadata_stat], color = meta_data[,group_by], fill = meta_data[,group_by]))+
-      ggplot2::geom_histogram(alpha = alpha)+
+      ggplot2::geom_histogram(alpha = alpha, position = "identity")+
       ggplot2::theme_classic()+
       ggplot2::labs(x = metadata_stat, fill = group_by) +
       ggplot2::guides(color = FALSE)+

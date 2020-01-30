@@ -47,7 +47,7 @@ clonal_contribution <- function(your_SE,
     stop("filter_selection must be an element in the colData column specified with filter_by")
   }
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
-    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(SE)[[plot_over]]))
+    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
   }
@@ -109,7 +109,7 @@ clonal_contribution <- function(your_SE,
   if (graph_type == "bar"){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_col(colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_y_continuous(name = "Clonal Contribution", labels = function(x){paste0(x * 100, "%")})+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
                      plot.title = ggplot2::element_text(hjust = 0.5))
