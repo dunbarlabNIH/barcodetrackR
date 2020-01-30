@@ -1,0 +1,10 @@
+SAMPLENAME	Mouse	Timepoint	Weeks	Source	Cell_type
+wk10	C22	wk10	10	PB	unsorted
+wk14	C22	wk14	14	PB	unsorted
+wk20	C22	wk20	20	PB	unsorted
+wk27	C22	wk26	26	PB	unsorted
+wk33	C22	wk32	32	PB	unsorted
+sac	C22	wk34	34	PB	unsorted
+BM_Spine_B	C22	wk34	34	BM_Spine	B
+BM_Spine_T	C22	wk34	34	BM_Spine	T
+BM_Spine_G	C22	wk34	34	BM_Spine	Gr
