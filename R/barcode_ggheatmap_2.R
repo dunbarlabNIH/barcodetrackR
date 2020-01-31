@@ -29,7 +29,6 @@
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
 #'
 barcode_ggheatmap_2 <- function(your_SE,
-                                selections = list(),
                                 plot_labels = NULL,
                                 n_clones = 10,
                                 your_title = "",
