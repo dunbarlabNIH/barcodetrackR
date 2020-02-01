@@ -126,7 +126,7 @@ barcode_ggheatmap_2 <- function(your_SE,
   if(grid) grid_color = "black" else grid_color = NA
 
   #make a plot_label that is invisible -> use it in the dendrogram and cluster bars to make sure they are the same height as the heatmap
-  invisible_label <- plot_labels[which(max(nchar(plot_labels)) == nchar(plot_labels))[1]]
+  invisible_label <- plot_labels[which(max(nchar(as.character(plot_labels))) == nchar(as.character(plot_labels)))[1]]
 
 
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
