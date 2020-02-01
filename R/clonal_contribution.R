@@ -124,8 +124,8 @@ clonal_contribution <- function(your_SE,
   }
 
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
-    g + ggplot2::scale_x_continuous(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices)
+    g + ggplot2::scale_x_continuous(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices) + ggplot2::theme(legend.position="none")
   } else {
-    g + ggplot2::scale_x_discrete(paste0(plot_over), labels = plot_over_display_choices)
+    g + ggplot2::scale_x_discrete(paste0(plot_over), labels = plot_over_display_choices) + ggplot2::theme(legend.position="none")
   }
 }
