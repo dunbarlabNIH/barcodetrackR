@@ -34,8 +34,9 @@ clonal_contribution <- function(your_SE,
                                 plot_over_display_choices = NULL,
                                 keep_numeric = TRUE,
                                 plot_non_selected = TRUE,
-                                linesize = 0.5,
-                                text_size = 15){
+                                linesize = 0.2,
+                                text_size = 15,
+                                your_title = ""){
 
 
   # Some basic error checking before running the function
@@ -111,6 +112,8 @@ clonal_contribution <- function(your_SE,
       ggplot2::geom_col(colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "Clonal Contribution", labels = function(x){paste0(x * 100, "%")})+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
+      ggplot2::theme_bw()+
+      ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
                      plot.title = ggplot2::element_text(hjust = 0.5))
 
@@ -119,6 +122,8 @@ clonal_contribution <- function(your_SE,
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
+      ggplot2::theme_bw()+
+      ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
                      plot.title = ggplot2::element_text(hjust = 0.5))
   }
