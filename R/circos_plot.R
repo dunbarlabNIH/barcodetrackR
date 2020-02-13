@@ -7,15 +7,13 @@
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
-#'@importFrom rlang %||%
-#'
 #'@export
 #'
 #'@examples
 #'barcode_ggheatmap_2(your_SE = ZH33_SE,  plot_label = 'Cell_type')
 #'
 circos_plot <- function(your_SE,
-                        plot_label = NULL,
+                        plot_label = "SAMPLENAME",
                         your_title = "",
                         color_scale = NULL) {
   
@@ -25,7 +23,7 @@ meta_data <- SummarizedExperiment::colData(your_SE)
 your_data <- your_data[rowSums(your_data) > 0,]
 
 #get labels for heatmap
-plot_label <- plot_label %||% 'SAMPLENAME'
+# plot_label <- plot_label %||% 'SAMPLENAME'
 colnames(your_data) <- meta_data[,plot_label]
 
 # Initialize circos plot
@@ -76,7 +74,9 @@ for (i in 1:nrow(unique_count)){
     # Draw links
     cell.1 <- comb_mat[1,j]
     cell.2 <- comb_mat[2,j]
-    circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + unique_count[i,"freq"]), cell.2, c(count_index[cell.2],count_index[cell.2] + unique_count[i,"freq"]), col = i)
+    circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + unique_count[i,"freq"]), 
+                cell.2, c(count_index[cell.2],count_index[cell.2] + unique_count[i,"freq"]), 
+                col = i)
   }
   # Update indices
   for (k in 1:num_cells){
