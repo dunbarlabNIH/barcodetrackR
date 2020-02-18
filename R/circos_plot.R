@@ -22,7 +22,7 @@ circos_plot <- function(your_SE,
 # Remove data that is zero in all timepoints
 your_data <- SummarizedExperiment::assays(your_SE)$counts
 meta_data <- SummarizedExperiment::colData(your_SE)
-your_data <- your_data[rowSums(your_data) > 0,]
+your_data <- as.matrix(your_data[rowSums(your_data) > 0,])
 
 #get labels for heatmap
 # plot_label <- plot_label %||% 'SAMPLENAME'
@@ -31,7 +31,7 @@ colnames(your_data) <- meta_data[,plot_label]
 # Create binary matrix of data
 temp_binary <- as.matrix((your_data > 0)+0)
 # Create temp of proportions
-temp_prop <- as.matrix(your_data/colSums(your_data)*100)
+temp_prop <- prop.table(your_data,2)*100
 
 # Sort temp prop by binary temp
 temp_prop <- as.matrix(temp_prop[do.call(order,-as.data.frame(temp_binary)),])
@@ -49,14 +49,14 @@ unique_count <- unique_count[do.call(order,-unique_count),]
 
 # Get the proportions of each barcode matching each unique combination
 unique_prop <- unique_count
-unique_prop$freq <- NULL
-count_vec <- unique_count$freq
-counter <- 0
+unique_prop$n <- NULL
+count_vec <- unique_count$n
+my_counter <- 0
 for (i in 1:nrow(unique_count)){
-  my_start <- counter+1
-  my_end <- counter + count_vec[i]
+  my_start <- my_counter+1
+  my_end <- my_counter + count_vec[i]
   unique_prop[i,] <- colSums(temp_prop[my_start:my_end,])
-  counter <- counter + as.numeric(unique_count$freq[i])
+  my_counter <- my_counter + as.numeric(unique_count$n[i])
 }
 
 # Generate counting index for each cell type
@@ -102,13 +102,13 @@ if (weighted == FALSE){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
-      circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + unique_count[i,"freq"]), 
-                  cell.2, c(count_index[cell.2],count_index[cell.2] + unique_count[i,"freq"]), 
+      circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + as.numeric(unique_count[i,"n"])), 
+                  cell.2, c(count_index[cell.2],count_index[cell.2] + as.numeric(unique_count[i,"n"])), 
                   col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
     for (k in 1:num_cells){
-      count_index[cell_list[k]] <- count_index[cell_list[k]] + unique_count[i,"freq"]
+      count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"n"])
     }
   }
   
@@ -120,7 +120,7 @@ else if (weighted == TRUE){
   circos.par(points.overflow.warning = FALSE)
   
   # Make x limits matrix
-  xlims <- rbind(c(0,100),c(0,100),c(0,100))
+  xlims <- t(replicate(length(colnames(your_data)), c(0,100)))
   circos.initialize(factors = factor(colnames(your_data), levels = colnames(your_data)), xlim = xlims)
   
   # Create outer tracks of circos plot
@@ -144,13 +144,13 @@ else if (weighted == TRUE){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
-      circos.link(cell.1, c(prop_count_index[cell.1],prop_count_index[cell.1] + unique_prop[i,cell.1]), 
-                  cell.2, c(prop_count_index[cell.2],prop_count_index[cell.2] + unique_prop[i,cell.2]), 
+      circos.link(cell.1, c(prop_count_index[cell.1],prop_count_index[cell.1] + as.numeric(unique_prop[i,cell.1])), 
+                  cell.2, c(prop_count_index[cell.2],prop_count_index[cell.2] + as.numeric(unique_prop[i,cell.2])), 
                   col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
     for (k in 1:num_cells){
-      prop_count_index[cell_list[k]] <- prop_count_index[cell_list[k]] + unique_prop[i,cell_list[k]]
+      prop_count_index[cell_list[k]] <- prop_count_index[cell_list[k]] + as.numeric(unique_prop[i,cell_list[k]])
     }
   }
   
