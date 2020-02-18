@@ -9,6 +9,11 @@
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
+#'@import dplyr
+#'@import RCircos
+#'@import circlize
+#'@import viridis
+#'
 #'@export
 #'
 #'@examples
@@ -19,7 +24,7 @@ circos_plot <- function(your_SE,
                         plot_label = "SAMPLENAME",
                         alpha = 1) {
   
-# Remove data that is zero in all timepoints
+# Load data, remove data that is zero in all timepoints
 your_data <- SummarizedExperiment::assays(your_SE)$counts
 meta_data <- SummarizedExperiment::colData(your_SE)
 your_data <- as.matrix(your_data[rowSums(your_data) > 0,])
@@ -51,11 +56,15 @@ unique_count <- unique_count[do.call(order,-unique_count),]
 unique_prop <- unique_count
 unique_prop$n <- NULL
 count_vec <- unique_count$n
-my_counter <- 0
+my_counter <- 1
 for (i in 1:nrow(unique_count)){
-  my_start <- my_counter+1
-  my_end <- my_counter + count_vec[i]
-  unique_prop[i,] <- colSums(temp_prop[my_start:my_end,])
+  my_start <- my_counter
+  my_end <- my_counter + count_vec[i] - 1
+  if (my_start == my_end){
+    unique_prop[i,] <- temp_prop[my_start:my_end,]
+  } else {
+    unique_prop[i,] <- colSums(temp_prop[my_start:my_end,])
+  }
   my_counter <- my_counter + as.numeric(unique_count$n[i])
 }
 
