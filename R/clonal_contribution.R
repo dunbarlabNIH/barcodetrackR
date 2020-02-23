@@ -110,7 +110,7 @@ clonal_contribution <- function(your_SE,
   if (graph_type == "bar"){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_col(colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "Clonal Contribution", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_bw()+
       ggplot2::ggtitle(your_title)+
