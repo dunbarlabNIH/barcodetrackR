@@ -5,52 +5,48 @@
 \title{Correlation Plot}
 \usage{
 cor_plot(
-  your_data,
-  names = colnames(your_data),
-  thresh = 0,
-  your_title = "",
+  your_SE,
+  plot_labels = colnames(your_SE),
   method_corr = "pearson",
-  labelsizes = 1,
-  plottype = "color",
-  printtables = FALSE,
+  your_title = "",
+  grid = TRUE,
+  label_size = 1,
+  plot_type = "color",
   no_negatives = FALSE,
-  show_grid = TRUE,
-  colorscale = "default"
+  return_table = FALSE,
+  color_scale = "default",
+  number_size = 0.5
 )
 }
 \arguments{
-\item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+\item{your_SE}{A Summarized Experiment object.}
 
-\item{names}{Character vector. Labels for each sample.}
+\item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
-\item{thresh}{Numeric. Threshold applied to your_data and scaled for each sample. When finding correlation,
-only barcodes whose sum in pair of samples being compared is greater than the average of each's
-scaled threshold will be used for finding correlation.}
+\item{method_corr}{Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.}
 
-\item{your_title}{Title for plot.}
+\item{your_title}{The title for the plot.}
 
-\item{method_corr}{Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhattan distance.}
+\item{grid}{Logical. Include a grid or not in the correlation plot}
 
-\item{labelsizes}{Numeric. Size of the plot labels.}
+\item{label_size}{The size of the column labels.}
 
-\item{plottype}{Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".}
+\item{plot_type}{Character. One of "color", "circle", or "number".}
 
-\item{printtables}{Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
-displaying a plot.}
+\item{no_negatives}{Logical. Whether to make negative correlations = 0.}
 
-\item{show_grid}{Logical. Wheter to show grid or not.}
+\item{return_table}{Logical. Whether or not to return table of p-values, confidence intervals, and R values instead of displaying a plot.}
 
-\item{colorscale}{Character. One of "default", "rainbow", or "white_heat"}
+\item{color_scale}{Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.}
 
-\item{nonegatives}{Logical. Whether to make negative correlations = 0. Should almost always be TRUE.}
+\item{number_size}{Size of the text label when plot_type is "number".}
 }
 \value{
-Plots correlation plot of the data frame.
+Plots pairwise correlation plot for the samples in your_SE.
 }
 \description{
 Gives the pairwise correlation between each sample-sample pair in the data frame.
 }
 \examples{
-cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
-cor_plot(your_data = zh33, thresh = 874, printtables = TRUE)
+cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plottype = "color")
 }

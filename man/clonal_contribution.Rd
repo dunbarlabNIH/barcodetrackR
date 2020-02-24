@@ -16,8 +16,9 @@ clonal_contribution(
   plot_over_display_choices = NULL,
   keep_numeric = TRUE,
   plot_non_selected = TRUE,
-  linesize = 0.5,
-  text_size = 15
+  linesize = 0.2,
+  text_size = 15,
+  your_title = ""
 )
 }
 \arguments{
