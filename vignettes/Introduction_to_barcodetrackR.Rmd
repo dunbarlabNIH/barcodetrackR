@@ -17,15 +17,11 @@ require("barcodetrackR")
 
 ```
 
-## A. Loading data into barcodetrackR
+## A. Loading data into `barcodetrackR`
 
 ### Loading SummarizedExperiment objects
 
-The _barcodetrackR_ package operates on SummarizedExperiment objects from Bioconductor. It stores associated colData for each sample in here as well as any metadata. 
-
-Our input dataframes to create the SummarizedExperiment (SE) objects are n x m data frames where there are n rows of observations (typically cellular barcodes, insertion sites, or the like) and the m columns are the samples. The input metadata must have row order identical to the order of the colums in its corresponding dataframe. The metadata must also have a column titled "SAMPLENAME" that denotes the column of your_data it refers to.
-
-The package includes sample data from published experiments. For this vignette, we will load publically available data from the following papers:
+The _barcodetrackR_ package operates on SummarizedExperiment objects from Bioconductor. It stores associated colData for each sample in here as well as any metadata. For this vignette, we will load publically available data from the following papers (included in the package):
 
 * Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology 3.29 (2018): eaat9781.
 * Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation 26.1 (2020): 16-25.
@@ -43,7 +39,21 @@ belderbos_SE <- create_SE(your_data = belderbos_dataframe, meta_data = belderbos
 six_dataframe <- read.delim(system.file("sample_data", "SixE_etal/WAS5_reads.txt", package = "barcodetrackR"), row.names = 1)
 six_metadata <- read.delim(system.file("sample_data", "SixE_etal/WAS5_metadata.txt", package = "barcodetrackR"))
 six_SE <- create_SE(your_data = six_dataframe, meta_data = six_metadata, threshold = 0)
+
 ```
+
+In addition to reads data, the Six et al. paper includes "estimated abundance" data for each of these timepoints. We load these into a new SE in order to compare our analyses downstream.
+
+```{r load custom counts, eval = TRUE}
+six_estabundances <- read.delim(system.file("sample_data", "SixE_etal/WAS5_estabundance.txt", package = "barcodetrackR"), row.names = 1)
+six_ea_SE <- create_SE(your_data = six_estabundances, meta_data = six_metadata, threshold = 0)
+```
+
+### A note on input data
+
+Our input dataframes to create the SummarizedExperiment (SE) objects are n x m data frames where there are n rows of observations (typically cellular barcodes, insertion sites, or the like) and the m columns are the samples. The input metadata must have row order identical to the order of the colums in its corresponding dataframe. The metadata must also have a column titled "SAMPLENAME" that denotes the column of your_data it refers to.
+
+### Assays created in the SummarizedExperiment object by create_SE
 
 create_SE takes the input dataframe and metadata and creates an SE object with the following assays:
 
@@ -53,14 +63,9 @@ create_SE takes the input dataframe and metadata and creates an SE object with t
 * normalized: the normalized read values (CPM)
 * logs: the log of the normalized values
 
-### Adding custom assays to the SummarizedExperiment objects
-In addition to reads data, the Six et al. paper includes "estimated abundance" data for each of these timepoints. We load these into the assay as well which allows the assay to be used in our analyses as well.
-
-```{r load custom assay, eval = TRUE}
-six_estabundances <- read.delim(system.file("sample_data", "SixE_etal/WAS5_estabundance.txt", package = "barcodetrackR"), row.names = 1)
-SummarizedExperiment::assays(six_SE)[["estimated_abundances"]] <- six_estabundances
+```{r list assays, eval = TRUE}
+SummarizedExperiment::assays(six_SE)
 ```
-
 
 ## B. Correlations between samples
 
@@ -75,18 +80,18 @@ cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 
 ### cor_plot
 A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
-```{r cor_plot 1, eval = TRUE, fig.width = 8, fig.height = 8}
+```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- SummarizedExperiment::colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "pearson", plot_type = "color")
 ```
 
 We can also use the spearman correlation as our metric of interest, and visualize our correlation plot using circles with areas proportional to the absolute value of the correlation and colors corresponding to the value of the correlations. 
-```{r cor_plot 2, eval = TRUE, fig.width = 8, fig.height = 8}
+```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "spearman", plot_type = "circle")
 ```
 
 We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
-```{r cor_plot 3, eval = TRUE, fig.width = 12, fig.height = 6}
+```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "pearson", return_table = TRUE) %>% head
 ```
 
@@ -101,13 +106,18 @@ A useful visualization to study clonal patterns over time is by using a heat map
 We first visualize the top 10 clones from the selected samples in the Wu dataset.
 
 ```{r barcode_ggheatmap wu_SE 1, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
-barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection], n_clones = 10, label_size = 8, your_title = "ZJ31")
+barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection], n_clones = 10, label_size = 10)
 ```
 
-We can also visualize the percentage contribution of each of these clones and add a dendogram cut into 4 clusters (based on the Euclidean distance between each clone's log assay).
+We can also visualize the percentage contribution of each of these clones and add a dendogram cut into 4 clusters (based on the Euclidean distance between each clone's log assay). Here we plot the top 10 clones within the Six dataset and order the columns to group them by celltype.
 
 ```{r barcode_ggheatmap wu_SE 2, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
-barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection], n_clones = 10, label_size = 8, your_title = "ZJ31", dendro = TRUE, clusters = 4, cellnote_assay = "percentages", distance_method = "euclidean")
+six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
+                        "m13_BCELLS", "m36_BCELLS", "m43_BCELLS", "m55_BCELLS", 
+                        "m13_NKCELLS", "m36_NKCELLS", "m43_NKCELLS","m55_NKCELLS",
+                        "m13_GRANULOCYTES", "m36_GRANULOCYTES", "m43_GRANULOCYTES", "m55_GRANULOCYTES", 
+                        "m13_MONOCYTES", "m36_MONOCYTES", "m43_MONOCYTES","m55_MONOCYTES")
+barcode_ggheatmap(your_SE = six_SE[,six_celltype_order], n_clones = 5, cellnote_size = 3, label_size = 1, dendro = TRUE, clusters = 4, cellnote_assay = "percentages", distance_method = "euclidean")
 ```
 
 <!-- Now what if we wanted to group the samples by cell type instead to see the clonal changes within each cell type across time? Let's switch the order of the SE and also explore some of the user-defined parameters to the heat map function. -->

@@ -26,12 +26,12 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+#'barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
 #'
 barcode_ggheatmap <- function(your_SE,
                                 plot_labels = NULL,
                                 n_clones = 10,
-                                your_title = "",
+                                your_title = NULL,
                                 grid = TRUE,
                                 label_size = 1,
                                 dendro = FALSE,
@@ -144,7 +144,7 @@ barcode_ggheatmap <- function(your_SE,
     ggplot2::scale_x_discrete(expand = c(0,0))+
     ggplot2::ylab(NULL)+
     ggplot2::xlab(NULL)+
-    ggplot2::ggtitle(paste0("\n", your_title, "\n"))+
+    ggplot2::ggtitle(your_title)+
     ggplot2::theme(
       plot.margin = ggplot2::unit(c(0,0,0,0), "cm"),
       plot.title = ggplot2::element_text(size = 20),

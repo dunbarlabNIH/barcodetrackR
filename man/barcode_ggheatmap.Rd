@@ -8,7 +8,7 @@ barcode_ggheatmap(
   your_SE,
   plot_labels = NULL,
   n_clones = 10,
-  your_title = "",
+  your_title = NULL,
   grid = TRUE,
   label_size = 1,
   dendro = FALSE,
@@ -63,6 +63,6 @@ Displays a heatmap in the current plot window.
 Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
 }
 \examples{
-barcode_ggheatmap_2(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
 
 }
