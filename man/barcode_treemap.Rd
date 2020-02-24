@@ -4,8 +4,13 @@
 \alias{barcode_treemap}
 \title{Barcode treemap}
 \usage{
-barcode_treemap(your_data, column_choice = NULL, threshold = 0,
-  colors_choice = c("blue", "yellow"), your_title = "")
+barcode_treemap(
+  your_data,
+  column_choice = NULL,
+  threshold = 0,
+  colors_choice = c("blue", "yellow"),
+  your_title = ""
+)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -27,4 +32,3 @@ Makes a treemap of the chosen column in your data frame.
 \examples{
 barcode_treemap(your_data = zh33, column_choice = "32m_CD4.fastq", colors_choice = c("red", "green"))
 }
-

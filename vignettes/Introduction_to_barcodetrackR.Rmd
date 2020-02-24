@@ -1,0 +1,176 @@
+---
+title: "Introduction to barcodetrackR"
+author: "Ryland Mortlock and Diego A. Espinoza"
+date: Last compiled on `r format(Sys.Date(), "%d %B %Y")`
+output:
+  html_document:
+  pdf_document: default
+fig_caption: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# Required packages
+require("magrittr")
+require("barcodetrackR")
+
+```
+
+## A. Loading data into barcodetrackR
+
+### Loading SummarizedExperiment objects with `create_SE`
+
+The _barcodetrackR_ package operates on SummarizedExperiment objects from Bioconductor. It stores associated colData for each sample in here as well as any metadata. For this vignette, we will load publically available data from the following papers (included in the package):
+
+* Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology 3.29 (2018): eaat9781.
+* Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation 26.1 (2020): 16-25.
+* Six, E., et al. "Clonal tracking in gene therapy patients reveals a diversity of human hematopoietic differentiation programs." Blood (2020).
+
+```{r load data, eval = TRUE}
+wu_dataframe <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
+wu_metadata <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR"))
+wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata, threshold = 0)
+
+belderbos_dataframe <- read.delim(system.file("sample_data", "BelderbosME_etal/mouse_UBC_C22.txt", package = "barcodetrackR"), row.names = 1)
+belderbos_metadata <- read.delim(system.file("sample_data", "BelderbosME_etal/mouse_UBC_C22_metadata.txt", package = "barcodetrackR"))
+belderbos_SE <- create_SE(your_data = belderbos_dataframe, meta_data = belderbos_metadata, threshold = 0)
+
+six_dataframe <- read.delim(system.file("sample_data", "SixE_etal/WAS5_reads.txt", package = "barcodetrackR"), row.names = 1)
+six_metadata <- read.delim(system.file("sample_data", "SixE_etal/WAS5_metadata.txt", package = "barcodetrackR"))
+six_SE <- create_SE(your_data = six_dataframe, meta_data = six_metadata, threshold = 0)
+
+```
+
+In addition to reads data, the Six et al. paper includes "estimated abundance" data for each of these timepoints. We load these into a new SE in order to compare our analyses downstream.
+
+```{r load custom counts, eval = TRUE}
+six_estabundances <- read.delim(system.file("sample_data", "SixE_etal/WAS5_estabundance.txt", package = "barcodetrackR"), row.names = 1)
+six_ea_SE <- create_SE(your_data = six_estabundances, meta_data = six_metadata, threshold = 0)
+```
+
+Our input dataframes to create the SummarizedExperiment (SE) objects are n x m data frames where there are n rows of observations (typically cellular barcodes, insertion sites, or the like) and the m columns are the samples. The input metadata must have row order identical to the order of the colums in its corresponding dataframe. The metadata must also have a column titled "SAMPLENAME" that denotes the column of your_data it refers to.
+
+### Assays created in the SummarizedExperiment object by `create_SE`
+
+create_SE takes the input dataframe and metadata and creates an SE object with the following assays:
+
+* counts: the raw values from the input dataframe
+* percentages: the per-column proportions of each entry in each column
+* ranks: the rank of each entry in each column
+* normalized: the normalized read values (CPM)
+* logs: the log of the normalized values
+
+```{r list assays, eval = TRUE}
+SummarizedExperiment::assays(six_SE)
+```
+
+## B. Correlations between samples
+
+### `scatter_plot`
+A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a scatter_plot function here.
+
+```{r scatter_plot, eval = TRUE, fig.width = 7, fig.height=4}
+wu_scatterplot_1 <- scatter_plot(wu_SE[,c("ZJ31_20m_Gr", "ZJ31_20m_B")], method_corr = "pearson", display_corr = TRUE, your_title = "Gr vs B scatter plot")
+wu_scatterplot_2 <- scatter_plot(wu_SE[,c("ZJ31_20m_Gr", "ZJ31_20m_T")], method_corr = "pearson", display_corr = TRUE, your_title = "Gr vs T scatter plot")
+cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
+```
+
+### `cor_plot`
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
+wu_cor_plot_sample_selection <- SummarizedExperiment::colData(wu_SE)$SAMPLENAME[1:20]
+cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "pearson", plot_type = "color")
+```
+
+We can also use the spearman correlation as our metric of interest, and visualize our correlation plot using circles with areas proportional to the absolute value of the correlation and colors corresponding to the value of the correlations. 
+```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
+cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "spearman", plot_type = "circle")
+```
+
+We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
+```{r cor_plot 3, eval = TRUE}
+cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "pearson", return_table = TRUE) %>% head
+```
+
+Above, we used two of the three available correlation visualizations ("color" and "circle") using the standard color palette provided. A "no_negative" parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
+
+## C. Tracking clonal patterns over time
+
+### `barcode_ggheatmap`
+
+A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. our function barcode_ggheatmap does this by choosing the top N clones within each sample and tracking them over time; in a large number of cases, the large-contributing clones are of most interest to the user.
+
+We first visualize the top 10 clones from the selected samples in the Wu dataset.
+
+```{r barcode_ggheatmap wu_SE 1, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection], n_clones = 10, label_size = 10)
+```
+
+We can also visualize the percentage contribution of each of these clones and add a dendogram cut into 4 clusters (based on the Euclidean distance between each clone's log assay). Here we plot the top 10 clones within the Six dataset and order the columns to group them by celltype.
+
+```{r barcode_ggheatmap wu_SE 2, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
+                        "m13_BCELLS", "m36_BCELLS", "m43_BCELLS", "m55_BCELLS", 
+                        "m13_NKCELLS", "m36_NKCELLS", "m43_NKCELLS","m55_NKCELLS",
+                        "m13_GRANULOCYTES", "m36_GRANULOCYTES", "m43_GRANULOCYTES", "m55_GRANULOCYTES", 
+                        "m13_MONOCYTES", "m36_MONOCYTES", "m43_MONOCYTES","m55_MONOCYTES")
+barcode_ggheatmap(your_SE = six_SE[,six_celltype_order], n_clones = 5, cellnote_size = 3, label_size = 10, dendro = TRUE, clusters = 4, cellnote_assay = "percentages", distance_method = "euclidean")
+```
+
+
+The Belderbros dataset generally contains less clones than either the Wu or Six datasets.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
+```{r heat_map_mouse, eval = TRUE, warning = FALSE}
+belderbros_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB], n_clones = 10, your_title = "Mouse C22 Heatmap",
+                    label_size = 10, dendro = TRUE, cellnote_size = 3, cellnote_assay = "percentages", clusters = 4)
+```
+
+Compared to the monkey, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
+
+<!-- ## Binary heat map -->
+
+<!-- In some cases, we may be interested in simply which barcodes are present in which samples. In that case, a binary heat map can give the simplest visual representation. -->
+
+<!-- ```{r binary_heat_map, echo=TRUE, warning = FALSE} -->
+<!-- barcode_binary_heatmap(your_SE = se.mouse.byTime, -->
+<!--                        threshold = 0.01, -->
+<!--                        your_title = "Mouse C22 Binary Heatmap", -->
+<!--                        label_size = 12) -->
+<!-- ``` -->
+
+<!-- The above binary heat map only shows clones present at a proportion of 1% or greater in at least one sample. Just like the previous heat map, one can see short-term clones at wk10 with a few sticking around through wk20, and a group of long-term clones that appear at wk14 and are present until sacrifice. -->
+
+<!-- ## Clonal Contribution (bar or line plots) -->
+
+<!-- A simpler way to view clonal patterns over time is by a line or bar chart showing the proportion of top clones. In the above heat maps for the monkey ZJ31, we could see that there are some large uni-lineage CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD16+ NK cell samples across time. -->
+
+<!-- ```{r clonal_contribution_line, echo=TRUE, warning = FALSE} -->
+<!-- clonal_contribution(your_SE = se.monkey.sub, -->
+<!--                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p", -->
+<!--                     n_clones = 20, -->
+<!--                     graph_type = "line", -->
+<!--                     filter_by = "Cell_type", -->
+<!--                     filter_selection = "NK_CD56n_CD16p", -->
+<!--                     plot_over = "Months", -->
+<!--                     linesize = 0.2) -->
+<!-- ``` -->
+
+<!-- The colored clones represent the top 20 clones in the 20 month CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints. -->
+
+<!-- For data with fewer clones, a bar chart might be appropriate. We can view the data from mouse C22, previously shown as a heat map. One can hide the smaller clones through the plot_non_selected argument. We can also use categorical spacing on the x-axis rather than numeric. -->
+
+<!-- ```{r clonal_contribution_bar, echo=TRUE, warning = FALSE} -->
+<!-- clonal_contribution(your_SE = se.mouse, -->
+<!--                     SAMPLENAME_choice = "sac", -->
+<!--                     n_clones = 20, -->
+<!--                     graph_type = "bar", -->
+<!--                     filter_by = "Source", -->
+<!--                     filter_selection = "PB", -->
+<!--                     plot_over = "Weeks", -->
+<!--                     keep_numeric = FALSE, -->
+<!--                     plot_non_selected = FALSE, -->
+<!--                     linesize = 0.2) -->
+<!-- ``` -->
+
+<!-- The bar chart makes the following conclusion very evident: by the final timepoint, the large fraction of hematopoiesis was coming from a small number of clones, most of which appeared at 14 weeks. -->

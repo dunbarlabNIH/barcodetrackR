@@ -23,4 +23,3 @@ samples eventually reach 100%.
 \examples{
 rank_abundance_plot(your_data = zh33_Tlineage[,c(1,2,4)], dot_size = 4)
 }
-

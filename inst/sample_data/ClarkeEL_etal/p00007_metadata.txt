@@ -1,0 +1,5 @@
+SAMPLENAME	months
+1	6_months	6
+2	12_months	12
+3	18_months	18
+4	24_months	24

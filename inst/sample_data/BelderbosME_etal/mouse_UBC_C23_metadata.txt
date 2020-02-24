@@ -1,0 +1,4 @@
+SAMPLENAME	mouse	timepoint	weeks	source	celltype
+BM_Spine_B	C23	sac	unknown	BM_Spine	B
+BM_Spine_T	C23	sac	unkown	BM_Spine	T
+BM_Spine_G	C23	sac	unknown	BM_Spine	Gr

@@ -2,21 +2,26 @@
 % Please edit documentation in R/barcode_binary_heatmap.R
 \name{barcode_binary_heatmap}
 \alias{barcode_binary_heatmap}
-\title{Barcode Binary Heat Map}
+\title{Barcode Binary Heatmap}
 \usage{
-barcode_binary_heatmap(your_data, names = colnames(your_data),
-  your_title = "", label_size = 1, percent_threshold = 0)
+barcode_binary_heatmap(
+  your_SE,
+  plot_labels = NULL,
+  threshold = 0,
+  your_title = "",
+  label_size = 1
+)
 }
 \arguments{
-\item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+\item{your_SE}{A Summarized Experiment object.}
 
-\item{names}{Character vetor}
+\item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
-\item{your_title}{The title.}
+\item{threshold}{A chosen threshold (set as a proportion, i.e. 0.01 is 1%) that decides whether a feature entry is set to 0. Defaults to 0.}
+
+\item{your_title}{The title for the plot.}
 
 \item{label_size}{The size of the column labels.}
-
-\item{threshold}{A chosen (percentage) threshold that decides if a barcode exists or not.}
 }
 \value{
 Displays a binary heat map in the current plot window.
@@ -25,7 +30,5 @@ Displays a binary heat map in the current plot window.
 Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
 }
 \examples{
-barcode_binary_heatmap(your_data = zh33, percent_threshold = 0.01, label_size = 3)
-BBHM(your_data = zh33)
+barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
 }
-

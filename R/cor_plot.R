@@ -1,138 +1,123 @@
-#'@title Correlation Plot
+#' Correlation Plot
 #'
-#'@description Gives the pairwise correlation between each sample-sample pair in the data frame.
+#' Gives the pairwise correlation between each sample-sample pair in the data frame.
 #'
-#'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
-#'@param names Character vector. Labels for each sample.
-#'@param thresh Numeric. Threshold applied to your_data and scaled for each sample. When finding correlation,
-#'        only barcodes whose sum in pair of samples being compared is greater than the average of each's
-#'        scaled threshold will be used for finding correlation.
-#'@param your_title Title for plot.
-#'@param method_corr Character. One of "pearson", "spearman", or "kendall" or "manhattan" to compute manhattan distance.
-#'@param labelsizes Numeric. Size of the plot labels.
-#'@param plottype Character. One of "circle", "square", "ellipse", "number", "shade", "color", or "pie".
-#'@param printtables Logical. Whether or not to print tables of p-values, confidence intervals, and R values instead of
-#'        displaying a plot.
-#'@param nonegatives Logical. Whether to make negative correlations = 0. Should almost always be TRUE.
-#'@param show_grid Logical. Wheter to show grid or not.
-#'@param colorscale Character. One of "default", "rainbow", or "white_heat"
-#'@return Plots correlation plot of the data frame.
-#'@examples
-#'cor_plot(your_data = zh33, thresh = 874, your_title = "All Samples", plottype = "ellipse")
-#'cor_plot(your_data = zh33, thresh = 874, printtables = TRUE)
+#'@param your_SE A Summarized Experiment object.
+#'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
+#'@param method_corr Character. One of "pearson", "spearman", or "kendall".
+#'@param your_title The title for the plot.
+#'@param grid Logical. Include a grid or not in the correlation plot
+#'@param label_size The size of the column labels.
+#'@param plot_type Character. One of "color", "circle", or "number".
+#'@param no_negatives Logical. Whether to make negative correlations = 0.
+#'@param return_table Logical. Whether or not to return table of p-values, confidence intervals, and R values instead of displaying a plot.
+#'@param color_scale Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.
+#'@param number_size Size of the text label when plot_type is "number".
+#'@return Plots pairwise correlation plot for the samples in your_SE.
+#'
+#'@importFrom rlang %||%
+#'@importFrom magrittr %>%
+#'
 #'@export
+#'
+#'@examples
+#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plottype = "color")
+#"
 
-cor_plot = function(your_data, names=colnames(your_data), thresh = 0, your_title = "", method_corr ="pearson", labelsizes = 1, plottype = "color", printtables = FALSE, no_negatives = FALSE, show_grid = TRUE, colorscale = "default") {
+cor_plot = function(your_SE,
+                    plot_labels = colnames(your_SE),
+                    method_corr ="pearson",
+                    your_title = "",
+                    grid = TRUE,
+                    label_size = 1,
+                    plot_type = "color",
+                    no_negatives = FALSE,
+                    return_table = FALSE,
+                    color_scale = "default",
+                    number_size = 0.5) {
 
-  #scales thresh to each column (sample)
-  threshes <- thresh/colSums(your_data)
+  #extracts percentages assay from your_SE
+  plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
 
-  #scales all the data down to a percent of its samples reads
-  your_data <- as.data.frame(prop.table(as.matrix(your_data), margin = 2))
-  #note - needs to be coerced into a data frame to work appropriately
+  plotting_data_columns <- colnames(plotting_data)
 
-  #empty table of r values
-  ctab = matrix(ncol = ncol(your_data), nrow = ncol(your_data))
+  plotting_data_longer <- lapply(1:length(plotting_data_columns), function(i){
+    lapply(1:length(plotting_data_columns), function(j){
 
-  #empty table for computing pvalue (not really helpful but to satisfy reviewer)
-  ctab_pval = matrix(ncol = ncol(your_data), nrow =  ncol(your_data))
-
-  #empty table for computing lower and upper bounds for 95% confidence interval
-  ctab_ci_lo = matrix(nrow=ncol(your_data), ncol=ncol(your_data))
-  ctab_ci_hi = matrix(nrow=ncol(your_data), ncol=ncol(your_data))
-
-
-  if(method_corr == "manhattan"){
-    ctab <- as.matrix(dist(t(your_data), method = "manhattan"))
-  } else {
-    #compare each cell type, excluding any barcodes whose sum in the two samples being compared
-    #is less than the average of their two thresholds
-    for (i in 1:ncol(your_data)) {
-      for (j in 1:ncol(your_data)) {
-        tempdf <- data.frame(your_data[[i]],your_data[[j]])
-        tempdf <- tempdf[(tempdf[[1]] + tempdf[[2]]) > ((threshes[i] + threshes[j])/2), ]
-        ctab[i,j] <- cor(tempdf[[1]], tempdf[[2]], method = method_corr)
-
-
-        ct_results <- cor.test(tempdf[[1]], tempdf[[2]], method = method_corr)
-
-        if(is.null(ct_results$p.value)){
-          ctab_pval[i,j] <- "NA"
-        } else {
-          ctab_pval[i,j] <- ct_results$p.value
-        }
-
-        if(is.null(ct_results$conf.int)){
-          ctab_ci_lo[i,j] = "NA"
-          ctab_ci_hi[i,j] = "NA"
-        } else {
-          ctab_ci_lo[i,j]=ct_results$conf.int[1]
-          ctab_ci_hi[i,j]=ct_results$conf.int[2]
-        }
-
+      temp_df <- data.frame(plotting_data[[i]], plotting_data[[j]])
+      temp_df <- temp_df[rowSums(temp_df) > 0, ]
+      cortest_results <- cor.test(temp_df[[1]], temp_df[[2]], method = method_corr)
+      result_df <- data.frame(sample_i = plot_labels[i],
+                              sample_j = plot_labels[j],
+                              correlation_value = cortest_results$estimate,
+                              p_value = cortest_results$p.value)
+      if(method_corr == "pearson"){
+        result_df$ci_lo = cortest_results$conf.int[1]
+        result_df$ci_hi = cortest_results$conf.int[2]
       }
+      return(result_df)
+    }) %>% do.call(rbind, .)
+  }) %>% do.call(rbind, .) %>%
+    dplyr::mutate(sample_i = factor(sample_i, levels = plot_labels), sample_j = factor(sample_j, levels = rev(plot_labels)))
+
+  if(color_scale == "default"){
+    color_scale <- c("#67001F", "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC", "#053061")
+  } else {
+    if((length(color_scale) %% 2) != 1){
+      stop("color_scale must be a vector of odd length")
     }
-
   }
 
-
-  ctab[is.na(ctab)] <- 0
-  colorlimits = c(-1,1)
-  if(no_negatives == TRUE){
-    ctab[ctab < 0] <- 0
-    colorlimits <- c(0,1)
+  if(no_negatives){
+    plotting_data_longer %>%
+      dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, p_value)) %>%
+      dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
+      dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
+      dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
+    color_limits <- c(0, 1)
+    floor_limit <- ceiling(length(color_scale)/2)
+    color_scale <- color_scale[floor_limit:length(color_scale)]
+  } else {
+    color_limits <- c(-1,1)
   }
 
-
-  colnames(ctab) <- names
-  rownames(ctab) <- names
-  colnames(ctab_pval) <- names
-  rownames(ctab_pval) <- names
-  colnames(ctab_ci_lo) <- names
-  rownames(ctab_ci_lo) <- names
-  colnames(ctab_ci_hi) <- names
-  rownames(ctab_ci_hi) <- names
-
-  gridcolor = ifelse(show_grid, "black", "white")
-
-
-
-  if(printtables){
-    return(list("cortable" = ctab, "cortable_pval" = ctab_pval, "cortable_ci_hi" = ctab_ci_hi, "cortable_ci_lo" = ctab_ci_lo))
+  if(return_table){
+    return(plotting_data_longer)
   }
 
-  else{
-    if(method_corr == "manhattan"){
-      corrplot::corrplot(ctab,
-                         tl.cex = labelsizes,
-                         method = plottype,
-                         title = title(your_title, line = -1, cex.main = 2),
-                         addgrid.col = gridcolor,
-                         tl.col="black",
-                         outline = TRUE,
-                         mar = c(1, 1, 3, 1),
-                         is.corr = FALSE,
-                         cl.lim = c(0,2),
-                         col = colorRampPalette(c(rep("black", 10),rev(c("#67001F", "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE","#4393C3", "#2166AC", "#053061")) ))(200))
-    } else {
-      corrplot::corrplot(ctab,
-                         tl.cex = labelsizes,
-                         method = plottype,
-                         title = title(your_title, line = -1, cex.main = 2),
-                         addgrid.col = gridcolor,
-                         tl.col="black",
-                         outline = TRUE,
-                         mar = c(1, 1, 3, 1),
-                         col = switch(colorscale,
-                                      default = NULL,
-                                      rainbow = colorRampPalette(rainbow(7))(100),
-                                      white_heat = colorRampPalette(col = c("black", "black", "black", "black", "black", "black","brown", "red", "orange", "yellow", "white"))(100)),
-                         cl.lim = colorlimits
-      )
-    }
+  gg_corplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = sample_i, y = sample_j)) +
+    ggplot2::scale_x_discrete(position = "top") +
+    ggplot2::theme(axis.ticks = ggplot2::element_blank(),
+                   rect = ggplot2::element_blank(),
+                   axis.text.x = ggplot2::element_text(angle = 90, hjust = 0),
+                   axis.title = ggplot2::element_blank())
 
-
-
+  if(plot_type == "color"){
+    gg_corplot <- gg_corplot +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
+  } else if (plot_type == "circle"){
+    gg_corplot <- gg_corplot +
+      ggplot2::geom_tile(color = "black", fill = "white") +
+      ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
+      ggplot2::scale_size_area("|correlation|", limits = c(0, 1)) +
+      ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
+  } else if (plot_type == "number") {
+    gg_corplot <- gg_corplot +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")+
+      ggplot2::geom_text(ggplot2::aes(label = round(correlation_value, digits = 2)), color = "black", size = number_size)
+  } else {
+    stop("plot_type must be one of \"color\", \"circle\", or \"number\"")
   }
+
+  return(gg_corplot)
+
 
 }
+
+
+
+
+
+

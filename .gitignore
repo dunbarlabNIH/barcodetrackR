@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .DS_Store
-graveyard
 inst/barcode_app/graveyard.R
+inst/sample_calls/
+inst/doc

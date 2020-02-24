@@ -4,8 +4,7 @@
 \alias{barcodecount}
 \title{Barcode Counter}
 \usage{
-barcodecount(your_data, count = "cumulative", months = NULL,
-  threshold = 0)
+barcodecount(your_data, count = "cumulative", months = NULL, threshold = 0)
 }
 \arguments{
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
@@ -26,4 +25,3 @@ Counts the number of barcodes sequentially by column cumulatively, uniquely, or 
 barcodecount(your_data = zh33, count = "unique", months = c(1,2,3,4.5,6.5,9), threshold = 1000)
 barcodecount(your_data = zg66, count = "new", months = c(1:10), threshold = 900)
 }
-

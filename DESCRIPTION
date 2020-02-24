@@ -38,4 +38,8 @@ Imports:
     treemap,
     vegan,
     xtable
-RoxygenNote: 5.0.1
+RoxygenNote: 7.0.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
