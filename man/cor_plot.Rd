@@ -23,7 +23,7 @@ cor_plot(
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
-\item{method_corr}{Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.}
+\item{method_corr}{Character. One of "pearson", "spearman", or "kendall".}
 
 \item{your_title}{The title for the plot.}
 

@@ -4,7 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
-#'@param method_corr Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.
+#'@param method_corr Character. One of "pearson", "spearman", or "kendall".
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the correlation plot
 #'@param label_size The size of the column labels.
@@ -50,9 +50,12 @@ cor_plot = function(your_SE,
       result_df <- data.frame(sample_i = plot_labels[i],
                               sample_j = plot_labels[j],
                               correlation_value = cortest_results$estimate,
-                              p_value = cortest_results$p.value,
-                              ci_lo = cortest_results$conf.int[1],
-                              ci_hi = cortest_results$conf.int[2])
+                              p_value = cortest_results$p.value)
+      if(method_corr == "pearson"){
+        result_df$ci_lo = cortest_results$conf.int[1]
+        result_df$ci_hi = cortest_results$conf.int[2]
+      }
+      return(result_df)
     }) %>% do.call(rbind, .)
   }) %>% do.call(rbind, .) %>%
     dplyr::mutate(sample_i = factor(sample_i, levels = plot_labels), sample_j = factor(sample_j, levels = rev(plot_labels)))
