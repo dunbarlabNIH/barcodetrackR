@@ -18,25 +18,38 @@ require("barcodetrackR")
 
 ```
 
-## Load the sample data
+## A. Loading data into barcodetrackR
 
-The _barcodetrackR_ package includes sample data from published cellular barcoding experiments. For this vignette, we will load data from publically available data from the following papers:
+### A.1 Creating SummarizedExperiment objects
+
+The _barcodetrackR_ package operates on SummarizedExperiment objects from Bioconductor. It stores metadata in here as well. It also includes sample data from published cellular barcoding experiments. For this vignette, we will load data from publically available data from the following papers:
 
 * Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology 3.29 (2018): eaat9781.
 * Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation 26.1 (2020): 16-25.
 * Six, E., et al. "Clonal tracking in gene therapy patients reveals a diversity of human hematopoietic differentiation programs." Blood (2020).
 
-The package uses the R object type SummarizedExperiment to store barcoding data and its associated metadata.
-
-```{r load_data, eval = TRUE}
+```{r load data, eval = TRUE}
 wu_dataframe <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
 wu_metadata <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR"))
-wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata)
+wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata, threshold = 0)
 
-barcode.mouse <- read.delim('/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/mouseUBC/mouse_UBC_C22.txt', row.names = 1)
-meta.mouse <- read.delim('/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/mouseUBC/mouse_UBC_C22_metadata.txt')
-se.mouse <- create_SE(your_data = barcode.mouse, meta_data = meta.mouse, threshold = 5e-6)
+belderbos_dataframe <- read.delim(system.file("sample_data", "BelderbosME_etal/mouse_UBC_C22.txt", package = "barcodetrackR"), row.names = 1)
+belderbos_metadata <- read.delim(system.file("sample_data", "BelderbosME_etal/mouse_UBC_C22_metadata.txt", package = "barcodetrackR"))
+belderbos_SE <- create_SE(your_data = belderbos_dataframe, meta_data = belderbos_metadata, threshold = 0)
+
+six_dataframe <- read.delim(system.file("sample_data", "SixE_etal/WAS5_reads.txt", package = "barcodetrackR"), row.names = 1)
+six_metadata <- read.delim(system.file("sample_data", "SixE_etal/WAS5_metadata.txt", package = "barcodetrackR"))
+six_SE <- create_SE(your_data = six_dataframe, meta_data = six_metadata, threshold = 0)
 ```
+
+### A.2 Adding custom assays to the SummarizedExperiment objects
+In addition to reads data, the Six et al. paper includes "estimated abundance" data for each of these timepoints. We load these into the assay as well which allows the assay to be used in our analyses as well.
+
+```{r load custom assay, eval = TRUE}
+six_estabundances <- read.delim(system.file("sample_data", "SixE_etal/WAS5_estabundance.txt", package = "barcodetrackR"), row.names = 1)
+SummarizedExperiment::assays(six_SE)[["estimated_abundances"]] <- six_estabundances
+```
+
 
 ## Heat map
 

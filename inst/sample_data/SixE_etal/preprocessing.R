@@ -41,4 +41,4 @@ all(rownames(raw_six_data_estabundance) == rownames(raw_six_data_reads))
 
 write.table(file = "inst/sample_data/SixE_etal/WAS5_reads.txt", raw_six_data_reads, sep = '\t', quote = FALSE)
 write.table(file = "inst/sample_data/SixE_etal/WAS5_estabundance.txt", raw_six_data_estabundance, sep = '\t', quote = FALSE)
-write.table(file = "inst/sample_data/SixE_etal/WAS5_metadata.txt", WAS5_metadata, sep = '\t', quote =  FALSE)
+write.table(file = "inst/sample_data/SixE_etal/WAS5_metadata.txt", WAS5_metadata, sep = '\t', quote =  FALSE, row.names = FALSE)
