@@ -171,7 +171,7 @@ barcode_ggheatmap <- function(your_SE,
           axis.ticks = ggplot2::element_blank()
         )
       if(!is.null(your_title )){
-        g2_dendrogram <- g2_dendrogram + ggtitle("\n")
+        g2_dendrogram <- g2_dendrogram + ggplot2::ggtitle("\n")
       }
     }
     if(clusters > 0){
@@ -187,7 +187,7 @@ barcode_ggheatmap <- function(your_SE,
           axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
           legend.position="none")
       if(!is.null(your_title )){
-        g3_clusters <- g3_clusters + ggtitle("\n")
+        g3_clusters <- g3_clusters + ggplot2::ggtitle("\n")
       }
 
     }

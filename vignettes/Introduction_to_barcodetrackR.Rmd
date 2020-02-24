@@ -115,31 +115,18 @@ six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
                         "m13_NKCELLS", "m36_NKCELLS", "m43_NKCELLS","m55_NKCELLS",
                         "m13_GRANULOCYTES", "m36_GRANULOCYTES", "m43_GRANULOCYTES", "m55_GRANULOCYTES", 
                         "m13_MONOCYTES", "m36_MONOCYTES", "m43_MONOCYTES","m55_MONOCYTES")
-barcode_ggheatmap(your_SE = six_SE[,six_celltype_order], n_clones = 5, cellnote_size = 3, label_size = 1, dendro = TRUE, clusters = 4, cellnote_assay = "percentages", distance_method = "euclidean")
+barcode_ggheatmap(your_SE = six_SE[,six_celltype_order], n_clones = 5, cellnote_size = 3, label_size = 10, dendro = TRUE, clusters = 4, cellnote_assay = "percentages", distance_method = "euclidean")
 ```
 
 
-<!-- The mouse dataset generally contains less clones than the monkey. Let's make a heat map showing some detailed information about the top clones from the peripheral blood samples across time. -->
+The Belderbros dataset generally contains less clones than either the Wu or Six datasets.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
+```{r heat_map_mouse, eval = TRUE, warning = FALSE}
+belderbros_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB], n_clones = 10, your_title = "Mouse C22 Heatmap",
+                    label_size = 10, dendro = TRUE, cellnote_size = 3, cellnote_assay = "percentages", clusters = 4)
+```
 
-<!-- ```{r heat_map_mouse, echo=TRUE, warning = FALSE} -->
-<!-- # Subset to only include peripheral blood samples -->
-<!-- se.mouse.sub <- subset_SE(se.mouse, Source = "PB") -->
-
-<!-- # Order by timepoint -->
-<!-- se.mouse.byTime <- se.mouse.sub[, with(se.mouse.sub@colData, order(se.mouse.sub@colData$Weeks))] -->
-
-<!-- # Make a detailed heat map -->
-<!-- barcode_ggheatmap_2(your_SE = se.mouse.byTime, -->
-<!--                     n_clones = 10, -->
-<!--                     your_title = "Mouse C22 Heatmap", -->
-<!--                     label_size = 12, -->
-<!--                     dendro = TRUE, -->
-<!--                     cellnote_size = 3, -->
-<!--                     cellnote_assay = "percentages", -->
-<!--                     clusters = 4) -->
-<!-- ``` -->
-
-<!-- Compared to the monkey, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis. -->
+Compared to the monkey, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
 
 <!-- ## Binary heat map -->
 
