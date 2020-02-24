@@ -163,7 +163,6 @@ barcode_ggheatmap <- function(your_SE,
         ggplot2::coord_flip()+
         ggplot2::ylab(NULL)+
         ggplot2::xlab(NULL)+
-        ggplot2::ggtitle("\n \n")+
         ggplot2::theme(
           plot.margin = ggplot2::unit(c(0,0,0,0), "cm"),
           plot.title = ggplot2::element_text(size = 20),
@@ -171,11 +170,13 @@ barcode_ggheatmap <- function(your_SE,
           panel.background = ggplot2::element_rect(fill = "white",colour = "white"),
           axis.ticks = ggplot2::element_blank()
         )
+      if(!is.null(your_title )){
+        g2_dendrogram <- g2_dendrogram + ggtitle("\n")
+      }
     }
     if(clusters > 0){
       g3_clusters <-ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
-        ggplot2::ggtitle("\n \n")+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
         ggplot2::theme(
           plot.margin = ggplot2::unit(c(0,0.1,0,0), "cm"),
@@ -185,6 +186,9 @@ barcode_ggheatmap <- function(your_SE,
           axis.text.y=ggplot2::element_blank(),
           axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
           legend.position="none")
+      if(!is.null(your_title )){
+        g3_clusters <- g3_clusters + ggtitle("\n")
+      }
 
     }
 
