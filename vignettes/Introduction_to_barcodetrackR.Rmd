@@ -13,7 +13,8 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 
 # Required packages
-suppressPackageStartupMessages(require("magrittr"))
+require("magrittr")
+require("barcodetrackR")
 
 ```
 
@@ -28,9 +29,9 @@ The _barcodetrackR_ package includes sample data from published cellular barcodi
 The package uses the R object type SummarizedExperiment to store barcoding data and its associated metadata.
 
 ```{r load_data, eval = TRUE}
-wu_dataframe <- read.delim("../inst/sample_data/WuC_etal/monkey_ZJ31.txt")
-wu_metadat <- read.delim('/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/DunbarLab/monkey_ZJ31_metadata.txt')
-se.monkey <- create_SE(your_data = barcode.monkey, meta_data = meta.monkey, threshold = 5e-4)
+wu_dataframe <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
+wu_metadata <- read.delim(system.file("sample_data", "WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR"))
+wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata)
 
 barcode.mouse <- read.delim('/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/mouseUBC/mouse_UBC_C22.txt', row.names = 1)
 meta.mouse <- read.delim('/Users/mortlockrd/Desktop/GitHub/barcodetrackR/inst/sample_data/mouseUBC/mouse_UBC_C22_metadata.txt')

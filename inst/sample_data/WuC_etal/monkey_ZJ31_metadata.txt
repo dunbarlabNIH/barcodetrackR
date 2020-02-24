@@ -1,4 +1,4 @@
-SAMPLENAME	Monkey	Timepoint	Months	Cell_type
+SAMPLENAME	monkey	timepoint	months	celltype
 ZJ31_6m_T	ZJ31	6m	6	T
 ZJ31_9.5m_T	ZJ31	9.5m	9.5	T
 ZJ31_12m_T	ZJ31	12m	12	T

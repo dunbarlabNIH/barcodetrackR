@@ -1,4 +1,4 @@
-SAMPLENAME	Mouse	Timepoint	Weeks	Source	Cell_type
+SAMPLENAME	mouse	timepoint	weeks	source	celltype
 wk9	C21	wk9	9	PB	unsorted
 wk14	C21	wk14	14	PB	unsorted
 wk20	C21	wk20	20	PB	unsorted
