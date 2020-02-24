@@ -126,7 +126,7 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB], n_clones = 
                     label_size = 10, dendro = TRUE, cellnote_size = 3, cellnote_assay = "percentages", clusters = 4)
 ```
 
-Compared to the monkey, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
+Compared to the monkey data, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
 
 <!-- ## Binary heat map -->
 
