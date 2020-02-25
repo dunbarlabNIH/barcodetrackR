@@ -4,7 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
-#'@param threshold A chosen threshold (set as a proportion, i.e. 0.01 is 1%) that decides whether a feature entry is set to 0. Defaults to 0.
+#'@param your_threshold A chosen threshold that decides whether a feature entry is set to 0. Defaults to 0.
 #'@param your_title The title for the plot.
 #'@param label_size The size of the column labels.
 #'@return Displays a binary heat map in the current plot window.
@@ -15,7 +15,7 @@
 
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
-                                   threshold = 0,
+                                   your_threshold = 0,
                                    your_title = "",
                                    label_size = 1) {
 
@@ -27,7 +27,7 @@ barcode_binary_heatmap <- function(your_SE,
 
   #changing plotting_data to binary
   plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
-  plotting_data[plotting_data < threshold] <- 0
+  plotting_data[plotting_data < your_threshold] <- 0
   plotting_data[plotting_data > 0] <- 1
   plotting_data <- plotting_data[rowSums(plotting_data) > 0,]
   barcode_order <- rownames(plotting_data)[do.call(order, plotting_data)]
