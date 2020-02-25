@@ -1,11 +1,20 @@
 ---
 title: "Introduction to barcodetrackR"
-author: "Ryland Mortlock and Diego A. Espinoza"
+author:
+- name: Diego A. Espinoza
+  affiliation: Perelman School of Medicine at University of Pennsylvania
+  email: d93espinoza@gmail.com
+- name: Ryland Mortlock
+  affiliation: National Institutes of Health
 date: Last compiled on `r format(Sys.Date(), "%d %B %Y")`
+abstract: >
+  Document summary
 output:
-  html_document:
-  pdf_document: default
-fig_caption: yes
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Introduction to barcodetrackR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
 ---
 
 ```{r setup, include=FALSE}

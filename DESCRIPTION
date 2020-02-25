@@ -40,6 +40,7 @@ Imports:
     xtable
 RoxygenNote: 7.0.2
 Suggests: 
+    BiocStyle,
     knitr,
     rmarkdown
 VignetteBuilder: knitr
