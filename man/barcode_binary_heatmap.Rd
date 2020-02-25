@@ -8,7 +8,6 @@ barcode_binary_heatmap(
   your_SE,
   plot_labels = NULL,
   threshold = 0,
-  your_title = "",
   label_size = 1
 )
 }
@@ -18,8 +17,6 @@ barcode_binary_heatmap(
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{threshold}{A chosen threshold (set as a proportion, i.e. 0.01 is 1%) that decides whether a feature entry is set to 0. Defaults to 0.}
-
-\item{your_title}{The title for the plot.}
 
 \item{label_size}{The size of the column labels.}
 }
