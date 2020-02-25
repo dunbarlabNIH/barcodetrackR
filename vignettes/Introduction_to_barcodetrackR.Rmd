@@ -2,15 +2,16 @@
 title: "Introduction to barcodetrackR"
 author:
 - name: Diego A. Espinoza
-  affiliation: Perelman School of Medicine at University of Pennsylvania
+  affiliation: Perelman School of Medicine at University of Pennsylvania, Philadelphia, PA
   email: d93espinoza@gmail.com
 - name: Ryland Mortlock
-  affiliation: National Institutes of Health
+  affiliation: National Heart, Lung and Blood Institute, National Institutes of Health, Bethesda, MD
+package: barcodetrackR
 date: Last compiled on `r format(Sys.Date(), "%d %B %Y")`
-abstract: >
-  Document summary
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document:
+    toc: TRUE
+    toc_float: TRUE
 vignette: >
   %\VignetteIndexEntry{Introduction to barcodetrackR}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,17 +19,16 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+knitr::opts_chunk$set(comment=NA, out.width = 12, tidy = TRUE)
 # Required packages
 require("magrittr")
 require("barcodetrackR")
 
 ```
 
-## A. Loading data into barcodetrackR
+# Loading data
 
-### Loading SummarizedExperiment objects with `create_SE`
+## Loading SummarizedExperiment objects with create_SE
 
 The _barcodetrackR_ package operates on SummarizedExperiment objects from Bioconductor. It stores associated colData for each sample in here as well as any metadata. For this vignette, we will load publically available data from the following papers (included in the package):
 
@@ -60,7 +60,7 @@ six_ea_SE <- create_SE(your_data = six_estabundances, meta_data = six_metadata, 
 
 Our input dataframes to create the SummarizedExperiment (SE) objects are n x m data frames where there are n rows of observations (typically cellular barcodes, insertion sites, or the like) and the m columns are the samples. The input metadata must have row order identical to the order of the colums in its corresponding dataframe. The metadata must also have a column titled "SAMPLENAME" that denotes the column of your_data it refers to.
 
-### Assays created in the SummarizedExperiment object by `create_SE`
+## Assays created in the SummarizedExperiment object by create_SE
 
 create_SE takes the input dataframe and metadata and creates an SE object with the following assays:
 
@@ -74,9 +74,9 @@ create_SE takes the input dataframe and metadata and creates an SE object with t
 SummarizedExperiment::assays(six_SE)
 ```
 
-## B. Correlations between samples
+# Correlations
 
-### `scatter_plot`
+## scatter_plot
 A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a scatter_plot function here.
 
 ```{r scatter_plot, eval = TRUE, fig.width = 7, fig.height=4}
@@ -85,7 +85,7 @@ wu_scatterplot_2 <- scatter_plot(wu_SE[,c("ZJ31_20m_Gr", "ZJ31_20m_T")], method_
 cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
-### `cor_plot`
+## cor_plot
 A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- SummarizedExperiment::colData(wu_SE)$SAMPLENAME[1:20]
@@ -104,9 +104,9 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection], method_corr = "pearson", return_t
 
 Above, we used two of the three available correlation visualizations ("color" and "circle") using the standard color palette provided. A "no_negative" parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
 
-## C. Tracking clonal patterns over time
+# Clonal patterns
 
-### `barcode_ggheatmap`
+## barcode_ggheatmap
 
 A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. our function barcode_ggheatmap does this by choosing the top N clones within each sample and tracking them over time; in a large number of cases, the large-contributing clones are of most interest to the user.
 
@@ -136,6 +136,16 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB], n_clones = 
 ```
 
 Compared to the monkey, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
+
+# Bias
+
+# Diversity
+
+# Circos
+
+# Utilities
+
+
 
 <!-- ## Binary heat map -->
 
