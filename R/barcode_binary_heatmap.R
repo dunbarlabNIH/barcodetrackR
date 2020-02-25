@@ -4,7 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
-#'@param your_threshold A chosen threshold (set as a proportion, i.e. 0.01 is 1%) that decides whether a feature entry is set to 0. Defaults to 0.
+#'@param your_threshold A chosen threshold that decides whether a feature entry is set to 0. Defaults to 0.
 # #'@param your_title The title for the plot.
 #'@param label_size The size of the column labels.
 #'@return Displays a binary heat map in the current plot window.
