@@ -19,7 +19,6 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(comment=NA, out.width = 12, tidy = TRUE)
 # Required packages
 require("magrittr")
 require("barcodetrackR")
