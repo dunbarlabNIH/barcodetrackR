@@ -156,14 +156,14 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
 
-When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example fro
+When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set.
 
-```{r cor_plot 4, eval = FALSE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
+```{r cor_plot 4, eval = FALSE, fig.width = 3, fig.height = 2, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
-         plot_type = "circle",
-         label_size = 1.5)
+         plot_type = "number",
+         number_size = 6)
 ```
 
 # Clonal patterns
