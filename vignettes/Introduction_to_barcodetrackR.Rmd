@@ -29,7 +29,6 @@ devtools::install_github("d93espinoza/barcodetrackR")
 The R package and functions were created by Diego A. Espinoza, Ryland Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/d93espinoza/barcodetrackR/issues.
 
 
-
 # Loading data
 
 ## Loading required packages
@@ -46,7 +45,7 @@ require("SummarizedExperiment")
 
 ## Creating objects with `create_SE`
 
-For this vignette, we will load publically available data from the following papers (included in the package):
+For this vignette, we will load publically available data from the following papers (these sample datasets are included in the R package):
 
 * [Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology (2018)](http://dx.doi.org/10.1126/sciimmunol.aat9781)
 * [Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation (2020)](http://dx.doi.org/10.1016/j.bbmt.2019.08.026)
@@ -77,7 +76,7 @@ belderbos_SE <- create_SE(your_data = belderbos_dataframe,
 
 
 system.file("sample_data/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
-  read.delim( row.names = 1) -> six_dataframe
+  read.delim(row.names = 1) -> six_dataframe
 
 system.file("sample_data/SixE_etal/WAS5_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> six_metadata
@@ -122,6 +121,8 @@ assays(six_SE)
 ## `scatter_plot`
 A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a `scatter_plot` function as part of the package.
 
+Here, we view the correlation of barcode counts between different cell types at the 20 month timepoint of the Wu et al study. We compare granulocytes (Gr) to B and T cells.
+
 ```{r scatter_plot, eval = TRUE, fig.width = 7, fig.height=4}
 Gr_B_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_B")
 Gr_T_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_T")
@@ -131,14 +132,13 @@ cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
 ## `cor_plot`
-A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
          plot_type = "color")
 ```
-
 
 We can also use the spearman correlation as our metric of interest, and visualize our correlation plot using circles with areas proportional to the absolute value of the correlation and colors corresponding to the value of the correlations.
 ```{r cor_plot 2, eval = FALSE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
@@ -154,7 +154,17 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          return_table = TRUE) %>% head
 ```
 
-Above, we used two of the three available correlation visualizations (`'color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
+Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
+
+When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example fro
+
+```{r cor_plot 4, eval = FALSE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
+belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
+         method_corr = "pearson",
+         plot_type = "circle",
+         label_size = 1.5)
+```
 
 # Clonal patterns
 

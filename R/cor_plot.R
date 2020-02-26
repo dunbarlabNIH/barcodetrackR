@@ -21,7 +21,7 @@
 #'@export
 #'
 #'@examples
-#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plottype = "color")
+#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")
 #"
 
 cor_plot = function(your_SE,
@@ -89,7 +89,7 @@ cor_plot = function(your_SE,
     ggplot2::scale_x_discrete(position = "top") +
     ggplot2::theme(axis.ticks = ggplot2::element_blank(),
                    rect = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 90, hjust = 0),
+                   axis.text.x = ggplot2::element_text(angle = 90, hjust = 0, size = label_size),
                    axis.title = ggplot2::element_blank())
 
   if(plot_type == "color"){
