@@ -170,15 +170,18 @@ cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `barcode_ggheatmap`
 
-A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. our function `barcode_ggheatmap` does this by choosing the top N clones (`n_clones`) within each sample and tracking them over time; in a large number of cases, the large-contributing clones are of most interest to the user.
+A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. Our function `barcode_ggheatmap` does this by choosing the top N clones (`n_clones`) within each sample and tracking them over time. The argument `n_clones` assumes that in most cases, the large-contributing clones are of most interest to the user. This assumption can be relaxed by passing a large value to the argument. 
 
-We first visualize the top 10 clones from the selected samples in the Wu dataset.
+We first visualize the top 10 clones from the selected samples in the Wu dataset. The default cell note is stars for the top 10 clones in each sample.
 
 ```{r barcode_ggheatmap wu_SE 1, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
-barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection], n_clones = 10, label_size = 10)
+barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
+                  n_clones = 10,
+                  label_size = 14,
+                  cellnote_size = 8)
 ```
 
-We can also visualize the percentage contribution of each of these clones and add a dendogram cut into 4 clusters (based on the Euclidean distance between each clone's log assay). Here we plot the top 10 clones within the Six dataset and order the columns to group them by celltype.
+We can also visualize the percentage contribution of each of these clones and add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype.
 
 ```{r barcode_ggheatmap wu_SE 2, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
 six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
@@ -187,18 +190,20 @@ six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
                         "m13_GRANULOCYTES", "m36_GRANULOCYTES", "m43_GRANULOCYTES",
                         "m55_GRANULOCYTES",
                         "m13_MONOCYTES", "m36_MONOCYTES", "m43_MONOCYTES","m55_MONOCYTES")
+
 barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   n_clones = 5,
+                  cellnote_assay = "percentages",
                   cellnote_size = 3,
                   label_size = 10,
                   dendro = TRUE,
                   clusters = 4,
-                  cellnote_assay = "percentages",
                   distance_method = "euclidean")
 ```
 
+Splitting the clones into 4 clusters makes it easy to identify clones which are biased towards Monocytes (*purple*), T cells (*green*), NK cells (*light blue*), and B cell / Granulocyte (*red*).
 
-The Belderbros dataset generally contains less clones than either the Wu or Six datasets.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
+The Belderbros dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
 ```{r heat_map_mouse, eval = TRUE, warning = FALSE}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
