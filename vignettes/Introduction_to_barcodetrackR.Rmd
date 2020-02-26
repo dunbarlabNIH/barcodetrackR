@@ -205,12 +205,46 @@ Compared to the monkey data, the mouse data generally shows a smaller number of 
 
 ## `barcode_binary_heatmap`
 
-In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view a subset of the Belderbos dataset representing a total of `{r nrow(belderbos_SE[,belderbos_wk_samples_PB])}` clones.
+In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view a subset of the Belderbos dataset representing a total of `r nrow(belderbos_SE[,belderbos_wk_samples_PB])` clones.
 
 ```{r binary_heat_map, echo=TRUE, warning = FALSE}
 barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB], label_size = 12)
 ```
 
+## `clonal_contribution` (bar plot)
+
+Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for the monkey ZJ31, we could see that there are some large uni-lineage CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD16+ NK cell samples across time.
+
+```{r clonal_contribution_line, echo=TRUE, warning = FALSE}
+
+clonal_contribution(your_SE = wu_SE[,16:20],
+                    SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
+                    n_clones = 10,
+                    graph_type = "line",
+                    filter_by = "celltype",
+                    filter_selection = "NK_CD56n_CD16p",
+                    plot_over = "months",
+                    linesize = 0.2)
+```
+
+The colored clones represent the top 10 clones in the 10 month CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
+
+For data with fewer clones, a bar chart might be appropriate. We can view the data from mouse C22, previously shown as a heat map. One can hide the smaller clones through the plot_non_selected argument. We can also use categorical spacing on the x-axis rather than numeric.
+
+```{r clonal_contribution_bar, echo=TRUE, warning = FALSE, eval = FALSE}
+clonal_contribution(your_SE = se.mouse,
+                    SAMPLENAME_choice = "sac",
+                    n_clones = 10,
+                    graph_type = "bar",
+                    filter_by = "Source",
+                    filter_selection = "PB",
+                    plot_over = "Weeks",
+                    keep_numeric = FALSE,
+                    plot_non_selected = FALSE,
+                    linesize = 0.2)
+```
+
+The bar chart makes the following conclusion very evident: by the final timepoint, the large fraction of hematopoiesis was coming from a small number of clones, most of which appeared at 14 weeks.
 
 # Bias
 
@@ -223,36 +257,4 @@ barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB], label_s
 
 
 
-<!-- <!-- ## Clonal Contribution (bar or line plots) --> -->
 
-<!-- <!-- A simpler way to view clonal patterns over time is by a line or bar chart showing the proportion of top clones. In the above heat maps for the monkey ZJ31, we could see that there are some large uni-lineage CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD16+ NK cell samples across time. --> -->
-
-<!-- <!-- ```{r clonal_contribution_line, echo=TRUE, warning = FALSE} --> -->
-<!-- <!-- clonal_contribution(your_SE = se.monkey.sub, --> -->
-<!-- <!--                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p", --> -->
-<!-- <!--                     n_clones = 20, --> -->
-<!-- <!--                     graph_type = "line", --> -->
-<!-- <!--                     filter_by = "Cell_type", --> -->
-<!-- <!--                     filter_selection = "NK_CD56n_CD16p", --> -->
-<!-- <!--                     plot_over = "Months", --> -->
-<!-- <!--                     linesize = 0.2) --> -->
-<!-- <!-- ``` --> -->
-
-<!-- <!-- The colored clones represent the top 20 clones in the 20 month CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints. --> -->
-
-<!-- <!-- For data with fewer clones, a bar chart might be appropriate. We can view the data from mouse C22, previously shown as a heat map. One can hide the smaller clones through the plot_non_selected argument. We can also use categorical spacing on the x-axis rather than numeric. --> -->
-
-<!-- <!-- ```{r clonal_contribution_bar, echo=TRUE, warning = FALSE} --> -->
-<!-- <!-- clonal_contribution(your_SE = se.mouse, --> -->
-<!-- <!--                     SAMPLENAME_choice = "sac", --> -->
-<!-- <!--                     n_clones = 20, --> -->
-<!-- <!--                     graph_type = "bar", --> -->
-<!-- <!--                     filter_by = "Source", --> -->
-<!-- <!--                     filter_selection = "PB", --> -->
-<!-- <!--                     plot_over = "Weeks", --> -->
-<!-- <!--                     keep_numeric = FALSE, --> -->
-<!-- <!--                     plot_non_selected = FALSE, --> -->
-<!-- <!--                     linesize = 0.2) --> -->
-<!-- <!-- ``` --> -->
-
-<!-- <!-- The bar chart makes the following conclusion very evident: by the final timepoint, the large fraction of hematopoiesis was coming from a small number of clones, most of which appeared at 14 weeks. --> -->
