@@ -31,4 +31,5 @@ Creates a binary heatmap showing the presence of new clones from L to R in the d
 }
 \examples{
 barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
+
 }

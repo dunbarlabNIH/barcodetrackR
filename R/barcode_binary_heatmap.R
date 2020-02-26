@@ -8,11 +8,12 @@
 #'@param your_title The title for the plot.
 #'@param label_size The size of the column labels.
 #'@return Displays a binary heat map in the current plot window.
+#'
+#'@export
+#'
 #'@examples
 #'barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
-#'@export
-
-
+#'
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
                                    your_threshold = 0,
