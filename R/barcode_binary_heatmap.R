@@ -43,16 +43,18 @@ barcode_binary_heatmap <- function(your_SE,
 
   ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value))+
-    ggplot2::scale_fill_manual(values = c("1" = "blue", "0" = "white"), expand = c(0,0), labels = c("Absent", "Present"))+
+    ggplot2::scale_fill_manual(paste0("Detection"),
+                               values = c("1" = "blue", "0" = "white"),
+                               expand = c(0,0),
+                               labels = c("detected", "not detected"))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
     ggplot2::scale_x_discrete(expand = c(0,0), labels = plot_labels)+
     ggplot2::ylab(NULL)+
     ggplot2::xlab(NULL)+
-    ggplot2::ggtitle(paste0("\n", your_title, "\n"))+
+    ggplot2::ggtitle(your_title)+
     ggplot2::theme(
       plot.title = ggplot2::element_text(size = 20),
       axis.text.x = ggplot2::element_text(angle=90, hjust = 1, vjust = 0.5, size = label_size),
-      legend.text = ggplot2::element_text(size =  15, face = 'bold'),
       legend.title = ggplot2::element_text(size =  15),
       axis.ticks = ggplot2::element_blank(),
       panel.border = ggplot2::element_rect(colour = "black", fill=NA, size=1)

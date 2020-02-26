@@ -190,8 +190,8 @@ barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
 
 The Belderbros dataset generally contains less clones than either the Wu or Six datasets.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
 ```{r heat_map_mouse, eval = TRUE, warning = FALSE}
-belderbros_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
-barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB],
+belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   n_clones = 10,
                   label_size = 10,
                   dendro = TRUE,
@@ -203,19 +203,13 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbros_wk_samples_PB],
 Compared to the monkey data, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
 
 
-## Binary heat map
+## `barcode_binary_heatmap`
 
-In some cases, we may be interested in simply which barcodes are present in which samples. In that case, a binary heat map can give the simplest visual representation.
+In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view a subset of the Belderbos dataset representing a total of `{r nrow(belderbos_SE[,belderbos_wk_samples_PB])}` clones.
 
 ```{r binary_heat_map, echo=TRUE, warning = FALSE}
-barcode_binary_heatmap(your_SE = se.mouse.byTime,
-                       threshold = 0.01,
-                       your_title = "Mouse C22 Binary Heatmap",
-                       label_size = 12)
+barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB], label_size = 12)
 ```
-
-The above binary heat map only shows clones present at a proportion of 1% or greater in at least one sample. Just like the previous heat map, one can see short-term clones at wk10 with a few sticking around through wk20, and a group of long-term clones that appear at wk14 and are present until sacrifice.
-
 
 
 # Bias
