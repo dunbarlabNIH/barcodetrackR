@@ -20,7 +20,7 @@
 #'@param text_size Numeric. Size of text in plot.
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
 #'@examples
-#'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  filter_by = "Cell_type", filter_selection = "B", plot_over = "Timepoint", n_clones = 20)
+#'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  SAMPLENAME_choice = "Gr_3m", plot_over = "Timepoint", n_clones = 20)
 #'@export
 
 clonal_contribution <- function(your_SE,
@@ -28,8 +28,8 @@ clonal_contribution <- function(your_SE,
                                 clone_sequences = NULL,
                                 n_clones = 10,
                                 graph_type = "bar",
-                                filter_by,
-                                filter_selection,
+                                filter_by = NULL,
+                                filter_selection = NULL,
                                 plot_over,
                                 plot_over_display_choices = NULL,
                                 keep_numeric = TRUE,
@@ -41,11 +41,8 @@ clonal_contribution <- function(your_SE,
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
-  if(any(! c(filter_by, plot_over) %in% coldata_names)){
-    stop("filter_by and plot_over must both match a column name in colData(your_SE)")
-  }
-  if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
-    stop("filter_selection must be an element in the colData column specified with filter_by")
+  if(any(! c(plot_over) %in% coldata_names)){
+    stop("plot_over must match a column name in colData(your_SE)")
   }
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
@@ -54,6 +51,9 @@ clonal_contribution <- function(your_SE,
   }
   if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) != 1){
     stop("please specify only ONE of SAMPLENAME_choice or clone_sequences")
+  }
+  if (is.null(filter_by) == TRUE & is.null(filter_selection) == FALSE){
+    stop("filter_selection cannot be specified if filter_by is not specified.")
   }
 
   #get appropriate rows to use in plotting
@@ -64,17 +64,29 @@ clonal_contribution <- function(your_SE,
   } else {
     stop("one of SAMPLENAME_choice or clone_sequences must be not-NULL")
   }
-
-
-  #select those samples which to plot_over and to filter_by
-  temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices) & (your_SE[[filter_by]] == filter_selection)]
-  temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
-
-  #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
-  if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
-    stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
+  
+  # Filter by specified
+  if (is.null(filter_by) == FALSE){
+    # error handling
+    if(any(! c(filter_by) %in% coldata_names)){
+      stop("filter_by must match a column name in colData(your_SE)")
+    }
+    if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
+      stop("filter_selection must be an element in the colData column specified with filter_by")
+    }
+    #select those samples which to plot_over and to filter_by
+    temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices) & (your_SE[[filter_by]] == filter_selection)]
+    temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
+    #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
+    if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
+      stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
+    }
+  } else {
+    # Filter by not specified
+    temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
+    temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
   }
-
+  
   #fetch percentages and turn sample_name into the plot_over equivalents
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]

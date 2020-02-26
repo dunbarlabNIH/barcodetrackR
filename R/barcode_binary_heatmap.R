@@ -4,7 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
-#'@param your_threshold A chosen threshold that decides whether a feature entry is set to 0. Defaults to 0.
+#'@param threshold Clones with a proportion below this threshold will be set to 0.
 #'@param your_title The title for the plot.
 #'@param label_size The size of the column labels.
 #'@return Displays a binary heat map in the current plot window.
@@ -16,9 +16,9 @@
 #'
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
-                                   your_threshold = 0,
+                                   threshold = 0,
                                    your_title = "",
-                                   label_size = 1) {
+                                   label_size = 12) {
 
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
@@ -28,7 +28,7 @@ barcode_binary_heatmap <- function(your_SE,
 
   #changing plotting_data to binary
   plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
-  plotting_data[plotting_data < your_threshold] <- 0
+  plotting_data[plotting_data < threshold] <- 0
   plotting_data[plotting_data > 0] <- 1
   plotting_data <- plotting_data[rowSums(plotting_data) > 0,]
   barcode_order <- rownames(plotting_data)[do.call(order, plotting_data)]
@@ -46,7 +46,7 @@ barcode_binary_heatmap <- function(your_SE,
     ggplot2::scale_fill_manual(paste0("Detection"),
                                values = c("0" = "white", "1" = "#4575B4"),
                                expand = c(0,0),
-                               labels = c("detected", "not detected"))+
+                               labels = c("not detected", "detected"))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
     ggplot2::scale_x_discrete(expand = c(0,0), labels = plot_labels)+
     ggplot2::ylab(NULL)+

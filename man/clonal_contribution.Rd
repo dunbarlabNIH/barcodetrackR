@@ -10,8 +10,8 @@ clonal_contribution(
   clone_sequences = NULL,
   n_clones = 10,
   graph_type = "bar",
-  filter_by,
-  filter_selection,
+  filter_by = NULL,
+  filter_selection = NULL,
   plot_over,
   plot_over_display_choices = NULL,
   keep_numeric = TRUE,
@@ -55,5 +55,5 @@ Displays a stacked area line or bar plot (made by ggplot2) of the samples' top c
 Bar or line plot of percentage contribution from a selected choice or number of elements in the rows of the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
-clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  filter_by = "Cell_type", filter_selection = "B", plot_over = "Timepoint", n_clones = 20)
+clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  SAMPLENAME_choice = "Gr_3m", plot_over = "Timepoint", n_clones = 20)
 }

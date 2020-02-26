@@ -132,7 +132,7 @@ cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
 ## `cor_plot`
-A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we view the Pearson correlation between the T, B, Gr, NK CD16+/CD56-, and NK CD16-/CD56+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we view the Pearson correlation between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
@@ -183,7 +183,7 @@ barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
 
 We can also visualize the percentage contribution of each of these clones and add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype.
 
-```{r barcode_ggheatmap wu_SE 2, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+```{r barcode_ggheatmap six_SE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
 six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
                         "m13_BCELLS", "m36_BCELLS", "m43_BCELLS", "m55_BCELLS",
                         "m13_NKCELLS", "m36_NKCELLS", "m43_NKCELLS","m55_NKCELLS",
@@ -205,7 +205,7 @@ Splitting the clones into 4 clusters makes it easy to identify clones which are 
 
 The Belderbros dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  When possible, using the "percentages" option of the `cellnote_assay` aqrgument provides maximal information.
 
-```{r barcode_ggheatmap wu_SE 3, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
+```{r barcode_ggheatmap belderbos_SE, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   n_clones = 10,
@@ -220,46 +220,42 @@ Compared to the other data sets, this one generally shows a smaller number of cl
 
 ## `barcode_binary_heatmap`
 
-In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view a subset of the Belderbos dataset representing a total of `r nrow(belderbos_SE[,belderbos_wk_samples_PB])` clones.
+In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view the binary heat map of the belderbos data with a threshold of 0.01, meaning clones that make up less than 1% of a sample are treated as not detected.
 
 ```{r binary_heat_map, echo=TRUE, warning = FALSE}
-barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB], label_size = 12)
+barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
+                       label_size = 12,
+                       threshold = 0.01)
 ```
 
-## `clonal_contribution` (bar plot)
+## `clonal_contribution`
 
-Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for the monkey ZJ31, we could see that there are some large uni-lineage CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD16+ NK cell samples across time.
+Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for wu data, we could see that there are some large uni-lineage CD56-/CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD56-/CD16+ NK cell samples across time.
 
-```{r clonal_contribution_line, echo=TRUE, warning = FALSE}
+```{r clonal_contribution wu_SE, echo=TRUE, warning = FALSE}
 
-clonal_contribution(your_SE = wu_SE[,16:20],
+clonal_contribution(your_SE = wu_SE[,17:20],
                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
                     n_clones = 10,
                     graph_type = "line",
-                    filter_by = "celltype",
-                    filter_selection = "NK_CD56n_CD16p",
                     plot_over = "months",
                     linesize = 0.2)
 ```
 
-The colored clones represent the top 10 clones in the 10 month CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
+The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
 
-For data with fewer clones, a bar chart might be appropriate. We can view the data from mouse C22, previously shown as a heat map. One can hide the smaller clones through the plot_non_selected argument. We can also use categorical spacing on the x-axis rather than numeric.
+For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to false, we can only look at the top 10 clones from the chosen sample and ignore. We can also use categorical spacing on the x-axis rather than numeric by setting keep_numeric to false.
 
-```{r clonal_contribution_bar, echo=TRUE, warning = FALSE, eval = FALSE}
-clonal_contribution(your_SE = se.mouse,
-                    SAMPLENAME_choice = "sac",
+```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = FALSE}
+clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
+                    SAMPLENAME_choice = "wk33",
                     n_clones = 10,
                     graph_type = "bar",
-                    filter_by = "Source",
-                    filter_selection = "PB",
-                    plot_over = "Weeks",
+                    plot_over = "weeks",
                     keep_numeric = FALSE,
                     plot_non_selected = FALSE,
                     linesize = 0.2)
 ```
-
-The bar chart makes the following conclusion very evident: by the final timepoint, the large fraction of hematopoiesis was coming from a small number of clones, most of which appeared at 14 weeks.
 
 # Bias
 
