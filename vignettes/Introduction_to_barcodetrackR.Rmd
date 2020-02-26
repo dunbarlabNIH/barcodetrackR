@@ -141,14 +141,14 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 ```
 
 We can also use the spearman correlation as our metric of interest, and visualize our correlation plot using circles with areas proportional to the absolute value of the correlation and colors corresponding to the value of the correlations.
-```{r cor_plot 2, eval = FALSE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
+```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "spearman",
          plot_type = "circle")
 ```
 
 We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
-```{r cor_plot 3, eval = FALSE}
+```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
          return_table = TRUE) %>% head
@@ -158,12 +158,12 @@ Above, we used two of the three available correlation visualizations (`"color"` 
 
 When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set.
 
-```{r cor_plot 4, eval = FALSE, fig.width = 3, fig.height = 2, warning=FALSE, message=FALSE}
+```{r cor_plot 4, eval = TRUE, fig.width = 3, fig.height = 2, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
          plot_type = "number",
-         number_size = 6)
+         number_size = 3)
 ```
 
 # Clonal patterns
@@ -178,7 +178,7 @@ We first visualize the top 10 clones from the selected samples in the Wu dataset
 barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
                   n_clones = 10,
                   label_size = 14,
-                  cellnote_size = 8)
+                  cellnote_size = 4)
 ```
 
 We can also visualize the percentage contribution of each of these clones and add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype.
@@ -194,7 +194,7 @@ six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
 barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   n_clones = 5,
                   cellnote_assay = "percentages",
-                  cellnote_size = 4,
+                  cellnote_size = 2,
                   label_size = 14,
                   dendro = TRUE,
                   clusters = 4,
@@ -211,7 +211,7 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   n_clones = 10,
                   label_size = 18,
                   dendro = TRUE,
-                  cellnote_size = 6,
+                  cellnote_size = 4,
                   cellnote_assay = "percentages",
                   clusters = 4)
 ```
@@ -222,7 +222,7 @@ Compared to the other data sets, this one generally shows a smaller number of cl
 
 In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view the binary heat map of the belderbos data with a threshold of 0.01, meaning clones that make up less than 1% of a sample are treated as not detected.
 
-```{r binary_heat_map, echo=TRUE, warning = FALSE}
+```{r binary_heat_map, echo=TRUE, warning = FALSE, eval = FALSE}
 barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                        label_size = 12,
                        threshold = 0.01)
@@ -245,7 +245,7 @@ The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sa
 
 For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to false, we can only look at the top 10 clones from the chosen sample and ignore. We can also use categorical spacing on the x-axis rather than numeric by setting keep_numeric to false.
 
-```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = FALSE}
+```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                     SAMPLENAME_choice = "wk33",
                     n_clones = 10,
@@ -278,12 +278,12 @@ suppressMessages(plot(wu_ridge_plot)) # Supress message on which bandwith is cho
 By default, the ridge plot calculates the density of clones at each value of the log bias. It does not consider the fractional contribution of the clones. If you want larger clones to be more influential to the density estimation, set weighted = TRUE to make a weighted heat map.
 
 ```{r ridge_plot wu_SE 2, echo=FALSE, warning = FALSE, eval = TRUE}
-wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
-                            selection_var = "celltype",
-                            selection_1 = "B",
-                            selection_2 = "T",
-                            plot_by = "timepoint",
-                            weighted = TRUE)
+wu_ridge_plot_weighted <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
+                                     selection_var = "celltype",
+                                     selection_1 = "B",
+                                     selection_2 = "T",
+                                     plot_by = "timepoint",
+                                     weighted = TRUE)
 
 suppressMessages(plot(wu_ridge_plot_weighted)) # Supress message on which bandwith is chosen
 ```
@@ -292,7 +292,7 @@ For this dataset, the weighted heat map shows a more balanced (less biased) clon
 
 Creating a ridge plot based on the Six et al data also shows that the clonality between B and T cells (as assessed by viral integration site analysis) becomes less biased over time.
 
-```{r ridge_plot six_SE, echo=FALSE, warning = FALSE, eval = FALSE}
+```{r ridge_plot six_SE, echo=FALSE, warning = FALSE, eval = TRUE}
 six_ridge_plot <- ridge_plot(your_SE = six_SE,
                              selection_var = "celltype",
                              selection_1 = "B",
@@ -307,12 +307,12 @@ suppressMessages(plot(six_ridge_plot))
 
 
 
-##`bias_distribution_barplot`
+## `bias_distribution_barplot`
 
 
 
 
-##`ternary_plot`
+## `ternary_plot`
 
 
 
