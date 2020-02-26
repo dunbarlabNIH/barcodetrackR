@@ -238,8 +238,7 @@ clonal_contribution(your_SE = wu_SE[,17:20],
                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
                     n_clones = 10,
                     graph_type = "line",
-                    plot_over = "months",
-                    linesize = 0.2)
+                    plot_over = "months")
 ```
 
 The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
@@ -253,11 +252,70 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                     graph_type = "bar",
                     plot_over = "weeks",
                     keep_numeric = FALSE,
-                    plot_non_selected = FALSE,
-                    linesize = 0.2)
+                    plot_non_selected = FALSE)
 ```
 
-# Bias
+# Clonal Bias
+
+## `ridge_plot`
+
+The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as log(selection_1/selection_2 + 1) so that it can handle clones which are zero in one of the samples. If the `"plot_by"` argument is provided, the ridge plot will have a y axis corresponding to samples along the variable provided which must be a column of colData. 
+
+Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+
+```{r ridge_plot wu_SE 1, echo=FALSE, warning = FALSE, eval = TRUE}
+wu_ridge_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
+
+wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
+                            selection_var = "celltype",
+                            selection_1 = "B",
+                            selection_2 = "T",
+                            plot_by = "timepoint")
+
+suppressMessages(plot(wu_ridge_plot)) # Supress message on which bandwith is chosen
+```
+
+By default, the ridge plot calculates the density of clones at each value of the log bias. It does not consider the fractional contribution of the clones. If you want larger clones to be more influential to the density estimation, set weighted = TRUE to make a weighted heat map.
+
+```{r ridge_plot wu_SE 2, echo=FALSE, warning = FALSE, eval = TRUE}
+wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
+                            selection_var = "celltype",
+                            selection_1 = "B",
+                            selection_2 = "T",
+                            plot_by = "timepoint",
+                            weighted = TRUE)
+
+suppressMessages(plot(wu_ridge_plot_weighted)) # Supress message on which bandwith is chosen
+```
+
+For this dataset, the weighted heat map shows a more balanced (less biased) clonality between B and T cells as compared to the regular ridge plot. This means that although there are highly biased clones, the larger clones tend to be shared between B and T cells.
+
+Creating a ridge plot based on the Six et al data also shows that the clonality between B and T cells (as assessed by viral integration site analysis) becomes less biased over time.
+
+```{r ridge_plot six_SE, echo=FALSE, warning = FALSE, eval = FALSE}
+six_ridge_plot <- ridge_plot(your_SE = six_SE,
+                             selection_var = "celltype",
+                             selection_1 = "B",
+                             selection_2 = "T",
+                             plot_by = "months")
+
+suppressMessages(plot(six_ridge_plot))
+```
+
+## `bias_histogram`
+
+
+
+
+##`bias_distribution_barplot`
+
+
+
+
+##`ternary_plot`
+
+
+
 
 # Diversity
 
