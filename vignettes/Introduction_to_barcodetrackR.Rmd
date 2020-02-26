@@ -194,8 +194,8 @@ six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
 barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   n_clones = 5,
                   cellnote_assay = "percentages",
-                  cellnote_size = 3,
-                  label_size = 10,
+                  cellnote_size = 4,
+                  label_size = 14,
                   dendro = TRUE,
                   clusters = 4,
                   distance_method = "euclidean")
@@ -203,20 +203,20 @@ barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
 
 Splitting the clones into 4 clusters makes it easy to identify clones which are biased towards Monocytes (*purple*), T cells (*green*), NK cells (*light blue*), and B cell / Granulocyte (*red*).
 
-The Belderbros dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  Here is a heat map showing some detailed information about the top clones from the peripheral blood samples across time.
-```{r heat_map_mouse, eval = TRUE, warning = FALSE}
+The Belderbros dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  When possible, using the "percentages" option of the `cellnote_assay` aqrgument provides maximal information.
+
+```{r barcode_ggheatmap wu_SE 3, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   n_clones = 10,
-                  label_size = 10,
+                  label_size = 18,
                   dendro = TRUE,
-                  cellnote_size = 3,
+                  cellnote_size = 6,
                   cellnote_assay = "percentages",
                   clusters = 4)
 ```
 
-Compared to the monkey data, the mouse data generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
-
+Compared to the other data sets, this one generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
 
 ## `barcode_binary_heatmap`
 
