@@ -2,21 +2,43 @@
 % Please edit documentation in R/clonal_diversity.R
 \name{clonal_diversity}
 \alias{clonal_diversity}
-\title{Clonal Diversity}
+\title{Clonal diversity plot}
 \usage{
-clonal_diversity(your_data, threshold = 2000, divindex = "shannon")
+clonal_diversity(
+  your_SE,
+  plot_over,
+  plot_over_display_choices = NULL,
+  group_by,
+  index_type = "shannon",
+  point_size = 5,
+  line_size = 2,
+  text_size = 15
+)
 }
 \arguments{
-\item{your_data}{A data frame. Individual barcodes in rows and samples in columns.}
+\item{your_SE}{A Summarized Experiment object.}
 
-\item{divindex}{Character. One of "shannon", "simpson", or "invsimpson".}
+\item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. timepoint}
+
+\item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
+
+\item{group_by}{The column of metadata you want to group by e.g. cell_type}
+
+\item{index_type}{Character. One of "count", "shannon", or "simpson"}
+
+\item{point_size}{Numeric. Size of points.}
+
+\item{line_size}{Numeric. Size of lines.}
+
+\item{text_size}{Numeric. Size of text in plot.}
 }
 \value{
-Vector of the diversities of each column.
+Outputs plot of a diversity measure tracked for groups over a factor.
 }
 \description{
-Gives the diversity for each sample (column) in your data.
+A line plot that tracks a diversity measure from a selected choice or number of elements in the rows of the SummarizedExperiment object.
 }
 \examples{
-clonaldiversity(your_data = zh33, divindex = "shannon")
+diversity_plot(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
+
 }
