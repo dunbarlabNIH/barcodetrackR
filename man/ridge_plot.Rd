@@ -6,23 +6,17 @@
 \usage{
 ridge_plot(
   your_SE,
-  cell_var,
-  cell_1,
-  cell_2,
+  selection_var,
+  selection_1,
+  selection_2,
   plot_by,
   weighted = F,
-  text_size = 20,
+  text_size = 16,
   scale = 1
 )
 }
 \arguments{
 \item{your_SE}{Your SummarizedExperiment of barcode data and associated metadata}
-
-\item{cell_var}{The column of metadata corresponding to cell types}
-
-\item{cell_1}{The first cell type to be compared}
-
-\item{cell_2}{The second cell type to be compared}
 
 \item{plot_by}{The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata}
 
@@ -31,6 +25,12 @@ ridge_plot(
 \item{text_size}{The size of the text in the plot.}
 
 \item{scale}{Sets the overlap between ridges. Larger values give more overlap.}
+
+\item{cell_var}{The column of metadata corresponding to cell types}
+
+\item{cell_1}{The first cell type to be compared. Will be on the RIGHT side of the ridge plot}
+
+\item{cell_2}{The second cell type to be compared. Will be on the LEFT side of the ridge plot}
 }
 \value{
 Bias plot for two lineages over time.
@@ -39,5 +39,5 @@ Bias plot for two lineages over time.
 Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
 }
 \examples{
-ridge_plot(your_se = SE, cell_var = "Cell_type", cell_1 = "B", cell_2 = "T", plot_by = "Timepoint")
+ridge_plot(your_se = SE, cell_var = "selection_type", selection_1 = "B", selection_2 = "T", plot_by = "Timepoint")
 }

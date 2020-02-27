@@ -8,14 +8,14 @@ barcode_ggheatmap(
   your_SE,
   plot_labels = NULL,
   n_clones = 10,
+  cellnote_assay = "stars",
   your_title = NULL,
   grid = TRUE,
-  label_size = 1,
+  label_size = 12,
   dendro = FALSE,
   cellnote_size = 4,
   distance_method = "Euclidean",
   minkowski_power = 2,
-  cellnote_assay = "stars",
   hclust_linkage = "complete",
   row_order = "hierarchical",
   clusters = 0,
@@ -29,6 +29,8 @@ barcode_ggheatmap(
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{n_clones}{The top 'n' clones to plot.}
+
+\item{cellnote_assay}{Character. One of "stars", "reads", or "percentages"}
 
 \item{your_title}{The title for the plot.}
 
@@ -53,8 +55,6 @@ barcode_ggheatmap(
 \item{percent_scale}{A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.}
 
 \item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
-
-\item{cellnote_option}{Character. One of "stars", "reads", or "percentages"}
 }
 \value{
 Displays a heatmap in the current plot window.

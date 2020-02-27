@@ -10,12 +10,12 @@ cor_plot(
   method_corr = "pearson",
   your_title = "",
   grid = TRUE,
-  label_size = 1,
+  label_size = 12,
   plot_type = "color",
   no_negatives = FALSE,
   return_table = FALSE,
   color_scale = "default",
-  number_size = 0.5
+  number_size = 3
 )
 }
 \arguments{
@@ -48,5 +48,5 @@ Plots pairwise correlation plot for the samples in your_SE.
 Gives the pairwise correlation between each sample-sample pair in the data frame.
 }
 \examples{
-cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plottype = "color")
+cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")
 }

@@ -21,7 +21,7 @@
 #'@export
 #'
 #'@examples
-#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plottype = "color")
+#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")
 #"
 
 cor_plot = function(your_SE,
@@ -29,12 +29,12 @@ cor_plot = function(your_SE,
                     method_corr ="pearson",
                     your_title = "",
                     grid = TRUE,
-                    label_size = 1,
+                    label_size = 8,
                     plot_type = "color",
                     no_negatives = FALSE,
                     return_table = FALSE,
                     color_scale = "default",
-                    number_size = 0.5) {
+                    number_size = 3) {
 
   #extracts percentages assay from your_SE
   plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
@@ -89,6 +89,7 @@ cor_plot = function(your_SE,
     ggplot2::scale_x_discrete(position = "top") +
     ggplot2::theme(axis.ticks = ggplot2::element_blank(),
                    rect = ggplot2::element_blank(),
+                   text = ggplot2::element_text(size = label_size),
                    axis.text.x = ggplot2::element_text(angle = 90, hjust = 0),
                    axis.title = ggplot2::element_blank())
 
