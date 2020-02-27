@@ -12,8 +12,8 @@ install.packages("devtools") #or skip, if you already have it
 devtools::install_github("d93espinoza/barcodetrackR") #installs package from GitHub
 ```
 
-## Usage
+## Usage and Documentation
 
-Please see our vignette at: https://github.com/d93espinoza/barcodetrackR/blob/master/vignettes/Introduction_to_barcodetrackR.Rmd
+Please see examples and documentation at: http://d93espinoza.github.io/barcodetrackR/
 
 
