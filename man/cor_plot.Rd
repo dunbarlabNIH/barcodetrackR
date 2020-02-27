@@ -10,7 +10,7 @@ cor_plot(
   method_corr = "pearson",
   your_title = "",
   grid = TRUE,
-  label_size = 12,
+  label_size = 8,
   plot_type = "color",
   no_negatives = FALSE,
   return_table = FALSE,

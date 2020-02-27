@@ -1,7 +1,3 @@
 .Rproj.user
 .Rhistory
-.RData
 .DS_Store
-inst/barcode_app/graveyard.R
-inst/sample_calls/
-inst/doc
