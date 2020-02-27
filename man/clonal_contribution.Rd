@@ -18,7 +18,8 @@ clonal_contribution(
   plot_non_selected = TRUE,
   linesize = 0.2,
   text_size = 15,
-  your_title = ""
+  your_title = "",
+  y_limit = NULL
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ clonal_contribution(
 \item{linesize}{Numeric. Thickness of the lines.}
 
 \item{text_size}{Numeric. Size of text in plot.}
+
+\item{y_limit}{Numeric. What the max value of the y scale should be for the "percentages" assay.}
 
 \item{clones_sequences}{The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.}
 }

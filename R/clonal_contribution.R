@@ -18,6 +18,7 @@
 #'@param plot_non_selected Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice
 #'@param linesize Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
+#'@param y_limit Numeric. What the max value of the y scale should be for the "percentages" assay.
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
 #'@examples
 #'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  SAMPLENAME_choice = "Gr_3m", plot_over = "Timepoint", n_clones = 20)
@@ -36,7 +37,8 @@ clonal_contribution <- function(your_SE,
                                 plot_non_selected = TRUE,
                                 linesize = 0.2,
                                 text_size = 15,
-                                your_title = ""){
+                                your_title = "",
+                                y_limit = NULL){
 
 
   # Some basic error checking before running the function
@@ -64,7 +66,7 @@ clonal_contribution <- function(your_SE,
   } else {
     stop("one of SAMPLENAME_choice or clone_sequences must be not-NULL")
   }
-  
+
   # Filter by specified
   if (is.null(filter_by) == FALSE){
     # error handling
@@ -86,7 +88,7 @@ clonal_contribution <- function(your_SE,
     temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
     temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
   }
-  
+
   #fetch percentages and turn sample_name into the plot_over equivalents
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]
@@ -100,7 +102,6 @@ clonal_contribution <- function(your_SE,
   } else {
     plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
   }
-
 
 
   #set up appropriate levels in plotting the selected elements and specify the colors
@@ -118,26 +119,29 @@ clonal_contribution <- function(your_SE,
     color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences))), selected_sequences)
   }
 
-
   if (graph_type == "bar"){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_col(colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_bw()+
       ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
-                     plot.title = ggplot2::element_text(hjust = 0.5))
+                     plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
 
   } else if (graph_type == "line"){
     g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "Clonal Contribution %", labels = function(x){paste0(x * 100, "%")})+
+      ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_bw()+
       ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
-                     plot.title = ggplot2::element_text(hjust = 0.5))
+                     plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
+  }
+
+  if(!is.null(y_limit)){
+   g <- g + ggplot2::coord_cartesian(ylim = c(0, y_limit))
   }
 
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
