@@ -159,7 +159,7 @@ Above, we used two of the three available correlation visualizations (`"color"` 
 
 When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set.
 
-```{r cor_plot 4, eval = TRUE, fig.width = 3, fig.height = 2, warning=FALSE, message=FALSE}
+```{r cor_plot 4, eval = TRUE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
@@ -217,8 +217,6 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   clusters = 4)
 ```
 
-Compared to the other data sets, this one generally shows a smaller number of clones making up a large proportion of the hematopoiesis.
-
 ## `barcode_binary_heatmap`
 
 In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view the binary heat map of the belderbos data with a threshold of 0.01, meaning clones that make up less than 1% of a sample are treated as not detected.
@@ -260,7 +258,11 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `ridge_plot`
 
-The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as log(selection_1/selection_2 + 1) so that it can handle clones which are zero in one of the samples. If the `"plot_by"` argument is provided, the ridge plot will have a y axis corresponding to samples along the variable provided which must be a column of colData.
+The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as:
+
+$logbias=log(\frac{count_1}{count_2}+1)$
+
+so that it can handle clones which are zero in one of the samples.
 
 Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
@@ -289,9 +291,9 @@ wu_ridge_plot_weighted <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selec
 suppressMessages(plot(wu_ridge_plot_weighted)) # Supress message on which bandwith is chosen
 ```
 
-For this dataset, the weighted heat map shows a more balanced (less biased) clonality between B and T cells as compared to the regular ridge plot. This means that although there are highly biased clones, the larger clones tend to be shared between B and T cells.
+For this dataset, the weighted heat map shows a more balanced (less biased) clonality between B and T cells as compared to the regular ridge plot. This means that although there are highly biased clones, the largerr clones tend to be shared between B and T cells.
 
-Creating a ridge plot based on the Six et al data also shows that the clonality between B and T cells (as assessed by viral integration site analysis) becomes less biased over time.
+Creating a ridge plot based on the Six et al data also shows that the clonality between B and T cells (as assessed by viral integration site analysis) tends to become less biased over time.
 
 ```{r ridge_plot six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 six_ridge_plot <- ridge_plot(your_SE = six_SE,

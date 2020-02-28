@@ -17,6 +17,9 @@
 #'@param ncols Numeric. Number of columns to plot on using plot_grid from cowplot.
 #'@param same_all_y Logical. Whether or not to plot all plots on the same y axis limits.
 #'@return Histogram of log bias for two factors over another set of factors.
+#'
+#'@importFrom rlang %||%
+#'
 #'@examples
 #'bias_histogram(your_SE = SE, split_bias_on = "Lineage", bias_1 = "B", bias_2 = "T", split_bias_over = "Month", bias_over = c(1,2,4.5,12))
 #'@export
@@ -37,7 +40,7 @@ bias_histogram <- function(your_SE, split_bias_on, bias_1, bias_2, split_bias_ov
     stop("bias_1 and bias_2 must both be elements in the colData column specified with split_bias_on")
   }
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
-    bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(SE)[[split_bias_over]]))
+    bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]]))
   } else {
     bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
   }
