@@ -256,69 +256,74 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 # Clonal Bias
 
+## `bias_histogram`
+
+The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
+
+```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+wu_bias_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
+
+bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
+               split_bias_on = "celltype",
+               bias_1 = "B",
+               bias_2 = "T",
+               split_bias_over = "months",
+               ncols = 2)
+```
+
+Similarly, for the Six, et al data.
+
+```{r bias_histogram six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+bias_histogram(your_SE = six_SE,
+               split_bias_on = "celltype",
+               bias_1 = "B",
+               bias_2 = "T",
+               split_bias_over = "months",
+               ncols = 2)
+```
+
 ## `ridge_plot`
 
 The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as:
 
-$logbias=log(\frac{count_1}{count_2}+1)$
+$logbias=log(\frac{count_1+1}{count_2+1})$
 
 so that it can handle clones which are zero in one of the samples.
 
-Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset.
 
-```{r ridge_plot wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
-wu_ridge_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
-
-wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
-                            selection_var = "celltype",
-                            selection_1 = "B",
-                            selection_2 = "T",
-                            plot_by = "timepoint")
+```{r ridge_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
+                            split_bias_on = "celltype",
+                            bias_1 = "B",
+                            bias_2 = "T",
+                            split_bias_over = "months")
 
 suppressMessages(plot(wu_ridge_plot)) # Supress message on which bandwith is chosen
 ```
 
-By default, the ridge plot calculates the density of clones at each value of the log bias. It does not consider the fractional contribution of the clones. If you want larger clones to be more influential to the density estimation, set weighted = TRUE to make a weighted heat map.
-
-```{r ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
-wu_ridge_plot_weighted <- ridge_plot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
-                                     selection_var = "celltype",
-                                     selection_1 = "B",
-                                     selection_2 = "T",
-                                     plot_by = "timepoint",
-                                     weighted = TRUE)
-
-suppressMessages(plot(wu_ridge_plot_weighted)) # Supress message on which bandwith is chosen
-```
-
-For this dataset, the weighted heat map shows a more balanced (less biased) clonality between B and T cells as compared to the regular ridge plot. This means that although there are highly biased clones, the largerr clones tend to be shared between B and T cells.
-
-Creating a ridge plot based on the Six et al data also shows that the clonality between B and T cells (as assessed by viral integration site analysis) tends to become less biased over time.
-
-```{r ridge_plot six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
-six_ridge_plot <- ridge_plot(your_SE = six_SE,
-                             selection_var = "celltype",
-                             selection_1 = "B",
-                             selection_2 = "T",
-                             plot_by = "months")
-
-suppressMessages(plot(six_ridge_plot))
-```
-
-## `bias_histogram`
-
-
-
-
 ## `bias_distribution_barplot`
 
+```{r bias_distribution_barplot wu_SE, echo=TRUE, warning = FALSE, eval = FALSE}
 
+bias_distribution_barplot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
+               split_bias_on = "celltype",
+               bias_1 = "B",
+               split_bias_over = "months")
+```
 
+Right now, error in line 52. Will come back to this.
 
 ## `ternary_plot`
 
+A ternary plot can be made for any SE with just 3 samples in it. 
 
+```{r ternary_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+wu_ternary_plot_sample_selection <- c("ZJ31_6m_Gr", "ZJ31_6m_B", "ZJ31_6m_T")
+ternary_plot(your_SE = wu_SE[,wu_ternary_plot_sample_selection])
+```
 
+For now, I just quickly changed the current ternary_plot to accept SE as input. Plenty of room for improvement on this function. I still think we should include it because it's used in a lot of papers.
 
 # Diversity
 

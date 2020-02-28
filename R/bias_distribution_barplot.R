@@ -17,7 +17,7 @@
 bias_distribution_barplot <- function(your_SE,
                                       split_bias_on,
                                       bias_1,
-                                      bias_rest,
+                                      bias_rest = NULL,
                                       split_bias_over,
                                       bias_over = NULL,
                                       breaks = c(10,5,2,1,0),
@@ -37,7 +37,7 @@ bias_distribution_barplot <- function(your_SE,
     stop("bias_1 and bias_rest must both be elements in the colData column specified with split_bias_on")
   }
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
-    bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(SE)[[split_bias_over]]))
+    bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]]))
   } else {
     bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
   }

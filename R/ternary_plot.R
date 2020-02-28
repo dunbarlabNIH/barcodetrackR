@@ -2,15 +2,19 @@
 #'
 #'@description Creates a ternary plot showing the bias of clones towards one of three axes.
 #'
-#'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
+#'@param your_SE A SummarizedExperiment.
 #'@param show_arrows Logical. Display arrows or not.
 #'@param show_ticks Logical. Display tick marks or not.
 #'@param density_mode Logical. Uses a kernel density estimation to view concentrations of clones.
 #'@return Displays a ternary plot in the current plot window.
 #'@examples
-#'ternary_plot(your_data = zh33, dot_size = 1000, density_mode = TRUE)
+#'ternary_plot(your_SE = zh33, dot_size = 1000, density_mode = TRUE)
 #'@export
-ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, density_mode = FALSE){
+ternary_plot <- function(your_SE, show_arrows = FALSE, show_ticks = TRUE, density_mode = FALSE){
+  # Load data
+  your_data <- SummarizedExperiment::assays(your_SE)$counts
+  meta_data <- SummarizedExperiment::colData(your_SE)
+  
   if (ncol(your_data) != 3){
     stop("You must include 3 columns of data.")
   }
@@ -32,7 +36,7 @@ ternary_plot <- function(your_data, show_arrows = TRUE, show_ticks = TRUE, densi
 
   your_data <- your_data[order(-your_data$ABUNDANCE),]
 
-  print(max(your_data$ABUNDANCE))
+ # print(max(your_data$ABUNDANCE))
 
 
   g <- ggtern::ggtern(your_data, ggtern::aes(X1, X2, X3))+

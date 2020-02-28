@@ -5,14 +5,14 @@
 \title{Ternary Plot}
 \usage{
 ternary_plot(
-  your_data,
-  show_arrows = TRUE,
+  your_SE,
+  show_arrows = FALSE,
   show_ticks = TRUE,
   density_mode = FALSE
 )
 }
 \arguments{
-\item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+\item{your_SE}{A SummarizedExperiment.}
 
 \item{show_arrows}{Logical. Display arrows or not.}
 
@@ -27,5 +27,5 @@ Displays a ternary plot in the current plot window.
 Creates a ternary plot showing the bias of clones towards one of three axes.
 }
 \examples{
-ternary_plot(your_data = zh33, dot_size = 1000, density_mode = TRUE)
+ternary_plot(your_SE = zh33, dot_size = 1000, density_mode = TRUE)
 }

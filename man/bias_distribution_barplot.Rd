@@ -8,7 +8,7 @@ bias_distribution_barplot(
   your_SE,
   split_bias_on,
   bias_1,
-  bias_rest,
+  bias_rest = NULL,
   split_bias_over,
   bias_over = NULL,
   breaks = c(10, 5, 2, 1, 0),

@@ -23,9 +23,9 @@ bias_histogram(
 
 \item{split_bias_on}{The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen}
 
-\item{bias_1}{The factor you wish to plot on the left side of the plots.}
+\item{bias_1}{The factor you wish to plot on the right side of the plots.}
 
-\item{bias_2}{The factor you wish to plot on the right side of the plots.}
+\item{bias_2}{The factor you wish to plot on the left side of the plots.}
 
 \item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on.}
 

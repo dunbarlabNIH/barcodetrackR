@@ -7,8 +7,8 @@
 #'
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
 #'@param split_bias_on The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen
-#'@param bias_1 The factor you wish to plot on the left side of the plots.
-#'@param bias_2 The factor you wish to plot on the right side of the plots.
+#'@param bias_1 The factor you wish to plot on the right side of the plots.
+#'@param bias_2 The factor you wish to plot on the left side of the plots.
 #'@param split_bias_over The column in `colData(your_SE)` that you wish to observe the bias split on.
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
 #'@param breaks Numeric. The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).
@@ -63,7 +63,7 @@ bias_histogram <- function(your_SE, split_bias_on, bias_1, bias_2, split_bias_ov
     g <- ggplot2::ggplot(your_data[order(your_data$added_percentages),],
                          ggplot2::aes(x = log2_bias_cuts, y = added_percentages))+
       ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize, color = "black")+
-      ggplot2::scale_x_discrete(name = paste0("log2 bias: log2(", bias_1, "/", bias_2, ")"), drop = FALSE)+
+      ggplot2::scale_x_discrete(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")"), drop = FALSE)+
       ggplot2::scale_y_continuous(name = "Added Proportions", labels = function(i)(paste0(i*100, "%")))+
       ggplot2::theme(text = ggplot2::element_text(size = text_size),
                      panel.grid.major.x = ggplot2::element_blank(),
@@ -71,7 +71,7 @@ bias_histogram <- function(your_SE, split_bias_on, bias_1, bias_2, split_bias_ov
                      panel.background = ggplot2::element_rect(fill = "white", colour = "black"),
                      panel.spacing = ggplot2::unit(2, "lines"),
                      axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90))+
-      ggplot2::labs(title = bias_over[i])+
+      ggplot2::labs(title = paste0(split_bias_over,": ", bias_over[i]))+
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   })
   if(scale_all_y){

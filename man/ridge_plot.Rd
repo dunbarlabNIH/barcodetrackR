@@ -6,10 +6,11 @@
 \usage{
 ridge_plot(
   your_SE,
-  selection_var,
-  selection_1,
-  selection_2,
-  plot_by,
+  split_bias_on,
+  bias_1,
+  bias_2,
+  split_bias_over,
+  bias_over = NULL,
   weighted = F,
   text_size = 16,
   scale = 1
@@ -18,19 +19,21 @@ ridge_plot(
 \arguments{
 \item{your_SE}{Your SummarizedExperiment of barcode data and associated metadata}
 
-\item{plot_by}{The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata}
+\item{split_bias_on}{The column of metadata corresponding to cell types}
+
+\item{bias_1}{The first cell type to be compared. Will be on the RIGHT side of the ridge plot}
+
+\item{bias_2}{The second cell type to be compared. Will be on the LEFT side of the ridge plot}
+
+\item{split_bias_over}{The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.}
+
+\item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
 \item{weighted}{If true, the density estimation will be weighted by the overall contribution of each barcode}
 
 \item{text_size}{The size of the text in the plot.}
 
 \item{scale}{Sets the overlap between ridges. Larger values give more overlap.}
-
-\item{cell_var}{The column of metadata corresponding to cell types}
-
-\item{cell_1}{The first cell type to be compared. Will be on the RIGHT side of the ridge plot}
-
-\item{cell_2}{The second cell type to be compared. Will be on the LEFT side of the ridge plot}
 }
 \value{
 Bias plot for two lineages over time.
@@ -39,5 +42,5 @@ Bias plot for two lineages over time.
 Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
 }
 \examples{
-ridge_plot(your_se = SE, cell_var = "selection_type", selection_1 = "B", selection_2 = "T", plot_by = "Timepoint")
+ridge_plot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
 }

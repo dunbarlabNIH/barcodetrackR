@@ -3,10 +3,11 @@
 #' Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
 # '
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
-#'@param cell_var The column of metadata corresponding to cell types
-#'@param cell_1 The first cell type to be compared. Will be on the RIGHT side of the ridge plot
-#'@param cell_2 The second cell type to be compared. Will be on the LEFT side of the ridge plot
-#'@param plot_by The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata
+#'@param split_bias_on The column of metadata corresponding to cell types
+#'@param bias_1 The first cell type to be compared. Will be on the RIGHT side of the ridge plot
+#'@param bias_2 The second cell type to be compared. Will be on the LEFT side of the ridge plot
+#'@param split_bias_over The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.
+#'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
 #'@param weighted If true, the density estimation will be weighted by the overall contribution of each barcode
 #'@param text_size The size of the text in the plot.
 #'@param scale Sets the overlap between ridges. Larger values give more overlap. 
@@ -17,13 +18,14 @@
 #'@import ggplot2
 #'
 #'@examples
-#'ridge_plot(your_se = SE, cell_var = "selection_type", selection_1 = "B", selection_2 = "T", plot_by = "Timepoint")
+#'ridge_plot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
 #'@export
 ridge_plot <- function(your_SE,
-                       selection_var,
-                       selection_1,
-                       selection_2,
-                       plot_by,
+                       split_bias_on,
+                       bias_1,
+                       bias_2,
+                       split_bias_over,
+                       bias_over = NULL,
                        weighted = F,
                        text_size = 16,
                        scale = 1){
@@ -34,44 +36,48 @@ ridge_plot <- function(your_SE,
 
   # Basic error handling
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
-  if(any(! c(selection_var) %in% coldata_names)){
-    stop("selection_var must match a column name in colData(your_SE)")
+  if(any(! c(split_bias_on) %in% coldata_names)){
+    stop("split_bias_on must match a column name in colData(your_SE)")
   }
-  if(! selection_1 %in% unique(SummarizedExperiment::colData(your_SE)[[selection_var]])){
-    stop("selection_1 is not in selection_var")
+  if(! bias_1 %in% unique(SummarizedExperiment::colData(your_SE)[[split_bias_on]])){
+    stop("bias_1 is not in split_bias_on")
   }
-  if(! selection_2 %in% unique(SummarizedExperiment::colData(your_SE)[[selection_var]])){
-    stop("selection_2 is not in selection_var")
+  if(! bias_2 %in% unique(SummarizedExperiment::colData(your_SE)[[split_bias_on]])){
+    stop("bias_2 is not in split_bias_on")
   }
   
   # Only keep data that matches filter
-  your_data <- your_data[,meta_data[,selection_var] == selection_1 | meta_data[,selection_var] == selection_2]
-  meta_data <- meta_data[meta_data[,selection_var] == selection_1 | meta_data[,selection_var] == selection_2,]
+  your_data <- your_data[,meta_data[,split_bias_on] == bias_1 | meta_data[,split_bias_on] == bias_2]
+  meta_data <- meta_data[meta_data[,split_bias_on] == bias_1 | meta_data[,split_bias_on] == bias_2,]
   
-  # Make the selection_var an ordered factor
-  meta_data[,selection_var] <- factor(meta_data[,selection_var], levels = c(selection_1,selection_2))
+  # Make the split_bias_on an ordered factor
+  meta_data[,split_bias_on] <- factor(meta_data[,split_bias_on], levels = c(bias_1,bias_2))
   
   # error handling
-  if(any(! c(plot_by) %in% coldata_names)){
-    stop("plot_by must match a column name in colData(your_SE)")
+  if(any(! c(split_bias_over) %in% coldata_names)){
+    stop("split_bias_over must match a column name in colData(your_SE)")
   }
   
-  # Order data columns based on meta data to plot by
-  if (class(meta_data[,plot_by]) == "numeric"){
-    meta_ordered <- meta_data[order(meta_data[,plot_by],meta_data[,selection_var]),]
+  if(is.numeric(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
+    # Sort
+    bias_over <- bias_over %||% sort(meta_data[,split_bias_over])
     # Change to factor
-    meta_ordered[,plot_by] <- factor(meta_ordered[,plot_by])
-    data_ordered <- your_data[,order(meta_data[,plot_by],meta_data[,selection_var])]
+    bias_over <- factor(bias_over, levels = unique(bias_over))
   } else {
-    # Order meta_data based on the order of the data not alphabetically
-    meta_data[,plot_by] <- factor(meta_data[,plot_by], levels = unique(meta_data[,plot_by]))
-    meta_ordered <- meta_data[order(meta_data[,plot_by],meta_data[,selection_var]),]
-    data_ordered <- your_data[,order(meta_data[,plot_by],meta_data[,selection_var])]
+    bias_over <- bias_over %||% factor(meta_data[,split_bias_over], levels = unique(meta_data[,split_bias_over]))
   }
+  
+  # Only keep data that matches bias_over
+  your_data <- your_data[,(meta_data[,split_bias_over] %in% bias_over)]
+  meta_data <- meta_data[(meta_data[,split_bias_over] %in% bias_over),]
+  
+  # Order data and metadata
+  data_ordered <- your_data[,order(bias_over,meta_data[,split_bias_on])]
+  meta_ordered <- meta_data[order(bias_over,meta_data[,split_bias_on]),]
   
   #ensure that filtering results in a subset of samples that is identified by a unique element in plot_over
-  if(length(unique(meta_ordered[,plot_by]))*2 != ncol(data_ordered)){
-    stop("There should be 2 selections for every unique value of plot_by")
+  if(length(unique(bias_over))*2 != ncol(data_ordered)){
+    stop("There should be 2 selections for every unique value of bias_over")
   }
 
   your_data <- data_ordered[rowSums(data_ordered) > 0,]
@@ -84,7 +90,7 @@ ridge_plot <- function(your_SE,
     temp$added_prop <- rowSums(temp)
     temp$bias <- temp[,1]/temp[,2] # Calculate bias
     temp$log_bias <- log2(temp$bias)
-    temp$TP <- unique(meta_ordered[,plot_by])[i/2]
+    temp$TP <- unique(bias_over)[i/2]
     return(temp)
   })
   your_data <- do.call(rbind, your_data_list)
@@ -96,15 +102,14 @@ ridge_plot <- function(your_SE,
       dplyr::rename(log_bias = x) -> your_data_densities
 
     p <- ggplot2::ggplot(your_data_densities, ggplot2::aes(x = log_bias, y = TP, fill = TP, group = TP, height = density)) +
-      ggridges::geom_density_ridges(stat="identity", scale = scale) +
+      ggridges::geom_density_ridges(stat="identity", scale = scale)+
+      ggplot2::scale_x_continuous(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")")) +
       ggplot2::theme(text = ggplot2::element_text(size = text_size),
                      panel.grid.major.x = ggplot2::element_line(colour = "grey"),
                      panel.grid.major.y = ggplot2::element_blank(),
                      panel.background = ggplot2::element_rect(fill = "white"),
                      axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
-                     legend.position = "none") + ggplot2::scale_y_discrete(name = plot_by)
-                     # ggplot2::annotate("text",x = Inf, y = 0.6, label = selection_1, size = 8,hjust = 5)+
-                     # ggplot2::annotate("text",x = -Inf, y = 0.6, label = selection_2, size = 8, hjust = -5)
+                     legend.position = "none") + ggplot2::scale_y_discrete(name = split_bias_over)
   } else {
 
   # Normal ridge plot
@@ -118,16 +123,14 @@ ridge_plot <- function(your_SE,
     #   ggridges::geom_density_ridges(stat="identity", scale = scale) +
     p <- ggplot2::ggplot(your_data[order(your_data$added_prop),], ggplot2::aes(x = log_bias, y = TP, fill = TP, group = TP)) +
     ggridges::geom_density_ridges(scale = scale) +
+    ggplot2::scale_x_continuous(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")")) +
     ggplot2::theme(text = ggplot2::element_text(size = text_size),
                 panel.grid.major.x = ggplot2::element_line(colour = "grey"),
                 panel.grid.major.y = ggplot2::element_blank(),
                 panel.background = ggplot2::element_rect(fill = "white"),
                 axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
-                legend.position = "none") + ggplot2::scale_y_discrete(name = plot_by) +
+                legend.position = "none") + ggplot2::scale_y_discrete(name = split_bias_over) +
                 ggplot2::coord_cartesian(clip = "off")
-                # ggplot2::annotate("text",x = Inf, y = -Inf, label = selection_1, size = 8,hjust = 5, vjust = -1)+
-                # ggplot2::annotate("text",x = -Inf, y = -Inf, label = selection_2, size = 8, hjust = -7, vjust = -1)
-                # # The hjust above needs to be able to scale to different x limits
   }
 
 p
