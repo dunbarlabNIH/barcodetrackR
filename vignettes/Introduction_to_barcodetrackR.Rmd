@@ -344,7 +344,10 @@ clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type
 ```
 
 
-## `bray_curtis`
+## `mds_plot`
+Measures of simmilarity or dissimialrity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data. 
+
+
 
 
 ## `rank_abundance`
