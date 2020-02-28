@@ -1,12 +1,13 @@
 ---
 title: "barcodetrackR"
-#date: "`r format(Sys.Date(), "%d %B %Y")`"
+date: (`r format(Sys.Date(), "%d %B %Y")`)
 output:
   rmdformats::readthedown:
     self_contained: true
     thumbnails: false
     lightbox: false
     css: readthedown_custom_2.css
+  github_document: default
 ---
 
 
@@ -170,7 +171,7 @@ cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `barcode_ggheatmap`
 
-A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. Our function `barcode_ggheatmap` does this by choosing the top N clones (`n_clones`) within each sample and tracking them over time. The argument `n_clones` assumes that in most cases, the large-contributing clones are of most interest to the user. This assumption can be relaxed by passing a large value to the argument. 
+A useful visualization to study clonal patterns over time is by using a heat map which clusters the top clones based on relatedness and displays their proportion in each sample over time. Our function `barcode_ggheatmap` does this by choosing the top N clones (`n_clones`) within each sample and tracking them over time. The argument `n_clones` assumes that in most cases, the large-contributing clones are of most interest to the user. This assumption can be relaxed by passing a large value to the argument.
 
 We first visualize the top 10 clones from the selected samples in the Wu dataset. The default cell note is stars for the top 10 clones in each sample.
 
@@ -259,7 +260,7 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `ridge_plot`
 
-The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as log(selection_1/selection_2 + 1) so that it can handle clones which are zero in one of the samples. If the `"plot_by"` argument is provided, the ridge plot will have a y axis corresponding to samples along the variable provided which must be a column of colData. 
+The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as log(selection_1/selection_2 + 1) so that it can handle clones which are zero in one of the samples. If the `"plot_by"` argument is provided, the ridge plot will have a y axis corresponding to samples along the variable provided which must be a column of colData.
 
 Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
@@ -320,7 +321,7 @@ suppressMessages(plot(six_ridge_plot))
 # Diversity
 
 ## `rank_abundance`
-A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted), or by scaling all ranks to the range [0,1]. 
+A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted), or by scaling all ranks to the range [0,1].
 
 We plot all samples from the Belderbos dataset. Note that the week 10 and 14 samples appear to have the most _evenness_ across detected clones, while the other samples contain both large and small detected clones.
 ```{r belderbos rank_abundance, eval = TRUE}
@@ -353,7 +354,7 @@ clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type
 
 
 ## `mds_plot`
-Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data. 
+Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data.
 
 One of the most commonly used beta-diversity indices is the (Bray-Curtis Dissimilarity)[https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity]. Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
 ```{r wu bray diversity, eval = TRUE}

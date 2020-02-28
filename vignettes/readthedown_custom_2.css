@@ -1,3 +1,37 @@
+#sidebar h2{
+    background: url("monkey.png");
+    background-size: 65%;
+    background-position: center top;
+    background-color:#9bd1e0;
+    padding-bottom:0.809em;
+    display:flex;
+    font-size: 28px;
+    text-align: left top;
+    margin-bottom:0.809em;
+    padding:0.809em;
+    padding-top: 200px !important;
+    background-repeat: no-repeat;
+    margin-top: 0px;
+    z-index:200;
+}
+
+
+#sidebar {
+    position:fixed;
+    top:0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height:100%;
+    background:#282525;
+    z-index:200;
+    font-size: 16px;
+}
+
+h1,h2,h3,h4,h5,h6,legend{
+    color:#fffff;
+}
+
 #main .nav-pills > li.active > a,
 #main .nav-pills > li.active > a:hover,
 #main .nav-pills > li.active > a:focus {
@@ -6,10 +40,6 @@
 
 #main .nav-pills > li > a:hover {
   background-color: #000000;
-}
-
-h1,h2,h3,h4,h5,h6,legend{
-    color: #000000;
 }
 
 #nav-top span.glyphicon {
@@ -37,40 +67,3 @@ a:visited{
     color:#000000
 }
 
-#sidebar header{
-    height:32px;
-    display:inline-block;
-    line-height:32px;
-    padding:0 1.618em;
-    display:block;
-    font-weight:bold;
-    text-transform:uppercase;
-    font-size:80%;
-    color:#011F5b;
-    white-space:nowrap
-}
-
-
-#sidebar {
-    position:fixed;
-    top:0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height:100%;
-    background:#282525;
-    z-index:200;
-    font-size: 16px;
-}
-
-#sidebar h2{
-    z-index:200;
-    background-color:#011F5b;
-    text-align:center;
-    padding:0.809em;
-    display:block;
-    color:#fcfcfc;
-    font-size: 100%;
-    margin-top: 0px;
-    margin-bottom:0.809em;
-}
