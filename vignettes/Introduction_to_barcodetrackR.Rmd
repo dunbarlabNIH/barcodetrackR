@@ -319,6 +319,9 @@ suppressMessages(plot(six_ridge_plot))
 
 # Diversity
 
+## `rank_abundance`
+A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted).
+
 ## `clonal_diversity`
 Within-sample diversity indices (also referred to as alpha diversities) are indices computed independently for each sample in a data set. With clonal tracking, these diversity indices can give a global indication about the number of species in a sample using the number of detected species as input and sometimes also leveraging the proportional abundances of species within the sample. We include the function `clonal_diversity` which can calculate three diversity indices (making use the [`vegan`](https://cran.r-project.org/web/packages/vegan/) package):
 
@@ -345,12 +348,19 @@ clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type
 
 
 ## `mds_plot`
-Measures of simmilarity or dissimialrity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data. 
+Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data. 
+
+One of the most commonly used beta-diversity indices is the (Bray-Curtis Dissimilarity)[https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity]. Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
+```{r wu bray diversity, eval = TRUE}
+mds_plot(wu_SE, label_by = "celltype", method_dist = "bray", assay = "percentages")
+```
+
+When using the Bray-Curtis dissimilarity index between all of the samples in the Six dataset, we find that similarly to the Wu dataset, NK cells appear dissimilar from the remainder of the celltypes, while Monocytes and Granulocytes appear most similar to one another.
+```{r six bray diversity, eval = TRUE}
+mds_plot(six_SE, label_by = "celltype", method_dist = "bray", assay = "percentages")
+```
 
 
-
-
-## `rank_abundance`
 
 # Circos
 
