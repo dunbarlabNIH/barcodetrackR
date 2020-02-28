@@ -1,36 +1,40 @@
-#' Rank Abundance
+#' Rank abundance plot
 #'
-#' Rank-Abundance Plot of the Barcodes for each sample chosen. Uses the cumulative sum so that all
+#' Rank abundance Plot of the Barcodes for each sample chosen. Uses the cumulative sum so that all
 #' samples eventually reach 100%.
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
-#'@param dot_size Numeric. Size of the points.
-#'@param text_size Numeric. Size of text in plot.
+#'@param point_size Numeric. Size of the points.
+#'@param your_title The title for the plot.
+#'@param scale_rank Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.
 #'@return Displays a rank-abundance plot (made by ggplot2) of the samples chosen.
-#'@examples
-#'rank_abundance_plot(your_data = zh33_Tlineage[,c(1,2,4)], dot_size = 4)
+#'
+#'@importFrom magrittr %>%
+#'
 #'@export
-rank_abundance_plot <- function(your_data, dot_size = 5, text_size = 10){
-  data_list <- list()
-  your_data <- your_data[rowSums(your_data) != 0,]
-  your_data <- data.frame(100*prop.table(as.matrix(your_data), margin = 2))
-  for(i in 1:ncol(your_data)){
-    data_list[[i]] <- your_data[,i,drop = FALSE]
-    data_list[[i]] <- data_list[[i]][data_list[[i]][,1] > 0,,drop = FALSE]
-    data_list[[i]]$Rank <- 100 * 1/nrow(data_list[[i]])
-    data_list[[i]] <- data_list[[i]][order(-data_list[[i]][,1]),]
-    data_list[[i]][,1] <- cumsum(data_list[[i]][,1])
-    data_list[[i]][,2] <- cumsum(data_list[[i]][,2])
-    data_list[[i]][,3] <- colnames(data_list[[i]])[1]
-    rownames(data_list[[i]]) <- NULL
-    colnames(data_list[[i]]) <- c("Prop", "Rank", "Sample")
-  }
-  your_data <- do.call(rbind, data_list)
+#'
+#'@examples
+#'rank_abundance_plot(your_data = wu_SE, point_size = 4)
+rank_abundance_plot = function(your_SE,
+                               point_size = 3,
+                               your_title = NULL,
+                               scale_rank = FALSE) {
 
-  ggplot2::ggplot(data = your_data, ggplot2::aes(x = Rank, y = Prop, group = Sample))+
-    ggplot2::geom_point(ggplot2::aes(fill = Sample, colour = Sample), shape = 21, size = dot_size)+
+  your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
+
+  lapply(1:ncol(your_data), function(i){
+    tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%
+      dplyr::filter(percentage > 0) %>%
+      dplyr::arrange(desc(percentage)) %>%
+      dplyr::mutate(cumulative_sum = cumsum(percentage), rank = dplyr::row_number()) %>%
+      dplyr::mutate(scaled_rank = dplyr::percent_rank(-percentage))
+  }) %>% do.call(rbind, .) %>% dplyr::mutate(sample_name = factor(sample_name, levels = colnames(your_data))) -> plotting_data
+
+  scale_rank_choice <- ifelse(scale_rank, "scaled_rank", "rank")
+
+  ggplot2::ggplot(plotting_data, ggplot2::aes_string(x = scale_rank_choice, y = "cumulative_sum", group = "sample_name", color = "sample_name"))+
+    ggplot2::geom_point(size = point_size)+
     ggplot2::theme_bw()+
-    ggplot2::scale_x_continuous(breaks = seq(0,max(your_data$Rank),by = 10))+
-    ggplot2::scale_y_continuous(breaks = seq(0,100,by = 10))+
-    ggplot2::theme(text = ggplot2::element_text(size = text_size))
+    ggplot2::ggtitle(your_title)+
+    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
 }

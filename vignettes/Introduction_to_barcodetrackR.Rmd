@@ -320,7 +320,12 @@ suppressMessages(plot(six_ridge_plot))
 # Diversity
 
 ## `rank_abundance`
-A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted).
+A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted), or by scaling all ranks to the range [0,1]. 
+
+We plot all samples from the Belderbos dataset. Note that the week 10 and 14 samples appear to have the most _evenness_ across detected clones, while the other samples contain both large and small detected clones.
+```{r belderbos rank_abundance, eval = TRUE}
+rank_abundance_plot(belderbos_SE, scale_rank = TRUE)
+```
 
 ## `clonal_diversity`
 Within-sample diversity indices (also referred to as alpha diversities) are indices computed independently for each sample in a data set. With clonal tracking, these diversity indices can give a global indication about the number of species in a sample using the number of detected species as input and sometimes also leveraging the proportional abundances of species within the sample. We include the function `clonal_diversity` which can calculate three diversity indices (making use the [`vegan`](https://cran.r-project.org/web/packages/vegan/) package):

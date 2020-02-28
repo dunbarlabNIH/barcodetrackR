@@ -2,24 +2,31 @@
 % Please edit documentation in R/rank_abundance.R
 \name{rank_abundance_plot}
 \alias{rank_abundance_plot}
-\title{Rank Abundance}
+\title{Rank abundance plot}
 \usage{
-rank_abundance_plot(your_data, dot_size = 5, text_size = 10)
+rank_abundance_plot(
+  your_SE,
+  point_size = 3,
+  your_title = NULL,
+  scale_rank = FALSE
+)
 }
 \arguments{
+\item{point_size}{Numeric. Size of the points.}
+
+\item{your_title}{The title for the plot.}
+
+\item{scale_rank}{Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.}
+
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
-
-\item{dot_size}{Numeric. Size of the points.}
-
-\item{text_size}{Numeric. Size of text in plot.}
 }
 \value{
 Displays a rank-abundance plot (made by ggplot2) of the samples chosen.
 }
 \description{
-Rank-Abundance Plot of the Barcodes for each sample chosen. Uses the cumulative sum so that all
+Rank abundance Plot of the Barcodes for each sample chosen. Uses the cumulative sum so that all
 samples eventually reach 100%.
 }
 \examples{
-rank_abundance_plot(your_data = zh33_Tlineage[,c(1,2,4)], dot_size = 4)
+rank_abundance_plot(your_data = wu_SE, point_size = 4)
 }
