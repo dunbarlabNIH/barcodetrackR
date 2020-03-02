@@ -7,8 +7,8 @@
 ternary_plot(
   your_SE,
   show_arrows = FALSE,
-  show_ticks = TRUE,
-  density_mode = FALSE
+  show_ticks = FALSE,
+  density_mode = TRUE
 )
 }
 \arguments{

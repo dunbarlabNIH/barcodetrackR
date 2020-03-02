@@ -257,7 +257,6 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 # Clonal Bias
 
 ## `bias_histogram`
-
 The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
 ```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
@@ -285,7 +284,6 @@ bias_histogram(your_SE = six_SE,
 ```
 
 ## `ridge_plot`
-
 An alternative to the histogram is a ridge plot which shows clonal bias between cell types through a density estimation of the number of clones at each value of the log bias. Since the ridge plot treats clonal bias as a continuous variable, it can reveal trends that are masked by grouping into bins with a histogram. 
 
 It is important to note that in order to handle clones which have a count of zero in one of the samples, log+1 normalization is used within the ridge plot function. This differs from the histogram where these clones can be grouped into the farthest bins on either side. The log bias formula for the ridge plot function is given by:
@@ -295,41 +293,41 @@ $logbias=log(\frac{count_1+1}{count_2+1})$
 Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset.
 
 ```{r ridge_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
-
 wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
                             split_bias_on = "celltype",
                             bias_1 = "B",
                             bias_2 = "T",
-                            split_bias_over = "months",
-                            only_both = TRUE,
-                            weighted = TRUE)
+                            split_bias_over = "months")
 
 suppressMessages(plot(wu_ridge_plot)) # Supress message on which bandwith is chosen
-
 ```
 
 ## `bias_distribution_barplot`
 
 ```{r bias_distribution_barplot wu_SE, echo=TRUE, warning = FALSE, eval = FALSE}
-
-bias_distribution_barplot(your_SE = wu_SE[,wu_ridge_plot_sample_selection],
+bias_distribution_barplot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
                split_bias_on = "celltype",
                bias_1 = "B",
                split_bias_over = "months")
 ```
 
-Right now, error in line 52. Will come back to this.
+Right now, error in line 52 that I can't figure out.
 
 ## `ternary_plot`
-
-A ternary plot can be made for any SE with just 3 samples in it. 
+A ternary plot can be made to visualize shared clonality between three samples. The default for the function is to plot the density of clones. To instead, see the actual clones as dots, the `"density_mode"` argument can be set to FALSE.
 
 ```{r ternary_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_ternary_plot_sample_selection <- c("ZJ31_6m_Gr", "ZJ31_6m_B", "ZJ31_6m_T")
 ternary_plot(your_SE = wu_SE[,wu_ternary_plot_sample_selection])
 ```
 
-For now, I just quickly changed the current ternary_plot to accept SE as input. Plenty of room for improvement on this function. I still think we should include it because it's used in a lot of papers.
+A ternary plot for the first three samples from the Six dataset.
+
+```{r ternary_plot six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+ternary_plot(six_SE[,1:3])
+```
+
+This function needs a lot of work, and I will re-visit. But for now, I just made it compatible with the SummarizedExperiment. I think the ternary plot is still worth including and that the density mode should be the default mode.
 
 # Diversity
 
@@ -365,7 +363,6 @@ Similar to the Wu dataset, the Six dataset contains clonal tracking information 
 clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type = "shannon")
 ```
 
-
 ## `mds_plot`
 Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data.
 
@@ -380,12 +377,48 @@ mds_plot(six_SE, label_by = "celltype", method_dist = "bray", assay = "percentag
 ```
 
 
+# Circos plot
 
-# Circos
+The circos plot is a fun way to view relationships between variables. We make use of the [circlize package](https://jokergoo.github.io/circlize_book/book/graphics.html) to show shared clones between compartments as links between regions around a circle. Here, we will start by subetting our data to a single timepoint and comparing just three cell types: T cells, B cells, and Granulocytes. 
 
-# Utilities
+```{r circos_plot wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
+wu_circos_selection <- c("ZJ31_12m_T","ZJ31_12m_B","ZJ31_12m_Gr")
+circos_plot(wu_SE[,wu_circos_selection], plot_label = "celltype")
+```
 
+Here, we can see that most clones are present in all three cell types (*purple link*). There are also clones shared between each pair-wise combination of cell types. Based on the width of the links, you can ascertain that more clones are shared between Granulocytes and B cells (*yellow link*), followed by B cells and T cells (*blue link*), then T cells and Granulocytes (*green link*). The portion of each cell type without a link (*empty space*) represents the number of clones which are unique to that cell type.
 
+We can also create a weighted circos plot. The difference is that in the previous plot, the width of the links between cell types are proportional to the *number of clones* shared between those cell types. In the weighted heat map, the width of the links between two cell types is proportional to the *proportion of contribution* of the shared clones to the overall hematopoiesis in that cell type.
 
+```{r circos_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
+circos_plot(wu_SE[,wu_circos_selection], plot_label = "celltype", weighted = TRUE)
+```
 
+In this example, the circos plots look very similar. But you can see the subtle difference when you look at the blue link showing clones shared between B and T cells. The link is wider when connecting to T cells because the shared Bcell-Tcell clones represent a larger fraction of detected hematopoiesis in the T cell compartment than the B cell compartment. 
+
+The circos plot can handle any number of inputs but keep in mind that the number of unique combinations rises exponentially with the number of compartments. Here, we use the alpha parameter to control the transparency of the links. And we plot four cell types rather than three.
+
+```{r circos_plot wu_SE 3, echo=TRUE, warning = FALSE, eval = TRUE}
+wu_circos_selection2 <- c("ZJ31_12m_T","ZJ31_12m_B","ZJ31_12m_Gr","ZJ31_12m_NK_CD56n_CD16p")
+circos_plot(wu_SE[,wu_circos_selection2], plot_label = "celltype", alpha = 0.9)
+```
+
+The plot is quite involved, but we can quickly draw a few high-level conclusions. A large chunk of clones are shared between all four cell types (*darkest purple color*). Another large chunk of clones is shared between B cells, T cells, and Grans but not NK cells (*lighter purple*). Note that each unique color signifies a unique combination of the four cell types. 
+
+The regions of the circos plot need not be cell types. They could also be timepoints. Here, we show that example using the belderbos dataset from mouse studies showing only the first four timepoints of peripheral blood samples.
+
+```{r circos_plot belderbos_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
+belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+circos_plot(belderbos_SE[,belderbos_wk_samples_PB])
+```
+
+From the circos plot, we can see that the wk10 and wk14 timepoints have fewer number of clones detected, as indicated by their smaller bars around the perimeter. There are some clones shared between all timepoints (*dark purple links*) but most of the clones appear to be present in the wk20, wk27, and wk33 samples but not the wk10 and wk14 (*green and yellow links*).
+
+```{r circos_plot belderbos_SE 2, echo=TRUE, warning = FALSE, eval=TRUE}
+circos_plot(belderbos_SE[,belderbos_wk_samples_PB], weighted = TRUE)
+```
+
+When looking at the weighted heat map, one sees that the majority of hematopoiesis in timepoints past 10 weeks is accounted for by the group of clones (*turquoise color*) that are present at all timepoints except for the wk10 timepoint. There are some clones present at all timepoints (*dark purple*) and the green and yellow links mostly represent fraction of hematopoiesis in the later timepoints coming from clones first detected at wk14 or wk20. 
+
+From this example, one can see that the two plots paint different but complementary pictures. With the regular circos plot, clones are treated as equal so the information on fractional contribution is lost. However, the number of detected clones is indicated by the length of each region around the perimeter of the circos. This information can be useful for some studies and it is lost in the weighted heat map since all compartments poportion adds to 100%. We recommend using the regular and circos plot in combination to obtain maximal information from any given dataset.
 
