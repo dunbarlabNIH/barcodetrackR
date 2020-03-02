@@ -8,7 +8,7 @@
 #'@param density_mode Logical. Uses a kernel density estimation to view concentrations of clones.
 #'@return Displays a ternary plot in the current plot window.
 #'@examples
-#'ternary_plot(your_SE = zh33, dot_size = 1000, density_mode = TRUE)
+#'ternary_plot(your_SE = zh33, density_mode = TRUE)
 #'@export
 ternary_plot <- function(your_SE, show_arrows = FALSE, show_ticks = FALSE, density_mode = TRUE){
   
