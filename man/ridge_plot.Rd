@@ -11,6 +11,7 @@ ridge_plot(
   bias_2,
   split_bias_over,
   bias_over = NULL,
+  remove_unique = FALSE,
   weighted = F,
   text_size = 16,
   scale = 1
@@ -28,6 +29,8 @@ ridge_plot(
 \item{split_bias_over}{The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.}
 
 \item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
+
+\item{remove_unique}{If set to true, only clones present in both samples will be considered.}
 
 \item{weighted}{If true, the density estimation will be weighted by the overall contribution of each barcode}
 

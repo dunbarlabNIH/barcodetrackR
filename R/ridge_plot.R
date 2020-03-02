@@ -8,12 +8,15 @@
 #'@param bias_2 The second cell type to be compared. Will be on the LEFT side of the ridge plot
 #'@param split_bias_over The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
+#'@param remove_unique If set to true, only clones present in both samples will be considered. 
 #'@param weighted If true, the density estimation will be weighted by the overall contribution of each barcode
 #'@param text_size The size of the text in the plot.
 #'@param scale Sets the overlap between ridges. Larger values give more overlap. 
 #'@return Bias plot for two lineages over time.
 #'
 #'@importFrom dplyr rename
+#'@importFrom dplyr group_by
+#'@importFrom rlang %||%
 #'@import ggridges
 #'@import ggplot2
 #'
@@ -26,6 +29,7 @@ ridge_plot <- function(your_SE,
                        bias_2,
                        split_bias_over,
                        bias_over = NULL,
+                       remove_unique = FALSE,
                        weighted = F,
                        text_size = 16,
                        scale = 1){
@@ -85,6 +89,11 @@ ridge_plot <- function(your_SE,
   your_data_list <- lapply(2*(1:(ncol(your_data)/2)), function(i){
     temp <- as.data.frame(as.matrix(your_data[,c(i-1,i)])) #subset the data
     temp <- temp[rowSums(temp) > 0,] # only keep barcodes with non-zero values for this pair
+    
+    if (remove_unique == TRUE){
+      temp <- temp[!(apply(temp, 1, function(y) any(y == 0))),]
+    }
+    
     temp <- as.data.frame(prop.table(as.matrix(temp+1), margin = 2)) # Add 1 to all values
     colnames(temp) <- c("F", "S")
     temp$added_prop <- rowSums(temp)

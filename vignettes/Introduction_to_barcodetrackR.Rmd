@@ -261,6 +261,7 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
 ```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+
 wu_bias_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 
 bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
@@ -269,9 +270,10 @@ bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
                bias_2 = "T",
                split_bias_over = "months",
                ncols = 2)
+
 ```
 
-Similarly, for the Six, et al data.
+The stacked bars of the histogram represent individual clones. For the Wu dataset, there are a multitude of small clones so the stacked bars are not visible. We can view clonal bias between B and T cells from the Six, et al dataset which has a smaller number of larger clones.
 
 ```{r bias_histogram six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 bias_histogram(your_SE = six_SE,
@@ -284,22 +286,26 @@ bias_histogram(your_SE = six_SE,
 
 ## `ridge_plot`
 
-The ridge plot function calculates the density of clones at different values of bias between two selections. Note that log_bias is calculated as:
+An alternative to the histogram is a ridge plot which shows clonal bias between cell types through a density estimation of the number of clones at each value of the log bias. Since the ridge plot treats clonal bias as a continuous variable, it can reveal trends that are masked by grouping into bins with a histogram. 
+
+It is important to note that in order to handle clones which have a count of zero in one of the samples, log+1 normalization is used within the ridge plot function. This differs from the histogram where these clones can be grouped into the farthest bins on either side. The log bias formula for the ridge plot function is given by:
 
 $logbias=log(\frac{count_1+1}{count_2+1})$
-
-so that it can handle clones which are zero in one of the samples.
 
 Here, we view a ridge plot showing clonal bias between B and T cells from the Wu dataset.
 
 ```{r ridge_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+
 wu_ridge_plot <- ridge_plot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
                             split_bias_on = "celltype",
                             bias_1 = "B",
                             bias_2 = "T",
-                            split_bias_over = "months")
+                            split_bias_over = "months",
+                            only_both = TRUE,
+                            weighted = TRUE)
 
 suppressMessages(plot(wu_ridge_plot)) # Supress message on which bandwith is chosen
+
 ```
 
 ## `bias_distribution_barplot`
