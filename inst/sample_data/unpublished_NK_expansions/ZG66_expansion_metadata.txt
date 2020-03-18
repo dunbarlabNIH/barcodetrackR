@@ -1,0 +1,8 @@
+SAMPLENAME	monkey	timepoint	days	condition	celltype
+ZG66_7day	ZG66	7d	7	LCL	bulk_NK
+ZG66_10day	ZG66	10d	10	LCL	bulk_NK
+ZG66_14day	ZG66	14d	14	LCL	bulk_NK
+ZG66_18day	ZG66	18d	18	LCL	bulk_NK
+ZG66_21day	ZG66	21d	21	LCL	bulk_NK
+ZG66_25day	ZG66	25d	25	LCL	bulk_NK
+ZG66_28day	ZG66	28d	28	LCL	bulk_NK
