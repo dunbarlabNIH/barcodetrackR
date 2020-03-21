@@ -8,7 +8,8 @@
 #'@param stat_option For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.
 #'@param stat_ref Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
-#'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
+#'@param top_n_significant The top 'n' clones with statistically significant change in proportion, to show for each sample. This argument must be specified when stat_display is set to "change," "increase," or "decrease."
+#'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the top_n_significant argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
@@ -43,6 +44,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    stat_option = "subsequent",
                                    stat_ref = NULL,
                                    stat_display = "top",
+                                   top_n_significant = 10,
                                    show_all_significant = FALSE,
                                    p_threshold = 0.05,
                                    plot_labels = NULL,
@@ -67,9 +69,6 @@ barcode_ggheatmap_stat <- function(your_SE,
     stop("plot_labels must be same length as number of columns being plotted")
   }
   
-  # set column names as plot_labels
-  colnames(your_SE) <- plot_labels
-
   #error checking
   if (stat_test != "prop.test"){
     stop("The only available command (for now) for stat_test is 'prop.test' which implements a two-proportions Z test.")
@@ -79,36 +78,127 @@ barcode_ggheatmap_stat <- function(your_SE,
     stop("percent_scale and color_scale must be vectors of the same length.")
   }
 
-  #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
-  if(row_order == "hierarchical" | row_order == "emergence") {
 
-    # If stat_display is set to "top", we only have to perform statistical testing on the top_n barcodes for each sample.
-    if (stat_display == "top"){
-      top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
-      your_SE <- your_SE[top_clones_choices,]
-    }
+  # If stat_display is set to "top", we only have to perform statistical testing on the top_n barcodes for each sample.
+  if (stat_display == "top"){
+    top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
+    your_SE <- your_SE[top_clones_choices,]
     
     # Perform statistical testing
-    p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initiliaze matrix to store p values
+    p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initialize matrix to store p values
     
     if (stat_option == "subsequent"){
       p_mat[,1] <- rep(1, times = nrow(your_SE)) # Fill first row with p value of 1
       for (i in 2:length(colnames(your_SE))){
         p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                     SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
                                                                    n = c(sample_size[i],sample_size[i-1]))$p.value)
+      } 
+    } else if (stat_option == "reference"){
+      stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
+      # Error checking
+      if (stat_ref_choice %in% colnames(your_SE) == FALSE){
+        stop("stat_ref must be a column name in your_SE")
+      }
+      stat_test_index <- 1:length(colnames(your_SE))
+      stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
+      stat_test_index <- stat_test_index[!stat_test_index %in% stat_ref_index] # Remove reference column
+      p_mat[,stat_ref_index] <- rep(1, times = nrow(your_SE)) # Fill reference column with p value of 1
+      # Perform statistical test
+      for (i in stat_test_index){
+        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                   n = c(sample_size[i],sample_size[stat_ref_index]))$p.value)
       }
     }
     
     # Add results of statistical testing into SE
     SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    
+  } else if (stat_display == "change" | stat_display == "increase" | stat_display == "decrease"){
+    # Must perform statistical testing on all rows in order to rank most significant
+    p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initialize matrix to store p values
+    if (stat_option == "subsequent"){
+      stat_ref_index <- 1 # for book-keeping
+      stat_test_index <- 2:length(colnames(your_SE))
+      p_mat[,1] <- rep(1, times = nrow(your_SE)) # Fill first row with p value of 1
+      for (i in stat_test_index){
+        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                   n = c(sample_size[i],sample_size[i-1]))$p.value)
+      } 
+    } else if (stat_option == "reference"){
+      stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
+      # Error checking
+      if (stat_ref_choice %in% colnames(your_SE) == FALSE){
+        stop("stat_ref must be a column name in your_SE")
+      }
+      stat_test_index <- 1:length(colnames(your_SE))
+      stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
+      stat_test_index <- stat_test_index[!stat_test_index %in% stat_ref_index] # Remove reference column
+      p_mat[,stat_ref_index] <- rep(1, times = nrow(your_SE)) # Fill reference column with p value of 1
+      # Perform statistical test
+      for (i in stat_test_index){
+        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                   n = c(sample_size[i],sample_size[stat_ref_index]))$p.value)
+      }
+    }
+    
+    # Add results of statistical testing into SE
+    SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    
+    # Create reference table for increasing or decreasing clones
+    if (stat_display == "increase" | stat_display == "decrease"){
+      increase_matrix = SummarizedExperiment::assays(your_SE)$percentages # Initialize
+      increase_matrix[,stat_ref_index] <- rep("filler", times = nrow(your_SE))
+      for (i in stat_test_index){
+        increase_matrix[,i] <- SummarizedExperiment::assays(your_SE)$percentages[,i] > SummarizedExperiment::assays(your_SE)$percentages[,stat_ref_index]
+      }
+      SummarizedExperiment::assays(your_SE)$increasing <- increase_matrix
+    }
+    
+    # Artificially set p-values to one for decreasing fold changes when the stat_display is set to increasing
+    p_mat_fake <- p_mat
+    if (stat_display == "increase"){
+      for (i in stat_test_index){
+        p_mat_fake[,i][increase_matrix[,i] == FALSE] <- rep(1,length(p_mat_fake[,i][increase_matrix[,i] == FALSE]))
+      }
+    } else if (stat_display == "decrease"){
+      for (i in stat_test_index){ 
+      p_mat_fake[,i][increase_matrix[,i] == TRUE] <- rep(1,length(p_mat_fake[,i][increase_matrix[,i] == TRUE]))
+      }
+    }
+    SummarizedExperiment::assays(your_SE)$p_val_fake <- p_mat_fake
+    
+    stat_significant_clones <- apply(SummarizedExperiment::assays(your_SE)$p_val_fake, 1, function(x){any(x<=p_threshold, na.rm = TRUE)})
+    your_SE <- your_SE[stat_significant_clones,]
+    
+    p_val_ranks <-  as.data.frame(apply(SummarizedExperiment::assays(your_SE)$p_val, 2, rank, ties.method = "min", na.last = "keep"))
+    p_val_ranks[,stat_ref_index] <- rep(top_n_significant + 1, nrow(your_SE))
+    SummarizedExperiment::assays(your_SE)$p_val_ranks <- p_val_ranks
+    
+    if (show_all_significant == FALSE){
+      top_significant_clone_choices <- apply(SummarizedExperiment::assays(your_SE)$p_val_ranks, 1, function(x){any(x<=top_n_significant, na.rm = TRUE)})
+      your_SE <- your_SE[top_significant_clone_choices,]
+    }
+  }
 
+  
+
+
+
+    
+    
     #creates data frame with '*' for those cells w/ top clones, "NA" for those who are not. Then adds this back to the SE.
     cellnote_matrix = SummarizedExperiment::assays(your_SE)$p_val
     cellnote_matrix[cellnote_matrix > p_threshold] <- NA
     cellnote_matrix[cellnote_matrix <= p_threshold] <- "*"
     SummarizedExperiment::assays(your_SE)$stars <- as.data.frame(cellnote_matrix)
 
+    #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
+    if(row_order == "hierarchical" | row_order == "emergence") {
+    
     #this does the heavy duty plotting set-up. It sets the order of the data on the heatmap and the dendrogram/cluster cuts
     if(row_order == "hierarchical"){
       clustering_data <- SummarizedExperiment::assays(your_SE)[["logs"]]
@@ -135,8 +225,10 @@ barcode_ggheatmap_stat <- function(your_SE,
     your_SE <- your_SE[row_order,]
     barcode_order <- row_order
   }
-
-
+    
+  # set column names as plot_labels
+  colnames(your_SE) <- plot_labels
+    
   #create scale for plotting
   log_used <- S4Vectors::metadata(your_SE)$log_base
   scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
@@ -150,7 +242,9 @@ barcode_ggheatmap_stat <- function(your_SE,
 
   #organizing labels for plotting overlay
   plotting_cellnote <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[[cellnote_assay]], var = "sequence")
-  plotting_cellnote <- plotting_cellnote %>% dplyr::mutate_all(as.character)
+  if(cellnote_assay == "stars"){
+    plotting_cellnote <- plotting_cellnote %>% dplyr::mutate_all(as.character)
+  }
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
   if(is.numeric(plotting_data$cellnote)){
