@@ -4,7 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param sample_size A numeric vector providing the sample size of each column of the SummarizedExperiment passed to the function. This sample size describes the samples that the barcoding data is meant to approximate.
-#'@param stat_test The statistical test to compare samples. Right now, the only option is the two proportions z test, implemented by the prop.test function. 
+#'@param stat_test The statistical test to use on the constructed contingency table for each barcoe. Options are "chi-squared" and "fisher."
 #'@param stat_option For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.
 #'@param stat_ref Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
@@ -40,7 +40,7 @@
 #'
 barcode_ggheatmap_stat <- function(your_SE,
                                    sample_size,
-                                   stat_test = "prop.test",
+                                   stat_test = "chi-squared",
                                    stat_option = "subsequent",
                                    stat_ref = NULL,
                                    stat_display = "top",
@@ -70,8 +70,8 @@ barcode_ggheatmap_stat <- function(your_SE,
   }
   
   #error checking
-  if (stat_test != "prop.test"){
-    stop("The only available command (for now) for stat_test is 'prop.test' which implements a two-proportions Z test.")
+  if (stat_test != "chi-squared" & stat_test != "fisher"){
+    stop("stat_test must be either 'chi-squared' or 'fisher'.")
   }
   
   if(length(percent_scale) != length(color_scale)){
@@ -84,15 +84,26 @@ barcode_ggheatmap_stat <- function(your_SE,
     top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
     your_SE <- your_SE[top_clones_choices,]
     
-    # Perform statistical testing
-    p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initialize matrix to store p values
+    # Initialize p value matrix
+    p_mat <- SummarizedExperiment::assays(your_SE)$percentages 
     
     if (stat_option == "subsequent"){
+      stat_ref_index <- 1 # for book-keeping
+      stat_test_index <- 2:length(colnames(your_SE))
       p_mat[,1] <- rep(1, times = nrow(your_SE)) # Fill first row with p value of 1
-      for (i in 2:length(colnames(your_SE))){
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                   n = c(sample_size[i],sample_size[i-1]))$p.value)
+      for (i in stat_test_index){
+        # Perform statistical test
+        if (stat_test == "chi-squared"){
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        }
+        
       } 
     } else if (stat_option == "reference"){
       stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
@@ -104,12 +115,22 @@ barcode_ggheatmap_stat <- function(your_SE,
       stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
       stat_test_index <- stat_test_index[!stat_test_index %in% stat_ref_index] # Remove reference column
       p_mat[,stat_ref_index] <- rep(1, times = nrow(your_SE)) # Fill reference column with p value of 1
-      # Perform statistical test
+      
       for (i in stat_test_index){
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                   n = c(sample_size[i],sample_size[stat_ref_index]))$p.value)
+        # Perform statistical test compared to reference
+        if (stat_test == "chi-squared"){
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+        } else if (stat_test == "fisher") {
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+        }
       }
+      
     }
     
     # Add results of statistical testing into SE
@@ -123,9 +144,18 @@ barcode_ggheatmap_stat <- function(your_SE,
       stat_test_index <- 2:length(colnames(your_SE))
       p_mat[,1] <- rep(1, times = nrow(your_SE)) # Fill first row with p value of 1
       for (i in stat_test_index){
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                   n = c(sample_size[i],sample_size[i-1]))$p.value)
+        # Perform statistical test
+        if (stat_test == "chi-squared"){
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        } else if (stat_test == "fisher") {
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        }
       } 
     } else if (stat_option == "reference"){
       stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
@@ -139,9 +169,18 @@ barcode_ggheatmap_stat <- function(your_SE,
       p_mat[,stat_ref_index] <- rep(1, times = nrow(your_SE)) # Fill reference column with p value of 1
       # Perform statistical test
       for (i in stat_test_index){
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) prop.test(x = c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                         SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                   n = c(sample_size[i],sample_size[stat_ref_index]))$p.value)
+        # Perform statistical test compared to reference
+        if (stat_test == "chi-squared"){
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+        } else if (stat_test == "fisher") {
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
+                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+      }
       }
     }
     
@@ -185,10 +224,7 @@ barcode_ggheatmap_stat <- function(your_SE,
   }
 
   
-
-
-
-    
+# Below here is normal barcode_ggheatmap
     
     #creates data frame with '*' for those cells w/ top clones, "NA" for those who are not. Then adds this back to the SE.
     cellnote_matrix = SummarizedExperiment::assays(your_SE)$p_val
