@@ -27,5 +27,5 @@ Displays a ternary plot in the current plot window.
 Creates a ternary plot showing the bias of clones towards one of three axes.
 }
 \examples{
-ternary_plot(your_SE = zh33, dot_size = 1000, density_mode = TRUE)
+ternary_plot(your_SE = zh33, density_mode = TRUE)
 }

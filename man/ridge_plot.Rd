@@ -12,9 +12,10 @@ ridge_plot(
   split_bias_over,
   bias_over = NULL,
   remove_unique = FALSE,
-  weighted = F,
+  weighted = FALSE,
   text_size = 16,
-  scale = 1
+  scale = 1,
+  add_dots = FALSE
 )
 }
 \arguments{

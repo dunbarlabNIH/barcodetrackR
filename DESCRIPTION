@@ -38,7 +38,7 @@ Imports:
     treemap,
     vegan,
     xtable
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Suggests: 
     BiocStyle,
     knitr,
