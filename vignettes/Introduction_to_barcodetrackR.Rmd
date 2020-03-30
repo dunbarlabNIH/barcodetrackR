@@ -266,7 +266,7 @@ wu_bias_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
                split_bias_on = "celltype",
                bias_1 = "B",
-               bias_2 = "T",
+               bias_2 = "Gr",
                split_bias_over = "months",
                ncols = 2)
 
