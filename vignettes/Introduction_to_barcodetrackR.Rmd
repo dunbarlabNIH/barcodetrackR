@@ -182,7 +182,7 @@ barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
                   cellnote_size = 4)
 ```
 
-We can also visualize the percentage contribution of each of these clones and add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype.
+We can also add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype. The dendrograms make it easily to visually categorize groups of similar clones.
 
 ```{r barcode_ggheatmap six_SE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
 six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
@@ -194,17 +194,15 @@ six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
 
 barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   n_clones = 5,
-                  cellnote_assay = "percentages",
-                  cellnote_size = 2,
+                  cellnote_assay = "stars",
+                  cellnote_size = 6,
                   label_size = 14,
                   dendro = TRUE,
                   clusters = 4,
                   distance_method = "euclidean")
 ```
 
-Splitting the clones into 4 clusters makes it easy to identify clones which are biased towards Monocytes (*purple*), T cells (*green*), NK cells (*light blue*), and B cell / Granulocyte (*red*).
-
-The Belderbros dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  When possible, using the "percentages" option of the `cellnote_assay` aqrgument provides maximal information.
+The Belderbos dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  When possible, using the "percentages" option of the `cellnote_assay` argument provides maximal information.
 
 ```{r barcode_ggheatmap belderbos_SE, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
 belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
@@ -216,6 +214,32 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   cellnote_assay = "percentages",
                   clusters = 4)
 ```
+
+##`barcode_ggheatmap_stat`
+
+In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells for which the barcoding data approximates clonality. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints, using a sample size of 10,000 barcoded cells.
+
+The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. 
+
+```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
+                      "ZJ31_6m_NK_CD56n_CD16p", "ZJ31_8.5m_NK_CD56n_CD16p",
+                      "ZJ31_9.5m_NK_CD56n_CD16p", "ZJ31_12m_NK_CD56n_CD16p",
+                      "ZJ31_17.5m_NK_CD56n_CD16p", "ZJ31_20m_NK_CD56n_CD16p")
+
+barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
+                       sample_size = rep(5000,length(wu_CD16_NK_order)),
+                       stat_test = "chi-squared",
+                       stat_option = "subsequent",
+                       p_threshold = 0.05,
+                       n_clones = 10,
+                       cellnote_assay = "stars",
+                       cellnote_size = 8,
+                       label_size = 14,
+                       dendro = TRUE,
+                       clusters = 3)
+```
+
 
 ## `barcode_binary_heatmap`
 

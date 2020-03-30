@@ -63,6 +63,9 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
                                    color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
   
+  # Remove elements of SE where all counts are 0
+  your_SE <- your_SE[rowSums(your_SE@assays@data$counts) > 0, ]
+  
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
   if(length(plot_labels) != ncol(your_SE)){
