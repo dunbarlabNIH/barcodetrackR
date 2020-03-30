@@ -328,14 +328,14 @@ Right now, error in line 52 that I can't figure out.
 ## `ternary_plot`
 A ternary plot can be made to visualize shared clonality between three samples. The default for the function is to plot the density of clones. To instead, see the actual clones as dots, the `"density_mode"` argument can be set to FALSE.
 
-```{r ternary_plot wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+```{r ternary_plot wu_SE, echo=TRUE, warning = FALSE, eval = FALSE}
 wu_ternary_plot_sample_selection <- c("ZJ31_6m_Gr", "ZJ31_6m_B", "ZJ31_6m_T")
 ternary_plot(your_SE = wu_SE[,wu_ternary_plot_sample_selection])
 ```
 
 A ternary plot for the first three samples from the Six dataset.
 
-```{r ternary_plot six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+```{r ternary_plot six_SE, echo=TRUE, warning = FALSE, eval = FALSE}
 ternary_plot(six_SE[,1:3])
 ```
 
