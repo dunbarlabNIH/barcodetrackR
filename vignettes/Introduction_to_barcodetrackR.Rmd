@@ -254,7 +254,7 @@ clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                     plot_non_selected = FALSE)
 ```
 
-# Clonal Bias
+# Clonal bias
 
 ## `bias_histogram`
 The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.

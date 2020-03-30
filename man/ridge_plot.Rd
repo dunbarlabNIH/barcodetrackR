@@ -14,7 +14,6 @@ ridge_plot(
   remove_unique = FALSE,
   weighted = FALSE,
   text_size = 16,
-  scale = 1,
   add_dots = FALSE
 )
 }
@@ -37,7 +36,7 @@ ridge_plot(
 
 \item{text_size}{The size of the text in the plot.}
 
-\item{scale}{Sets the overlap between ridges. Larger values give more overlap.}
+\item{add_dots}{Whether or not to add dots underneath the density plots.}
 }
 \value{
 Bias plot for two lineages over time.

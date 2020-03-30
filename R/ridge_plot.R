@@ -11,11 +11,9 @@
 #'@param remove_unique If set to true, only clones present in both samples will be considered.
 #'@param weighted If true, the density estimation will be weighted by the overall contribution of each barcode
 #'@param text_size The size of the text in the plot.
-#'@param scale Sets the overlap between ridges. Larger values give more overlap.
+#'@param add_dots Whether or not to add dots underneath the density plots.
 #'@return Bias plot for two lineages over time.
 #'
-#'@importFrom dplyr rename
-#'@importFrom dplyr group_by
 #'@importFrom rlang %||%
 #'@import ggridges
 #'@import ggplot2
@@ -32,7 +30,6 @@ ridge_plot <- function(your_SE,
                        remove_unique = FALSE,
                        weighted = FALSE,
                        text_size = 16,
-                       scale = 1,
                        add_dots = FALSE){
 
   # Basic error handling
@@ -82,6 +79,10 @@ ridge_plot <- function(your_SE,
     loop_bias_1 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_1) %>% dplyr::pull("SAMPLENAME") %>% as.character()
     loop_bias_2 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_2) %>% dplyr::pull("SAMPLENAME") %>% as.character()
     temp_your_data <- your_data[,c(loop_bias_1, loop_bias_2)]
+    temp_your_data <- temp_your_data[rowSums(temp_your_data) > 0,]
+    if(remove_unique){
+      temp_your_data <- temp_your_data[rowSums(temp_your_data > 0) == 2,]
+    }
     temp_bias <- log2((temp_your_data[,loop_bias_1] + 1)/(temp_your_data[,loop_bias_2]+1))
     temp_cumsum <- rowSums(temp_your_data)
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumsum = temp_cumsum))

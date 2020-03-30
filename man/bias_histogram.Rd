@@ -11,6 +11,7 @@ bias_histogram(
   bias_2,
   split_bias_over,
   bias_over = NULL,
+  remove_unique = FALSE,
   breaks = c(10, 2, 1, 0.5),
   text_size = 10,
   linesize = 0.4,
@@ -31,6 +32,8 @@ bias_histogram(
 
 \item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
+\item{remove_unique}{If set to true, only clones present in both samples will be considered.}
+
 \item{breaks}{Numeric. The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).}
 
 \item{text_size}{The size of the text in the plot.}
@@ -39,7 +42,7 @@ bias_histogram(
 
 \item{ncols}{Numeric. Number of columns to plot on using plot_grid from cowplot.}
 
-\item{same_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
+\item{scale_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
 }
 \value{
 Histogram of log bias for two factors over another set of factors.
