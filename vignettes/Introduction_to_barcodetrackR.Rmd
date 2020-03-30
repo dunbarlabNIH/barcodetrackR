@@ -49,6 +49,7 @@ require("SummarizedExperiment")
 For this vignette, we will load publically available data from the following papers (these sample datasets are included in the R package):
 
 * [Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology (2018)](http://dx.doi.org/10.1126/sciimmunol.aat9781)
+* [Koelle, Samson J., et al. "Quantitative stability of hematopoietic stem and progenitor cell clonal output in rhesus macaques receiving transplants." Blood (2017)](https://doi.org/10.1182/blood-2016-07-728691)
 * [Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation (2020)](http://dx.doi.org/10.1016/j.bbmt.2019.08.026)
 * [Six, Emmanuelle, et al. "Clonal tracking in gene therapy patients reveals a diversity of human hematopoietic differentiation programs." Blood (2020)](http://doi.org/10.1182/blood.2019002350)
 
@@ -64,6 +65,15 @@ wu_SE <- create_SE(your_data = wu_dataframe,
                    meta_data = wu_metadata,
                    threshold = 0)
 
+system.file("sample_data/KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> koelle_dataframe
+
+system.file("sample_data/KoelleSJ/ZH33_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> koelle_metadata
+
+koelle_SE <- create_SE(your_data = koelle_dataframe,
+                       meta_data = koelle_metadata,
+                       threshold = 0)
 
 system.file("sample_data/BelderbosME_etal/mouse_UBC_C22.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> belderbos_dataframe
@@ -402,7 +412,7 @@ clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type
 ## `mds_plot`
 Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data.
 
-One of the most commonly used beta-diversity indices is the (Bray-Curtis Dissimilarity)[https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity]. Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
+One of the most commonly used beta-diversity indices is the [Bray-Curtis Dissimilarity](https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity). Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
 ```{r wu bray diversity, eval = TRUE}
 mds_plot(wu_SE, label_by = "celltype", method_dist = "bray", assay = "percentages")
 ```
