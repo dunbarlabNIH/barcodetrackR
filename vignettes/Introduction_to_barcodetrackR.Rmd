@@ -227,11 +227,11 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `barcode_ggheatmap_stat`
 
-In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells for which the barcoding data approximates clonality. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints, using a sample size of 10,000 barcoded cells.
+In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells which the barcoding data approximates. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints, using a sample size of 5,000 barcoded cells per sample.
 
-The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. 
+The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. Users can view the p-value from the statistical test on the hatmap by changing the `cellnote_assay` parameter to `"p_val"`. Users can also compare each sample to a reference sample (such as the first timepoint) by changing the `stat_option` to `"reference"` and providing the desired sample name to the `reference_sample` parameter.
 
-```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 10, fig.height=7}
 wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
                       "ZJ31_6m_NK_CD56n_CD16p", "ZJ31_8.5m_NK_CD56n_CD16p",
                       "ZJ31_9.5m_NK_CD56n_CD16p", "ZJ31_12m_NK_CD56n_CD16p",
@@ -245,9 +245,22 @@ barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                        n_clones = 10,
                        cellnote_assay = "stars",
                        cellnote_size = 8,
-                       label_size = 14,
-                       dendro = TRUE,
-                       clusters = 3)
+                       label_size = 16)
+```
+
+Users can also return the results from the statistical test using the `barcode_statistics` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample. It is important to set this parameter to avoid long computation times. 
+
+Here we make statistical comparisons on the CD16+ NK samples form the Wu dataset. 
+
+```{r barcode_statistics wu_SE, eval = FALSE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+
+wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
+                                            sample_size = rep(5000,length(wu_CD16_NK_order)),
+                                            stat_test = "chi-squared",
+                                            stat_option = "subsequent",
+                                            bc_threshold = 0.001)
+
+head(wu_CD16_NK_statistics$p_val[,4:8])
 ```
 
 
@@ -365,19 +378,6 @@ bias_lineplot(your_SE = koelle_SE,
 ```
 
 
-
-## `bias_distribution_barplot`
-
-```{r bias_distribution_barplot wu_SE, echo=TRUE, warning = FALSE, eval = FALSE}
-bias_distribution_barplot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
-               split_bias_on = "celltype",
-               bias_1 = "B",
-               split_bias_over = "months")
-```
-
-Right now, error in line 52 that I can't figure out.
-
-
 # Diversity
 
 ## `rank_abundance`
@@ -402,14 +402,16 @@ As an example, we can plot the shannon diversities for the 5 cell types within t
 clonal_diversity(wu_SE[,1:20], plot_over = "months", group_by = "celltype", index_type = "shannon")
 ```
 
-Here we show the simpson indices for the unsorted samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their simpson indices.
-```{r belderbos simpson, eval = TRUE}
-clonal_diversity(belderbos_SE, plot_over = "weeks", group_by = "cell.type", index_type = "simpson")
+Here we show the simpson indices for the unsorted samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their shannon indices.
+
+```{r belderbos shannon, eval = TRUE}
+clonal_diversity(belderbos_SE, plot_over = "weeks", group_by = "cell.type", index_type = "shannon")
 ```
 
-Similar to the Wu dataset, the Six dataset contains clonal tracking information for the T, B, Gr, Monocyte, and NK lineages. We can plot these over time as well and interstingly observe that the shannon diversity of the NK cell fraction follows a similar pattern to that of the Wu dataset.
-```{r six shannon, eval = TRUE}
-clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type = "shannon")
+Similar to the Wu dataset, the Six dataset contains clonal tracking information for the T, B, Gr, Monocyte, and NK lineages. We can plot these over time as well and utilize the simpson index as a measure of diversity. 
+
+```{r six simpson, eval = TRUE}
+clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type = "simpson")
 ```
 
 ## `mds_plot`

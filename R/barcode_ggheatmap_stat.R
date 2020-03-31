@@ -6,14 +6,14 @@
 #'@param sample_size A numeric vector providing the sample size of each column of the SummarizedExperiment passed to the function. This sample size describes the samples that the barcoding data is meant to approximate.
 #'@param stat_test The statistical test to use on the constructed contingency table for each barcoe. Options are "chi-squared" and "fisher."
 #'@param stat_option For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.
-#'@param stat_ref Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
+#'@param reference_sample Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
-#'@param top_n_significant The top 'n' clones with statistically significant change in proportion, to show for each sample. This argument must be specified when stat_display is set to "change," "increase," or "decrease."
-#'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the top_n_significant argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
+#'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
+#'@param bc_threshold Clones must be above this proportion in at least one sample to be included in statistical testing.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "reads", or "percentages" or "p_val"
+#'@param cellnote_assay Character. One of "stars", "reads", "percentages" or "p_val"
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
@@ -36,17 +36,17 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+#'barcode_ggheatmap(your_SE = ZH33_SE, sample_size = rep(5000,ncol(ZH33_SE)), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars")
 #'
 barcode_ggheatmap_stat <- function(your_SE,
                                    sample_size,
                                    stat_test = "chi-squared",
                                    stat_option = "subsequent",
-                                   stat_ref = NULL,
+                                   reference_sample = NULL,
                                    stat_display = "top",
-                                   top_n_significant = 10,
                                    show_all_significant = FALSE,
                                    p_threshold = 0.05,
+                                   bc_threshold = 0,
                                    plot_labels = NULL,
                                    n_clones = 10,
                                    cellnote_assay = "stars",
@@ -63,8 +63,9 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
                                    color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
   
-  # Remove elements of SE where all counts are 0
-  your_SE <- your_SE[rowSums(your_SE@assays@data$counts) > 0, ]
+  # Apply bc_threshold
+  bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$percentages, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
+  your_SE <- your_SE[bc_passing_threshold,]
   
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
@@ -74,7 +75,11 @@ barcode_ggheatmap_stat <- function(your_SE,
   
   #error checking
   if (stat_test != "chi-squared" & stat_test != "fisher"){
-    stop("stat_test must be either 'chi-squared' or 'fisher'.")
+    stop("stat_test must be either 'chi-squared' or 'fisher' for now.")
+  }
+  
+  if (cellnote_assay != "stars" & cellnote_assay != "reads" & cellnote_assay != "percentages" & cellnote_assay != "p_val"){
+    stop("cellnote_assay must be one of 'stars', 'reads', 'percentages' or 'p_val'. ")
   }
   
   if(length(percent_scale) != length(color_scale)){
@@ -101,6 +106,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
                                                                                   sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        } else if (stat_test == "fisher") {
           p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
@@ -109,10 +115,10 @@ barcode_ggheatmap_stat <- function(your_SE,
         
       } 
     } else if (stat_option == "reference"){
-      stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
+      stat_ref_choice <- reference_sample %||% colnames(your_SE)[1]
       # Error checking
       if (stat_ref_choice %in% colnames(your_SE) == FALSE){
-        stop("stat_ref must be a column name in your_SE")
+        stop("reference_sample must be a column name in your_SE")
       }
       stat_test_index <- 1:length(colnames(your_SE))
       stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
@@ -161,10 +167,10 @@ barcode_ggheatmap_stat <- function(your_SE,
         }
       } 
     } else if (stat_option == "reference"){
-      stat_ref_choice <- stat_ref %||% colnames(your_SE)[1]
+      stat_ref_choice <- reference_sample %||% colnames(your_SE)[1]
       # Error checking
       if (stat_ref_choice %in% colnames(your_SE) == FALSE){
-        stop("stat_ref must be a column name in your_SE")
+        stop("reference_sample must be a column name in your_SE")
       }
       stat_test_index <- 1:length(colnames(your_SE))
       stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
@@ -183,7 +189,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                                                                    SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
                                                                                  c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
                                                                                    sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
-      }
+        }
       }
     }
     
@@ -217,11 +223,11 @@ barcode_ggheatmap_stat <- function(your_SE,
     your_SE <- your_SE[stat_significant_clones,]
     
     p_val_ranks <-  as.data.frame(apply(SummarizedExperiment::assays(your_SE)$p_val, 2, rank, ties.method = "min", na.last = "keep"))
-    p_val_ranks[,stat_ref_index] <- rep(top_n_significant + 1, nrow(your_SE))
+    p_val_ranks[,stat_ref_index] <- rep(n_clones + 1, nrow(your_SE))
     SummarizedExperiment::assays(your_SE)$p_val_ranks <- p_val_ranks
     
     if (show_all_significant == FALSE){
-      top_significant_clone_choices <- apply(SummarizedExperiment::assays(your_SE)$p_val_ranks, 1, function(x){any(x<=top_n_significant, na.rm = TRUE)})
+      top_significant_clone_choices <- apply(SummarizedExperiment::assays(your_SE)$p_val_ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
       your_SE <- your_SE[top_significant_clone_choices,]
     }
   }
@@ -231,8 +237,12 @@ barcode_ggheatmap_stat <- function(your_SE,
     
     #creates data frame with '*' for those cells w/ top clones, "NA" for those who are not. Then adds this back to the SE.
     cellnote_matrix = SummarizedExperiment::assays(your_SE)$p_val
+    # Convert NaNs to NAs
+    cellnote_matrix[cellnote_matrix == "NaN"] = NA
     cellnote_matrix[cellnote_matrix > p_threshold] <- NA
     cellnote_matrix[cellnote_matrix <= p_threshold] <- "*"
+    # Make sure the stat_ref_index column is a charcter type not double
+    cellnote_matrix[,stat_ref_index] <- rep(NA, nrow(cellnote_matrix))
     SummarizedExperiment::assays(your_SE)$stars <- as.data.frame(cellnote_matrix)
 
     #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
@@ -281,9 +291,6 @@ barcode_ggheatmap_stat <- function(your_SE,
 
   #organizing labels for plotting overlay
   plotting_cellnote <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[[cellnote_assay]], var = "sequence")
-  if(cellnote_assay == "stars"){
-    plotting_cellnote <- plotting_cellnote %>% dplyr::mutate_all(as.character)
-  }
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
   if(is.numeric(plotting_data$cellnote)){
@@ -295,8 +302,6 @@ barcode_ggheatmap_stat <- function(your_SE,
       plotting_data$cellnote <- round(plotting_data$cellnote, digits = 2)
     }
   }
-
-
 
   if(grid) grid_color = "black" else grid_color = NA
 
