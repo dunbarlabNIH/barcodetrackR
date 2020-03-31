@@ -104,7 +104,7 @@ bias_lineplot <- function(your_SE,
     ggplot2::theme(text = ggplot2::element_text(size = text_size),
                    axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
                    legend.position = "right",
-                   legend.title = "Added Proportions")
+                   legend.title = ggplot2::element_text("Added Proportions"))
 
   if(keep_numeric & is.numeric(bias_over)){
     g <- g + ggplot2::scale_x_continuous(name = split_bias_over, breaks = bias_over)

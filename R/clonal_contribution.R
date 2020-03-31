@@ -25,14 +25,14 @@
 #'@export
 
 clonal_contribution <- function(your_SE,
-                                SAMPLENAME_choice = NULL,
+                                SAMPLENAME_choice,
+                                filter_by,
+                                filter_selection,
+                                plot_over,
+                                plot_over_display_choices = NULL,
                                 clone_sequences = NULL,
                                 n_clones = 10,
                                 graph_type = "bar",
-                                filter_by = NULL,
-                                filter_selection = NULL,
-                                plot_over,
-                                plot_over_display_choices = NULL,
                                 keep_numeric = TRUE,
                                 plot_non_selected = TRUE,
                                 linesize = 0.2,
@@ -46,16 +46,14 @@ clonal_contribution <- function(your_SE,
   if(any(! c(plot_over) %in% coldata_names)){
     stop("plot_over must match a column name in colData(your_SE)")
   }
-  if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
-    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
-  } else {
-    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
-  }
   if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) != 1){
-    stop("please specify only ONE of SAMPLENAME_choice or clone_sequences")
+    stop("please specify only one of SAMPLENAME_choice or clone_sequences")
   }
-  if (is.null(filter_by) == TRUE & is.null(filter_selection) == FALSE){
-    stop("filter_selection cannot be specified if filter_by is not specified.")
+  if(any(! c(filter_by) %in% coldata_names)){
+    stop("filter_by must match a column name in colData(your_SE)")
+  }
+  if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
+    stop("filter_selection must be an element in the colData column specified with filter_by")
   }
 
   #get appropriate rows to use in plotting
@@ -67,26 +65,21 @@ clonal_contribution <- function(your_SE,
     stop("one of SAMPLENAME_choice or clone_sequences must be not-NULL")
   }
 
-  # Filter by specified
-  if (is.null(filter_by) == FALSE){
-    # error handling
-    if(any(! c(filter_by) %in% coldata_names)){
-      stop("filter_by must match a column name in colData(your_SE)")
-    }
-    if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
-      stop("filter_selection must be an element in the colData column specified with filter_by")
-    }
-    #select those samples which to plot_over and to filter_by
-    temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices) & (your_SE[[filter_by]] == filter_selection)]
-    temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
-    #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
-    if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
-      stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
-    }
+
+  #select those samples which to plot_over and to filter_by
+  temp_subset <- your_SE[,your_SE[[filter_by]] == filter_selection]
+  if(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]])){
+    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(temp_subset)[[plot_over]]))
   } else {
-    # Filter by not specified
-    temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
-    temp_subset_coldata <- SummarizedExperiment::colData(temp_subset)
+    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(temp_subset)[[plot_over]])
+  }
+  temp_subset <- temp_subset[,temp_subset[[plot_over]] %in% plot_over_display_choices]
+  temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% as.data.frame() %>% dplyr::mutate_if(is.factor,as.character)
+
+
+  #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
+  if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
+    stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
   }
 
   #fetch percentages and turn sample_name into the plot_over equivalents
@@ -96,13 +89,13 @@ clonal_contribution <- function(your_SE,
     tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%
     dplyr::mutate(fill_label = ifelse(sequence %in% selected_sequences, sequence, "other")) %>%
     dplyr::mutate(fill_label = factor(fill_label, levels = c(selected_sequences, "other"))) %>%
-    dplyr::mutate(sample_name = plyr::mapvalues(sample_name, rownames(temp_subset_coldata), temp_subset_coldata[[plot_over]]))
+    dplyr::left_join(temp_subset_coldata %>% dplyr::rename(sample_name = SAMPLENAME), by = "sample_name") %>%
+    dplyr::mutate(sample_name = !!as.name(plot_over))
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
     plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(sample_name)))
   } else {
     plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
   }
-
 
   #set up appropriate levels in plotting the selected elements and specify the colors
   if(plot_non_selected){
@@ -144,11 +137,12 @@ clonal_contribution <- function(your_SE,
    g <- g + ggplot2::coord_cartesian(ylim = c(0, y_limit))
   }
 
+
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
     g + ggplot2::scale_x_continuous(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices) +
       ggplot2::theme(legend.position="none")
   } else {
-    g + ggplot2::scale_x_discrete(paste0(plot_over), labels = plot_over_display_choices) +
+    g + ggplot2::scale_x_discrete(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices) +
       ggplot2::theme(legend.position="none")
   }
 }

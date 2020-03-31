@@ -151,10 +151,10 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          plot_type = "color")
 ```
 
-We can also use the spearman correlation as our metric of interest, and visualize our correlation plot using circles with areas proportional to the absolute value of the correlation and colors corresponding to the value of the correlations.
+A number of options are included; here we plot the Koelle dataset for all included samples and observe the high pairwise correlation of Monocyte and Granulocyte samples.
 ```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
-cor_plot(wu_SE[,wu_cor_plot_sample_selection],
-         method_corr = "spearman",
+cor_plot(koelle_SE,
+         method_corr = "pearson",
          plot_type = "circle")
 ```
 
@@ -225,7 +225,7 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   clusters = 4)
 ```
 
-##`barcode_ggheatmap_stat`
+## `barcode_ggheatmap_stat`
 
 In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells for which the barcoding data approximates clonality. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints, using a sample size of 10,000 barcoded cells.
 
@@ -267,26 +267,30 @@ Another familiar way to visualize clonal patterns over time is using a line or b
 
 ```{r clonal_contribution wu_SE, echo=TRUE, warning = FALSE}
 
-clonal_contribution(your_SE = wu_SE[,17:20],
+clonal_contribution(your_SE = wu_SE,
                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
                     n_clones = 10,
                     graph_type = "line",
                     plot_over = "months",
+                    filter_by = "celltype",
+                    filter_selection = "NK_CD56n_CD16p",
                     plot_non_selected = FALSE)
 ```
 
-The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
+The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample.
 
 For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to false, we can only look at the top 10 clones from the chosen sample and ignore. We can also use categorical spacing on the x-axis rather than numeric by setting keep_numeric to false.
 
 ```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = TRUE}
-clonal_contribution(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
-                    SAMPLENAME_choice = "wk33",
+clonal_contribution(your_SE = belderbos_SE,
+                    SAMPLENAME_choice = "sac",
                     n_clones = 10,
                     graph_type = "bar",
                     plot_over = "weeks",
+                    filter_by = "source",
+                    filter_selection = "PB",
                     keep_numeric = FALSE,
-                    plot_non_selected = FALSE)
+                    plot_non_selected = TRUE)
 ```
 
 # Clonal bias
@@ -337,17 +341,30 @@ ridge_plot(your_SE = wu_SE,
            add_dots = TRUE)
 ```
 
-We again view a comparison in the Wu dataset, this time comparing NK CD56- CD16+ cells to Granulocytes.
+We again view a comparison in the Wu dataset, this time comparing T cells to Granulocytes.
 
 ```{r ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
 ridge_plot(your_SE = wu_SE,
            split_bias_on = "celltype",
-           bias_1 = "NK_CD56n_CD16p",
+           bias_1 = "T",
            bias_2 = "Gr",
            split_bias_over = "months",
            weighted = TRUE,
            add_dots = TRUE)
 ```
+
+## `bias_lineplot`
+In some cases, there may be enough data to observe more interesting longitudinal trends. In the Koelle dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; the clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages seem to have similar abundances in each lineage over time.
+
+```{r bias_lineplot koelle_SE, echo=TRUE, warning = FALSE, eval = TRUE}
+bias_lineplot(your_SE = koelle_SE,
+              split_bias_on = "celltype",
+              bias_1 = "Gr",
+              bias_2 = "Mono",
+              split_bias_over = "months")
+```
+
+
 
 ## `bias_distribution_barplot`
 
@@ -360,21 +377,6 @@ bias_distribution_barplot(your_SE = wu_SE[,wu_bias_plot_sample_selection],
 
 Right now, error in line 52 that I can't figure out.
 
-## `ternary_plot`
-A ternary plot can be made to visualize shared clonality between three samples. The default for the function is to plot the density of clones. To instead, see the actual clones as dots, the `"density_mode"` argument can be set to FALSE.
-
-```{r ternary_plot wu_SE, echo=TRUE, warning = FALSE, eval = FALSE}
-wu_ternary_plot_sample_selection <- c("ZJ31_6m_Gr", "ZJ31_6m_B", "ZJ31_6m_T")
-ternary_plot(your_SE = wu_SE[,wu_ternary_plot_sample_selection])
-```
-
-A ternary plot for the first three samples from the Six dataset.
-
-```{r ternary_plot six_SE, echo=TRUE, warning = FALSE, eval = FALSE}
-ternary_plot(six_SE[,1:3])
-```
-
-This function needs a lot of work, and I will re-visit. But for now, I just made it compatible with the SummarizedExperiment. I think the ternary plot is still worth including and that the density mode should be the default mode.
 
 # Diversity
 
