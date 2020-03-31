@@ -68,7 +68,7 @@ wu_SE <- create_SE(your_data = wu_dataframe,
 system.file("sample_data/KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> koelle_dataframe
 
-system.file("sample_data/KoelleSJ/ZH33_metadata.txt", package = "barcodetrackR") %>%
+system.file("sample_data/KoelleSJ_etal/ZH33_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> koelle_metadata
 
 koelle_SE <- create_SE(your_data = koelle_dataframe,
