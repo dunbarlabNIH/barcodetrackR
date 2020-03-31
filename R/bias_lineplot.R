@@ -98,13 +98,12 @@ bias_lineplot <- function(your_SE,
   g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = plot_over, y = bias, color = cumul_sum, group = barcode)) +
     ggplot2::geom_line()+
     ggplot2::geom_point()+
-    ggplot2::scale_color_gradient(low = "gray85", high = "black")+
+    ggplot2::scale_color_gradient(name = "Added Proportions", low = "gray85", high = "black")+
     ggplot2::scale_y_continuous(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")")) +
     ggplot2::theme_classic()+
     ggplot2::theme(text = ggplot2::element_text(size = text_size),
                    axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
-                   legend.position = "right",
-                   legend.title = ggplot2::element_text("Added Proportions"))
+                   legend.position = "right")
 
   if(keep_numeric & is.numeric(bias_over)){
     g <- g + ggplot2::scale_x_continuous(name = split_bias_over, breaks = bias_over)
