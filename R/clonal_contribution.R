@@ -124,7 +124,7 @@ clonal_contribution <- function(your_SE,
       ggplot2::geom_col(colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
-      ggplot2::theme_bw()+
+      ggplot2::theme_classic()+
       ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
                      plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
@@ -134,7 +134,7 @@ clonal_contribution <- function(your_SE,
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
-      ggplot2::theme_bw()+
+      ggplot2::theme_classic()+
       ggplot2::ggtitle(your_title)+
       ggplot2::theme(text = ggplot2::element_text(size=text_size),
                      plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())

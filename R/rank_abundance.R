@@ -34,7 +34,7 @@ rank_abundance_plot = function(your_SE,
 
   ggplot2::ggplot(plotting_data, ggplot2::aes_string(x = scale_rank_choice, y = "cumulative_sum", group = "sample_name", color = "sample_name"))+
     ggplot2::geom_point(size = point_size)+
-    ggplot2::theme_bw()+
+    ggplot2::theme_classic()+
     ggplot2::ggtitle(your_title)+
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
 }

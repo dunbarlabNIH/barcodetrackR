@@ -10,6 +10,7 @@
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
 #'@param remove_unique If set to true, only clones present in both samples will be considered.
 #'@param text_size The size of the text in the plot.
+#'@param keep_numeric Whether to keep the numeric spacing within split_bias_over or switch to discrete x scale
 #'@return Bias line plot for two lineages over time.
 #'
 #'@importFrom rlang %||%
@@ -25,9 +26,8 @@ bias_lineplot <- function(your_SE,
                        split_bias_over,
                        bias_over = NULL,
                        remove_unique = FALSE,
-                       weighted = FALSE,
                        text_size = 16,
-                       add_dots = FALSE){
+                       keep_numeric = TRUE){
 
   # Basic error handling
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -81,26 +81,35 @@ bias_lineplot <- function(your_SE,
       temp_your_data <- temp_your_data[rowSums(temp_your_data > 0) == 2,]
     }
     temp_bias <- log2((temp_your_data[,loop_bias_1] + 1)/(temp_your_data[,loop_bias_2]+1))
-    temp_cumsum <- rowSums(temp_your_data)
+    temp_cumsum <- rowSums(prop.table(as.matrix(temp_your_data), margin = 2))
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
     do.call(rbind, .) %>%
-    dplyr::mutate(plot_over = factor(plot_over, levels = bias_over)) %>%
     dplyr::group_by(barcode) %>%
-    dplyr::mutate(full_abundance = sum(cumul_sum)) %>%
-    dplyr::arrange(full_abundance) %>%
+    dplyr::mutate(peak_abundance = max(cumul_sum)) %>%
+    dplyr::arrange(peak_abundance) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(barcode = factor(barcode, levels = unique(barcode)))-> plotting_data
 
+  if(!keep_numeric & is.numeric(bias_over)){
+    plotting_data$plot_over <- factor(plotting_data$plot_over, levels = bias_over)
+  }
 
-
-  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = plot_over, y = bias, color = full_abundance, group = barcode)) +
+  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = plot_over, y = bias, color = cumul_sum, group = barcode)) +
     ggplot2::geom_line()+
-    ggplot2::scale_color_viridis_c()+
+    ggplot2::geom_point()+
+    ggplot2::scale_color_gradient(low = "gray85", high = "black")+
     ggplot2::scale_y_continuous(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")")) +
+    ggplot2::theme_classic()+
     ggplot2::theme(text = ggplot2::element_text(size = text_size),
-                   panel.background = ggplot2::element_rect(fill = "white"),
                    axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90),
-                   legend.position = "right")
+                   legend.position = "right",
+                   legend.title = "Added Proportions")
+
+  if(keep_numeric & is.numeric(bias_over)){
+    g <- g + ggplot2::scale_x_continuous(name = split_bias_over, breaks = bias_over)
+  } else {
+    g <- g + ggplot2::scale_x_discrete(name = split_bias_over)
+  }
   g
 }
