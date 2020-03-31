@@ -85,20 +85,20 @@ ridge_plot <- function(your_SE,
     }
     temp_bias <- log2((temp_your_data[,loop_bias_1] + 1)/(temp_your_data[,loop_bias_2]+1))
     temp_cumsum <- rowSums(temp_your_data)
-    return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumsum = temp_cumsum))
+    return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
     do.call(rbind, .) %>%
     dplyr::mutate(plot_over = factor(plot_over, levels = bias_over)) -> plotting_data
 
   # Weighted ridge plot
   if (weighted){
-    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., weight = cumsum, fill = plot_over))
+    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., weight = cumul_sum, fill = plot_over))
   } else {
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., fill = plot_over))
   }
   if(add_dots){
     g <- g +
-      ggplot2::geom_point(data = plotting_data, ggplot2::aes(x = bias, y = plot_over, size = cumsum), inherit.aes = FALSE)
+      ggplot2::geom_point(data = plotting_data, ggplot2::aes(x = bias, y = plot_over, size = cumul_sum), inherit.aes = FALSE)
   }
 
   g +

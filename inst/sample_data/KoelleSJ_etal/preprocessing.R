@@ -13,9 +13,9 @@ colnames(raw_koelle_data) <- plyr::mapvalues(colnames(raw_koelle_data),
                                              to = koelle_metadata$SAMPLENAME)
 
 koelle_metadata %>%
-  dplyr::rename(month = MONTH, celltype = CELLTYPE) %>%
-  dplyr::select(SAMPLENAME, month, celltype) -> koelle_metadata
-
+  dplyr::rename(months = MONTH, celltype = CELLTYPE) %>%
+  dplyr::select(SAMPLENAME, months, celltype) -> koelle_metadata
+rownames(koelle_metadata) <- koelle_metadata$SAMPLENAME
 
 write.table(file = "inst/sample_data/KoelleSJ_etal/ZH33_reads.txt", raw_koelle_data, sep = '\t', quote = FALSE)
 write.table(file = "inst/sample_data/KoelleSJ_etal/ZH33_metadata.txt", koelle_metadata, sep = '\t', quote = FALSE)
