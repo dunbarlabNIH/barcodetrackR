@@ -271,7 +271,8 @@ clonal_contribution(your_SE = wu_SE[,17:20],
                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
                     n_clones = 10,
                     graph_type = "line",
-                    plot_over = "months")
+                    plot_over = "months",
+                    plot_non_selected = FALSE)
 ```
 
 The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample. The gray clones are other smaller clones which are found in the CD16+ samples at any of the four timepoints.
