@@ -153,11 +153,11 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 A number of options are included; here we plot the Koelle dataset for all included samples and observe the high pairwise correlation of Monocyte and Granulocyte samples.
 ```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
-cor_plot(six_SE[,16:20],
+cor_plot(six_SE[,10:20],
          method_corr = "pearson",
          plot_type = "circle",
          label_size = 12,
-         point_scale = 20)
+         point_scale = 8)
 ```
 
 We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
