@@ -15,7 +15,8 @@ cor_plot(
   no_negatives = FALSE,
   return_table = FALSE,
   color_scale = "default",
-  number_size = 3
+  number_size = 3,
+  point_scale = 1
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ cor_plot(
 \item{color_scale}{Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.}
 
 \item{number_size}{Size of the text label when plot_type is "number".}
+
+\item{point_scale}{The size of the largest point if the plot_type is "circle"}
 }
 \value{
 Plots pairwise correlation plot for the samples in your_SE.
