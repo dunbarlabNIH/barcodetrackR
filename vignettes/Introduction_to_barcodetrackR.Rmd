@@ -251,7 +251,7 @@ Users can also return the results from the statistical test using the `barcode_s
 
 Here we make statistical comparisons on the CD16+ NK samples form the Wu dataset. 
 
-```{r barcode_statistics wu_SE, eval = FALSE, echo=TRUE, warning = FALSE}
+```{r barcode_statistics wu_SE, eval = TRUE, echo=TRUE, warning = FALSE}
 
 wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
                                             sample_size = rep(5000,length(wu_CD16_NK_order)),
@@ -259,7 +259,7 @@ wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
                                             stat_option = "subsequent",
                                             bc_threshold = 0.001)
 
-head(wu_CD16_NK_statistics$p_val[,4:8])
+head(wu_CD16_NK_statistics$p_val[,4:5])
 ```
 
 
@@ -275,7 +275,7 @@ barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 ## `clonal_contribution`
 
-Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for wu data, we could see that there are some large uni-lineage CD56-/CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD56-/CD16+ NK cell samples across time.
+Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for wu data, we could see that there are some large uni-lineage CD56-/CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD56-/CD16+ NK cell samples across time. Each color indicates one of the top clones from the final timepoint.
 
 ```{r clonal_contribution wu_SE, echo=TRUE, warning = FALSE}
 
@@ -289,9 +289,7 @@ clonal_contribution(your_SE = wu_SE,
                     plot_non_selected = FALSE)
 ```
 
-The colored clones represent the top 10 clones in the 20 month CD56-/CD16+ NK sample.
-
-For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to false, we can only look at the top 10 clones from the chosen sample and ignore. We can also use categorical spacing on the x-axis rather than numeric by setting keep_numeric to false.
+For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to True, we can see all clones as stacks on the bar but only color the top 10 clones from the chosen sample. We can also use categorical spacing on the x-axis rather than numeric by setting `keep_numeric` to false.
 
 ```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 clonal_contribution(your_SE = belderbos_SE,
