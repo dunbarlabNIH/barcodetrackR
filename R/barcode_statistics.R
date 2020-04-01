@@ -1,6 +1,6 @@
-#' Barcode Top Clone Heatmap
+#' Barcode Statistics
 #'
-#' Creates a heatmap from the columns of data in the Summarized Experiment object, with the option to label based on statistical analysis. Uses ggplot2.
+#' Calculates statistical testing comparing each barcode between samples.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param sample_size A numeric vector providing the sample size of each column of the SummarizedExperiment passed to the function. This sample size describes the samples that the barcoding data is meant to approximate.

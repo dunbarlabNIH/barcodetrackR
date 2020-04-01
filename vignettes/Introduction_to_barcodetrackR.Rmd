@@ -152,7 +152,7 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 ```
 
 A number of options are included; here we plot the Koelle dataset for all included samples and observe the high pairwise correlation of Monocyte and Granulocyte samples.
-```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
+```{r cor_plot 2, eval = TRUE, fig.width = 12, fig.height = 10, warning=FALSE, message=FALSE}
 cor_plot(koelle_SE,
          method_corr = "pearson",
          plot_type = "circle")
@@ -244,15 +244,14 @@ barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                        p_threshold = 0.05,
                        n_clones = 10,
                        cellnote_assay = "stars",
-                       cellnote_size = 8,
-                       label_size = 16)
+                       cellnote_size = 6)
 ```
 
 Users can also return the results from the statistical test using the `barcode_statistics` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample. It is important to set this parameter to avoid long computation times. 
 
 Here we make statistical comparisons on the CD16+ NK samples form the Wu dataset. 
 
-```{r barcode_statistics wu_SE, eval = FALSE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
+```{r barcode_statistics wu_SE, eval = FALSE, echo=TRUE, warning = FALSE}
 
 wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
                                             sample_size = rep(5000,length(wu_CD16_NK_order)),

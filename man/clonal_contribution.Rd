@@ -6,14 +6,14 @@
 \usage{
 clonal_contribution(
   your_SE,
-  SAMPLENAME_choice = NULL,
+  SAMPLENAME_choice,
+  filter_by,
+  filter_selection,
+  plot_over,
+  plot_over_display_choices = NULL,
   clone_sequences = NULL,
   n_clones = 10,
   graph_type = "bar",
-  filter_by = NULL,
-  filter_selection = NULL,
-  plot_over,
-  plot_over_display_choices = NULL,
   keep_numeric = TRUE,
   plot_non_selected = TRUE,
   linesize = 0.2,
@@ -27,10 +27,6 @@ clonal_contribution(
 
 \item{SAMPLENAME_choice}{The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.}
 
-\item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.}
-
-\item{graph_type}{Choice of "bar" or "line" for how to display the clonal contribution data}
-
 \item{filter_by}{Name of metadata column to filter by e.g. Lineage}
 
 \item{filter_selection}{The value of the filter column to display e.g. "T" (within Lineage)}
@@ -38,6 +34,10 @@ clonal_contribution(
 \item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. Month}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.}
+
+\item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.}
+
+\item{graph_type}{Choice of "bar" or "line" for how to display the clonal contribution data}
 
 \item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
 

@@ -9,11 +9,11 @@ barcode_ggheatmap_stat(
   sample_size,
   stat_test = "chi-squared",
   stat_option = "subsequent",
-  stat_ref = NULL,
+  reference_sample = NULL,
   stat_display = "top",
-  top_n_significant = 10,
   show_all_significant = FALSE,
   p_threshold = 0.05,
+  bc_threshold = 0,
   plot_labels = NULL,
   n_clones = 10,
   cellnote_assay = "stars",
@@ -40,19 +40,19 @@ barcode_ggheatmap_stat(
 
 \item{stat_option}{For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.}
 
-\item{stat_ref}{Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.}
+\item{reference_sample}{Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.}
 
 \item{stat_display}{Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.}
 
-\item{top_n_significant}{The top 'n' clones with statistically significant change in proportion, to show for each sample. This argument must be specified when stat_display is set to "change," "increase," or "decrease."}
-
 \item{p_threshold}{The p_value threshold to use for statistical testing}
+
+\item{bc_threshold}{Clones must be above this proportion in at least one sample to be included in statistical testing.}
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{n_clones}{The top 'n' clones to plot.}
 
-\item{cellnote_assay}{Character. One of "stars", "reads", or "percentages" or "p_val"}
+\item{cellnote_assay}{Character. One of "stars", "reads", "percentages" or "p_val"}
 
 \item{your_title}{The title for the plot.}
 
@@ -78,7 +78,7 @@ barcode_ggheatmap_stat(
 
 \item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
 
-\item{show_all_signficant}{Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the top_n_significant argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.}
+\item{show_all_signficant}{Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.}
 }
 \value{
 Displays a heatmap in the current plot window.
@@ -87,6 +87,6 @@ Displays a heatmap in the current plot window.
 Creates a heatmap from the columns of data in the Summarized Experiment object, with the option to label based on statistical analysis. Uses ggplot2.
 }
 \examples{
-barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+barcode_ggheatmap(your_SE = ZH33_SE, sample_size = rep(5000,ncol(ZH33_SE)), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars")
 
 }
