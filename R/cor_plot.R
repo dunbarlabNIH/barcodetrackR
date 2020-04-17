@@ -13,6 +13,7 @@
 #'@param return_table Logical. Whether or not to return table of p-values, confidence intervals, and R values instead of displaying a plot.
 #'@param color_scale Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.
 #'@param number_size Size of the text label when plot_type is "number".
+#'@param point_scale The size of the largest point if the plot_type is "circle"
 #'@return Plots pairwise correlation plot for the samples in your_SE.
 #'
 #'@importFrom rlang %||%
@@ -34,7 +35,8 @@ cor_plot = function(your_SE,
                     no_negatives = FALSE,
                     return_table = FALSE,
                     color_scale = "default",
-                    number_size = 3) {
+                    number_size = 3,
+                    point_scale = 1) {
 
   #extracts percentages assay from your_SE
   plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
@@ -101,7 +103,7 @@ cor_plot = function(your_SE,
     gg_corplot <- gg_corplot +
       ggplot2::geom_tile(color = "black", fill = "white") +
       ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
-      ggplot2::scale_size_area("|correlation|", limits = c(0, 1)) +
+      ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "number") {
     gg_corplot <- gg_corplot +
