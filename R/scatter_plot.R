@@ -39,8 +39,12 @@ scatter_plot = function(your_SE,
 
   plotting_data <- plotting_data[rowSums(plotting_data) > 0,]
   if(display_corr){
-    correlation_label <- paste0("corr: ", cor.test(plotting_data[[1]], plotting_data[[2]], method = method_corr)$estimate)
-  } else {
+    if (method_corr == "manhattan"){
+      correlation_label <- paste0(method_corr," dist: ", round(cor.test(plotting_data[[1]], plotting_data[[2]], method = method_corr)$estimate,3))
+    } else {
+      correlation_label <- paste0(method_corr," corr: ", round(cor.test(plotting_data[[1]], plotting_data[[2]], method = method_corr)$estimate,3))
+    }
+      } else {
     correlation_label <- NULL
   }
 
