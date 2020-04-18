@@ -6,7 +6,7 @@
 #'@param group_by The column of metadata you want to group by e.g. cell_type
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. timepoint
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.
-#'@param index_type Character. One of "count", "shannon", or "simpson"
+#'@param index_type Character. One of "count", "shannon", "shannon_count", "simpson", or "invsimpson.
 #'@param point_size Numeric. Size of points.
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
@@ -58,8 +58,13 @@ clonal_diversity <- function(your_SE,
     vegan::diversity(your_data, MARGIN = 2, index = index_type) %>%
       tibble::enframe(name = "SAMPLENAME", value = "index") %>%
       dplyr::mutate(index_type = index_type) -> calculated_index
+  } else if (index_type == "shannon_count"){
+    vegan::diversity(your_data, MARGIN = 2, index = "shannon") %>%
+      tibble::enframe(name = "SAMPLENAME", value = "index") %>%
+      dplyr::mutate(index_type = index_type) -> calculated_index
+    calculated_index$index <- exp(calculated_index$index)
   } else {
-    stop("index_type must be one of \"count\", \"shannon\", \"simpson\", or \"invsimpson\"")
+    stop("index_type must be one of \"count\", \"shannon\", \"shannon_count\", \"simpson\", or \"invsimpson\"")
   }
 
   # merge measures with colData
@@ -75,7 +80,7 @@ clonal_diversity <- function(your_SE,
   ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+
-    ggplot2::labs(x = plot_over, col = group_by, y = paste0(index_type, ifelse(index_type == "counts", "", " index")))+
+    ggplot2::labs(x = plot_over, col = group_by, y = paste0(index_type, ifelse(index_type == "counts" | index_type == "shannon_count", "", " index")))+
     ggplot2::theme_classic() +
     ggplot2::theme(text = ggplot2::element_text(size=text_size))
 }
