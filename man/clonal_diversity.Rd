@@ -24,7 +24,7 @@ clonal_diversity(
 
 \item{group_by}{The column of metadata you want to group by e.g. cell_type}
 
-\item{index_type}{Character. One of "count", "shannon", or "simpson"}
+\item{index_type}{Character. One of "count", "shannon", "shannon_count", "simpson", or "invsimpson.}
 
 \item{point_size}{Numeric. Size of points.}
 
