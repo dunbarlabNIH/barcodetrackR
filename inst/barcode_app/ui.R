@@ -7,12 +7,12 @@ shinyUI(
     fluidRow(
       column(12,
              wellPanel(
-               div(style="display:inline-block; width:15%;",fileInput('file1', '1. Upload outfile')),
+               div(style="display:inline-block; width:30%;",fileInput('file1', '1. Upload data (rows as obserbations, columns as samples)')),
                div(style="display:inline-block; width:1%;", h5("")),
-               div(style="display:inline-block; width:15%;",fileInput('file2', '2. Upload keyfile')),
+               div(style="display:inline-block; width:40%;",fileInput('file2', '2. Upload metadata (must match order of data, with SAMPLENAME column  matching columns of data')),
                div(style="display:inline-block; width:1%;", h5("")),
-               div(style="display:inline-block; width:15%;",fileInput('file3', '3. Upload readme (optional)')),
-               div(style="display:inline-block; width:1%;", h5("")),
+              # div(style="display:inline-block; width:15%;",fileInput('file3', '3. Upload readme (optional)')),
+              # div(style="display:inline-block; width:1%;", h5("")),
                div(style="display:inline-block; width:15%;",numericInput("thresholdvalue", "4. Set threshold", value = 0.0005)), div(style="display:inline-block; width:1%;", h5("")),
                div(style="display:inline-block; width:1%;", h5("")),
                div(style="display:inline-block; width:15%;",uiOutput("thresholdPanel")),

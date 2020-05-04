@@ -15,35 +15,41 @@ shinyServer(
     })
 
     thresholded_data <- eventReactive(input$threshybutton, {
-      withProgress(message = "Loading outfile", value = 0, {
-        your_data <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
-        incProgress(0.5, detail = "Loading keyfile/readme and applying Threshold")
+      withProgress(message = "Loading files and applying threshold", value = 0, {
+        # your_data <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
+        your_data <- read.delim(input$file1$datapath,  row.names =1)
+        metadata <- read.delim(input$file2$datapath)
+
+        # incProgress(0.5, detail = "Loading metadata/readme and applying Threshold")
         t_your_data <- t(your_data)
-        keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
-        if(!(all(c("FILENAME", "GIVENNAME") %in% colnames(keyfile)))){
-          stop("Keyfile missing FILENAME and/or GIVENNAME columns")
+        # metadata <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
+        if(!(all(c("SAMPLENAME") %in% colnames(metadata)))){
+          stop("metadata missing SAMPLENAME column")
         }
-        keyfile <- keyfile[,c("FILENAME", "GIVENNAME")]
-        if(any(duplicated(keyfile$FILENAME))){
-          stop("Keyfile contains duplicate FILENAME")
+        metadata <- metadata[,c("SAMPLENAME")]
+        if(any(duplicated(metadata$SAMPLENAME))){
+          stop("metadata contains duplicate SAMPLENAME")
         }
-        if(any(duplicated(keyfile$GIVENNAME))){
-          stop("Keyfile contains duplicate GIVENNAME")
+        # if(any(duplicated(metadata$GIVENNAME))){
+        #   stop("metadata contains duplicate GIVENNAME")
+        # }
+        if(!(all(rownames(t_your_data) %in% metadata$SAMPLENAME))){
+          stop("Column in data is not a SAMPLENAME in metadata")
         }
-        if(!(all(rownames(t_your_data) %in% keyfile$FILENAME))){
-          stop("Column in outfile is not a FILENAME in keyfile")
+        if(!(all(metadata$SAMPLENAME %in% rownames(t_your_data)))){
+          stop("SAMPLENAME in metadata is not a column in data")
         }
-        if(!(all(keyfile$FILENAME %in% rownames(t_your_data)))){
-          stop("FILENAME in keyfile is not a column in outfile")
+        if(length(setdiff(metadata$SAMPLENAME, rownames(t_your_data))) != 0){
+          print(setdiff(metadata$SAMPLENAME, rownames(t_your_data)))
+          stop("Number of samples in metadata differs from number of samples in data")
         }
-        if(length(setdiff(keyfile$FILENAME, rownames(t_your_data))) != 0){
-          print(setdiff(keyfile$FILENAME, rownames(t_your_data)))
-          stop("Number of samples in keyfile differs from number of samples in outfile")
-        }
-        keyfile <- keyfile[match(colnames(your_data), keyfile$FILENAME),]
-        t_your_data <- data.frame(GIVENNAME = keyfile$GIVENNAME, t_your_data)
+        metadata <- metadata[match(colnames(your_data), metadata$SAMPLENAME),]
+        your_SE <- barcodetrackR::create_SE(your_data = your_data,
+                                            meta_data  = metadata,
+                                            threshold = input$thresholdvalue)
+        # t_your_data <- data.frame(GIVENNAME = metadata$GIVENNAME, t_your_data)
       })
-      return(t_your_data)
+      return(your_SE)
     }
     )
 
@@ -59,24 +65,24 @@ shinyServer(
       strong(current_threshold())
     })
 
-    readme_data <- eventReactive(input$threshybutton,{
-      if(is.null(thresholded_data()) | is.null(input$file3$datapath)){
-        return()
-      }
-      readme <- read.delim(input$file3$datapath, stringsAsFactors = FALSE, comment.char = "#")
-      if(!all(c("FILENAME", "MAPPED", "READS") %in% colnames(readme))){
-        stop("Uploaded readme must contain FILENAME, MAPPED, and READS columns")
-      }
-      readme <- readme[, c("FILENAME", "MAPPED", "READS")]
-      colnames(readme) <- c("FILENAME", "READS_WITH_LIBID", "RAW_READS")
-      keyfile <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
-      readme$GIVENNAME <- keyfile$GIVENNAME[match(readme$FILENAME, keyfile$FILENAME)]
-      readme$THRESHOLDED_READS <- rowSums(thresholded_data()[match(rownames(thresholded_data()), readme$FILENAME),-which(colnames(thresholded_data()) == "GIVENNAME")])
-      readme <- readme[,c("FILENAME", "GIVENNAME", "READS_WITH_LIBID", "THRESHOLDED_READS", "RAW_READS")]
-      readme$READS_WITH_LIBID_PERCENT <- round(readme$READS_WITH_LIBID/readme$RAW_READS * 100, digits = 2)
-      readme$THRESHOLDED_READS_PERCENT <- round(readme$THRESHOLDED_READS/readme$RAW_READS * 100, digits = 2)
-      return(readme)
-    })
+    # readme_data <- eventReactive(input$threshybutton,{
+    #   if(is.null(thresholded_data()) | is.null(input$file3$datapath)){
+    #     return()
+    #   }
+    #   readme <- read.delim(input$file3$datapath, stringsAsFactors = FALSE, comment.char = "#")
+    #   if(!all(c("FILENAME", "MAPPED", "READS") %in% colnames(readme))){
+    #     stop("Uploaded readme must contain FILENAME, MAPPED, and READS columns")
+    #   }
+    #   readme <- readme[, c("FILENAME", "MAPPED", "READS")]
+    #   colnames(readme) <- c("FILENAME", "READS_WITH_LIBID", "RAW_READS")
+    #   metadata <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
+    #   readme$GIVENNAME <- metadata$GIVENNAME[match(readme$FILENAME, metadata$FILENAME)]
+    #   readme$THRESHOLDED_READS <- rowSums(thresholded_data()[match(rownames(thresholded_data()), readme$FILENAME),-which(colnames(thresholded_data()) == "GIVENNAME")])
+    #   readme <- readme[,c("FILENAME", "GIVENNAME", "READS_WITH_LIBID", "THRESHOLDED_READS", "RAW_READS")]
+    #   readme$READS_WITH_LIBID_PERCENT <- round(readme$READS_WITH_LIBID/readme$RAW_READS * 100, digits = 2)
+    #   readme$THRESHOLDED_READS_PERCENT <- round(readme$THRESHOLDED_READS/readme$RAW_READS * 100, digits = 2)
+    #   return(readme)
+    # })
 
 
 
