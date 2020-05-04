@@ -21,26 +21,26 @@ shinyServer(
         metadata <- read.delim(input$file2$datapath)
 
         # incProgress(0.5, detail = "Loading metadata/readme and applying Threshold")
-        t_your_data <- t(your_data)
+        # t_your_data <- t(your_data)
         # metadata <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
         if(!(all(c("SAMPLENAME") %in% colnames(metadata)))){
           stop("metadata missing SAMPLENAME column")
         }
-        metadata <- metadata[,c("SAMPLENAME")]
+        # metadata <- metadata[,c("SAMPLENAME")]
         if(any(duplicated(metadata$SAMPLENAME))){
           stop("metadata contains duplicate SAMPLENAME")
         }
         # if(any(duplicated(metadata$GIVENNAME))){
         #   stop("metadata contains duplicate GIVENNAME")
         # }
-        if(!(all(rownames(t_your_data) %in% metadata$SAMPLENAME))){
+        if(!(all(colnames(your_data) %in% metadata$SAMPLENAME))){
           stop("Column in data is not a SAMPLENAME in metadata")
         }
-        if(!(all(metadata$SAMPLENAME %in% rownames(t_your_data)))){
+        if(!(all(metadata$SAMPLENAME %in% colnames(your_data)))){
           stop("SAMPLENAME in metadata is not a column in data")
         }
-        if(length(setdiff(metadata$SAMPLENAME, rownames(t_your_data))) != 0){
-          print(setdiff(metadata$SAMPLENAME, rownames(t_your_data)))
+        if(length(setdiff(metadata$SAMPLENAME, colnames(your_data))) != 0){
+          print(setdiff(metadata$SAMPLENAME, colnames(your_data)))
           stop("Number of samples in metadata differs from number of samples in data")
         }
         metadata <- metadata[match(colnames(your_data), metadata$SAMPLENAME),]
