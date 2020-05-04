@@ -96,8 +96,8 @@ shinyServer(
         return()
 
       tabsetPanel(
-        tabPanel("DataStatistics",
-                 uiOutput("DataStatistics")),
+        # tabPanel("DataStatistics",
+        #          uiOutput("DataStatistics")),
         tabPanel("Heatmap",
                  uiOutput("Heatmap")),
         tabPanel("CorPlot",
@@ -118,25 +118,25 @@ shinyServer(
 
     #======================================================================================================
 
-    #DATASTATISTICS TAB
-
-    output$DataStatistics <- renderUI({
-      fluidRow(
-        column(7,dataTableOutput('renderedReadme')),
-        column(5, plotOutput('readmeHistogram'))
-      )
-    })
-
-    output$readmeHistogram <- renderPlot({
-      hist(readme_data()$READS_WITH_LIBID_PERCENT,
-           breaks = seq(0,100, by = 1),
-           xlim = c(0,100),
-           main = "MAPPING % HISTOGRAM",
-           col = "lightblue",
-           xlab = "PERCENTAGE RAW READS WITH LIBID")
-    })
-    output$renderedReadme <- renderDataTable(readme_data(), options = list(scrollX=TRUE, pageLength = 10))
-
+    # #DATASTATISTICS TAB
+    # 
+    # output$DataStatistics <- renderUI({
+    #   fluidRow(
+    #     column(7,dataTableOutput('renderedReadme')),
+    #     column(5, plotOutput('readmeHistogram'))
+    #   )
+    # })
+    # 
+    # output$readmeHistogram <- renderPlot({
+    #   hist(readme_data()$READS_WITH_LIBID_PERCENT,
+    #        breaks = seq(0,100, by = 1),
+    #        xlim = c(0,100),
+    #        main = "MAPPING % HISTOGRAM",
+    #        col = "lightblue",
+    #        xlab = "PERCENTAGE RAW READS WITH LIBID")
+    # })
+    # output$renderedReadme <- renderDataTable(readme_data(), options = list(scrollX=TRUE, pageLength = 10))
+    # 
 
     #======================================================================================================
 
@@ -148,83 +148,94 @@ shinyServer(
         return()
 
       HeatmapInput <- function(){
-        print(barcodetrackR::barcode_ggheatmap(your_data = Heatmap_data(),
+        print(barcodetrackR::barcode_ggheatmap(your_SE = Heatmap_data(),
+                                               plot_labels = NULL,
                                                n_clones = input$Heatmap_top_clones,
-                                               your_title = input$Heatmap_title,
+                                               cellnote_assay = input$Heatmap_cellnote_assay,
+                                               your_title = paste0("\n",input$Heatmap_title),
                                                grid = input$Heatmap_grid,
                                                label_size = input$Heatmap_labels,
                                                dendro = input$Heatmap_dendrogram,
                                                cellnote_size = input$Heatmap_starsize,
-                                               log_transform = input$Heatmap_log_transform,
-                                               log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
                                                distance_method = input$Heatmap_distance,
                                                minkowski_power = input$Heatmap_mink_distance,
-                                               cellnote_option = input$Heatmap_cellnote_option,
                                                hclust_linkage = input$Heatmap_hclust_linkage,
                                                row_order = input$Heatmap_row_order,
-                                               clusters = input$Heatmap_clusters))}
+                                               clusters = input$Heatmap_clusters,
+                                               percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
+                                               color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
+                                               # log_transform = input$Heatmap_log_transform,
+                                               # log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
+                                               ))}
 
-      HeatmapREADMEtable <- function(){
-        your_table <- readme_data()
-        your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
-        temp_names <- your_table$GIVENNAME
-        temp_clones <- colSums(Heatmap_data() > 0)
-        your_table <- data.frame(THRESHOLDED_READS = your_table$THRESHOLDED_READS, TOTAL_READS = your_table$RAW_READS, THRESHOLDED_READS_PERCENT = your_table$THRESHOLDED_READS_PERCENT, N_CLONES = temp_clones)
-        rownames(your_table) <- temp_names
-        return(cbind(rownames(t(your_table)),t(your_table)))
-      }
+      # HeatmapREADMEtable <- function(){
+      #   your_table <- readme_data()
+      #   your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
+      #   temp_names <- your_table$GIVENNAME
+      #   temp_clones <- colSums(Heatmap_data() > 0)
+      #   your_table <- data.frame(THRESHOLDED_READS = your_table$THRESHOLDED_READS, TOTAL_READS = your_table$RAW_READS, THRESHOLDED_READS_PERCENT = your_table$THRESHOLDED_READS_PERCENT, N_CLONES = temp_clones)
+      #   rownames(your_table) <- temp_names
+      #   return(cbind(rownames(t(your_table)),t(your_table)))
+      # }
 
 
-      output$heatmap_datatable <- renderDataTable({HeatmapREADMEtable()},
-                                                  options = list(paging = FALSE, searching = FALSE))
-
-
-      output$downloadHeatmapkey <- downloadHandler(
-        filename = function() {paste(input$file1, "_heatmapkey.txt", sep = "")},
-        content = function(file){
-          write.table(barcodetrackR::barcode_ggheatmap(your_data = Heatmap_data(),
-                                                       n_clones = input$Heatmap_top_clones,
-                                                       log_transform = input$Heatmap_log_transform,
-                                                       printtable = TRUE,
-                                                       table_option = input$Heatmap_table_option,
-                                                       log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
-                                                       distance_method = input$Heatmap_distance,
-                                                       minkowski_power = input$Heatmap_mink_distance,
-                                                       hclust_linkage = input$Heatmap_hclust_linkage), file, sep = '\t', quote = FALSE)
-        }
-      )
-
-      output$downloadHeatmapSTATS <- downloadHandler(
-        filename = function() {paste(input$file1, "_heatmapSTATS.txt", sep = "")},
-        content = function(file){
-          write.table(HeatmapREADMEtable(), file, sep = '\t', quote = FALSE)
-        }
-      )
-
+      # output$heatmap_datatable <- renderDataTable({HeatmapREADMEtable()},
+      #                                             options = list(paging = FALSE, searching = FALSE))
+      # 
+      # 
+      # output$downloadHeatmapkey <- downloadHandler(
+      #   filename = function() {paste(input$file1, "_heatmapkey.txt", sep = "")},
+      #   content = function(file){
+      #     write.table(barcodetrackR::barcode_ggheatmap(your_SE = Heatmap_data(),
+      #                                                  plot_labels = NULL,
+      #                                                  n_clones = input$Heatmap_top_clones,
+      #                                                  log_transform = input$Heatmap_log_transform,
+      #                                                  printtable = TRUE,
+      #                                                  table_option = input$Heatmap_table_option,
+      #                                                  log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
+      #                                                  distance_method = input$Heatmap_distance,
+      #                                                  minkowski_power = input$Heatmap_mink_distance,
+      #                                                  hclust_linkage = input$Heatmap_hclust_linkage), file, sep = '\t', quote = FALSE)
+      #   }
+      # )
+      # 
+      # output$downloadHeatmapSTATS <- downloadHandler(
+      #   filename = function() {paste(input$file1, "_heatmapSTATS.txt", sep = "")},
+      #   content = function(file){
+      #     write.table(HeatmapREADMEtable(), file, sep = '\t', quote = FALSE)
+      #   }
+      # )
+      
+      
       output$viewHeatmap <- renderPlot({
         HeatmapInput()
       })
+ 
 
 
       Heatmap_data <- reactive({
-        df <- thresholded_data()
-        df <- df[df$GIVENNAME %in% input$Heatmap_samples,] #subset samples
-        df$GIVENNAME <- factor(df$GIVENNAME, levels = input$Heatmap_samples)
-        df <- df[order(df$GIVENNAME),]
-        newcolnames <- df$GIVENNAME
-        df$GIVENNAME <- NULL
-        df <- data.frame(t(df))
-        colnames(df) <- newcolnames
-        return(df)
+        # df <- thresholded_data()
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$Heatmap_samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$Heatmap_samples)
+        se <- se[,order(se$SAMPLENAME)]
+        # df <- df[df$GIVENNAME %in% input$Heatmap_samples,] #subset samples
+        # df$GIVENNAME <- factor(df$GIVENNAME, levels = input$Heatmap_samples)
+        #df <- df[order(df$GIVENNAME),]
+        # newcolnames <- df$GIVENNAME
+        # df$GIVENNAME <- NULL
+        # df <- data.frame(t(df))
+        # colnames(df) <- newcolnames
+        return(se)
 
       })
 
-      output$Heatmap_download_samples <- downloadHandler(
-        filename = function() {paste("_samplelist.txt", sep = "\t")},
-        content = function(file){
-          write.table(input$Heatmap_samples, file, sep = '\t', quote = FALSE, row.names = FALSE, col.names = FALSE)
-        }
-      )
+      # output$Heatmap_download_samples <- downloadHandler(
+      #   filename = function() {paste("_samplelist.txt", sep = "\t")},
+      #   content = function(file){
+      #     write.table(input$Heatmap_samples, file, sep = '\t', quote = FALSE, row.names = FALSE, col.names = FALSE)
+      #   }
+      # )
 
       Heatmap_uploaded_samples <- reactive({
         samples <- as.vector(t(read.delim(input$Heatmap_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
@@ -237,43 +248,43 @@ shinyServer(
         column(3,
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
-                 selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 downloadButton("Heatmap_download_samples", "Download This Sample List"),
+                 selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 # downloadButton("Heatmap_download_samples", "Download This Sample List"),
                  br(),
                  br(),
-                 numericInput("Heatmap_top_clones", "2. Number of top clones", value = 10),
+                 numericInput("Heatmap_top_clones", "Number of top clones", value = 10),
                  strong("3. Options"),
                  checkboxInput("Heatmap_grid", label = "Grid", value = TRUE),
-                 checkboxInput("Heatmap_log_transform", label = "Log-Transform", value = TRUE),
+                 # checkboxInput("Heatmap_log_transform", label = "Log-Transform", value = TRUE),
                  checkboxInput("Heatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
-                 selectInput("Heatmap_cellnote_option", "4. Select Cell Display Option",
-                             choices = c("reads", "percents", "logs", "stars", "ranks"),
+                 selectInput("Heatmap_cellnote_assay", "Select Cell Display Option",
+                             choices = c("stars", "reads", "percentages"),
                              selected = "stars"),
-                 numericInput("Heatmap_labels", "5. Set Column Label Size", value = 20),
-                 numericInput("Heatmap_starsize", "6. Set Cell Label Size", value = 15),
-                 textInput("Heatmap_title", "7. Title for Heatmap", value = ""),
-                 selectInput("Heatmap_distance", "8. Select Distance Metric/Function",
+                 numericInput("Heatmap_labels", "Set Column Label Size", value = 14),
+                 numericInput("Heatmap_starsize", "Set Cell Label Size", value = 8),
+                 textInput("Heatmap_title", "Title for Heatmap", value = ""),
+                 selectInput("Heatmap_distance", "Select Distance Metric/Function",
                              choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
                              selected = "Euclidean"),
-                 numericInput("Heatmap_mink_distance", "9. If Minkowski, choose Minkowski Power", value = 2, step = 1),
-                 selectInput("Heatmap_hclust_linkage", "10. Select Clustering Linkage",
+                 numericInput("Heatmap_mink_distance", "If Minkowski, choose Minkowski Power", value = 2, step = 1),
+                 selectInput("Heatmap_hclust_linkage", "Select Clustering Linkage",
                              choices = c("ward.D", "ward.D2", "single", "complete", "average", "mcquitty", "median", "centroid"),
                              selected = "complete"),
-                 selectInput("Heatmap_scale", "11. Select Log",
-                             choices = c("2", "e", "10", "100"),
-                             selected = "e"),
-                 numericInput("Heatmap_clusters", "12. Select number of clusters to cut", value = 0, step = 1, min = 1, max = 11),
-                 selectInput("Heatmap_row_order", "13. How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
-                 selectInput("Heatmap_table_option", "14. Select Format for Key (below)",
-                             choices = c("logs", "reads", "percents", "ranks"),
-                             selected = "percents"),
-                 strong("15. Press button to download Heatmap Key."),
-                 br(),
-                 downloadButton('downloadHeatmapkey', 'Heatmap_key'),
-                 br(),
-                 strong("16. Press button to download Heatmap Stats."),
-                 br(),
-                 downloadButton('downloadHeatmapSTATS', 'Heatmap_STATS')
+                 # selectInput("Heatmap_scale", "11. Select Log",
+                 #             choices = c("2", "e", "10", "100"),
+                 #             selected = "e"),
+                 numericInput("Heatmap_clusters", "Select number of clusters to cut", value = 0, step = 1, min = 1, max = 11),
+                 selectInput("Heatmap_row_order", "How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
+                 # selectInput("Heatmap_table_option", "14. Select Format for Key (below)",
+                 #             choices = c("logs", "reads", "percents", "ranks"),
+                 #             selected = "percents"),
+                 # strong("15. Press button to download Heatmap Key."),
+                 # br(),
+                 # downloadButton('downloadHeatmapkey', 'Heatmap_key'),
+                 # br(),
+                 # strong("16. Press button to download Heatmap Stats."),
+                 # br(),
+                 # downloadButton('downloadHeatmapSTATS', 'Heatmap_STATS')
                )
         ),
         column(8,
