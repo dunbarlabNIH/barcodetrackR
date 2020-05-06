@@ -13,7 +13,7 @@ create_SE <- function(your_data = NULL,
                       meta_data = NULL,
                       threshold = 0.0005,
                       log_base = exp(1),
-                      scale_factor = 4e6){
+                      scale_factor = 1e6){
   if(is.null(your_data) | is.null(meta_data)){
     stop("NEITHER `your_data` NOR `meta_data` can be NULL")
   }
