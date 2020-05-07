@@ -125,18 +125,18 @@ shinyServer(
       return()
     
       stat_histInput <- function(){
-        print(barcodetrackR::stat_hist(your_SE = thresholded_data(),
+        print(stat_hist(your_SE = thresholded_data(),
                                        data_choice = input$stat_hist_data_choice, 
                                        assay_choice = input$stat_hist_assay_choice, 
                                        sample_select = input$stat_hist_sample_select,
                                        metadata_stat = input$stat_hist_metadata_stat,
-                                       group_by = input$group_by,
-                                       scale_all_y = input$scale_all_y,
-                                       y_log_axis = input$y_log_axis,
-                                       text_size = input$text_size,
-                                       n_bins = input$n_bins,
-                                       n_cols = input$n_cols,
-                                       alpha = input$alpha
+                                       group_by = input$stat_hist_group_by,
+                                       scale_all_y = input$stat_hist_scale_all_y,
+                                       y_log_axis = input$stat_hist_y_log_axis,
+                                       text_size = input$stat_hist_text_size,
+                                       n_bins = input$stat_hist_n_bins,
+                                       n_cols = input$stat_hist_n_cols,
+                                       alpha = input$stat_hist_alpha
         ))}
       
       output$viewDataStatistics <- renderPlot({
@@ -151,18 +151,18 @@ shinyServer(
                  selectInput("stat_hist_data_choice", "Select Hhistogram Display Option",
                              choices = c("barcode_stats", "aggregate_stats"),
                              selected = "barcode_stats"),
-                 selectizeInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(assays(thresholded_data())), multiple = FALSE),
+                 selectInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(assays(thresholded_data())), multiple = FALSE),
                  br(),
-                 selectizeInput("stat_hist_metadata_stat", label = "Choose metadata", choices = colnames(colData(thresholded_data())), multiple = FALSE),
-                 selectizeInput("stat_hist_group_by", label = "Group by", choices = colnames(colData(thresholded_data())), multiple = FALSE),
+                 selectizeInput("stat_hist_metadata_stat", label = "Choose metadata", choices = colnames(colData(thresholded_data()))[unlist(lapply(colData(thresholded_data()), is.numeric))], multiple = FALSE),
+                 selectInput("stat_hist_group_by", label = "Group by", choices = colnames(colData(thresholded_data())), multiple = FALSE, selected = FALSE, selectize = FALSE, size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
                  br(),
                  strong("Options"),
                  checkboxInput("stat_hist_scale_all_y", label = "Scale all y", value = FALSE),
                  checkboxInput("stat_hist_y_log_axis", label = "Y log axis", value = FALSE),
-                 numericInput("stat_hist_text_size", "Set Column Label Size", value = 12),
-                 numericInput("stat_hist_n_bins", "Set Column Label Size", value = 10),
-                 numericInput("stat_hist_n_cols", "Set Column Label Size", value = 1),
-                 numericInput("stat_hist_alpha", "Set Column Label Size", value = 0.5)
+                 numericInput("stat_hist_text_size", "Text size", value = 12),
+                 numericInput("stat_hist_n_bins", "Number of bins", value = 10),
+                 numericInput("stat_hist_n_cols", "Number of columns", value = 1),
+                 numericInput("stat_hist_alpha", "Alpha", value = 0.5)
                )
         ),
         column(8,
@@ -172,43 +172,6 @@ shinyServer(
     })                                
                                        
               
-    
-      # stat_hist_data <- reactive({
-      #   # df <- thresholded_data()
-      #   se <- thresholded_data()
-      #   se <- se[,se$SAMPLENAME %in% input$stat_hist_samples] # subset samples
-      #   se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$stat_hist_samples)
-      #   se <- se[,order(se$SAMPLENAME)]
-      #   # df <- df[df$GIVENNAME %in% input$Heatmap_samples,] #subset samples
-      #   # df$GIVENNAME <- factor(df$GIVENNAME, levels = input$Heatmap_samples)
-      #   #df <- df[order(df$GIVENNAME),]
-      #   # newcolnames <- df$GIVENNAME
-      #   # df$GIVENNAME <- NULL
-      #   # df <- data.frame(t(df))
-      #   # colnames(df) <- newcolnames
-      #   return(se)
-      #   
-      # })
-      # 
-    
-    
-    
-    # output$DataStatistics <- renderUI({
-    #   fluidRow(
-    #     column(7,dataTableOutput('renderedReadme')),
-    #     column(5, plotOutput('readmeHistogram'))
-    #   )
-    # })
-    # 
-    # output$readmeHistogram <- renderPlot({
-    #   hist(readme_data()$READS_WITH_LIBID_PERCENT,
-    #        breaks = seq(0,100, by = 1),
-    #        xlim = c(0,100),
-    #        main = "MAPPING % HISTOGRAM",
-    #        col = "lightblue",
-    #        xlab = "PERCENTAGE RAW READS WITH LIBID")
-    # })
-    # output$renderedReadme <- renderDataTable(readme_data(), options = list(scrollX=TRUE, pageLength = 10))
 
 
     #======================================================================================================

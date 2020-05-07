@@ -99,7 +99,7 @@ stat_hist <- function(your_SE,
         ggplot2::ggplot(your_data, ggplot2::aes(x = your_data[,i]))+
         ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
         ggplot2::theme_classic()+
-        ggplot2::labs(x = paste0("barcodes: ",assay_choice), title = sample_select[i])+
+        ggplot2::labs(x = paste0("barcode ",assay_choice), title = sample_select[i])+
         ggplot2::theme(text = ggplot2::element_text(size = text_size))+
         ggplot2::scale_y_continuous(trans = y_axis_choice)
       )
@@ -125,7 +125,7 @@ stat_hist <- function(your_SE,
         ggplot2::ggplot(meta_data, ggplot2::aes(x = meta_data[,metadata_stat], color = meta_data[,group_by], fill = meta_data[,group_by]))+
         ggplot2::geom_histogram(bins = n_bins, alpha = alpha, position = "identity")+
         ggplot2::theme_classic()+
-        ggplot2::labs(x = paste0("metadata: ",metadata_stat), fill = group_by) +
+        ggplot2::labs(x = paste0("metadata: ",metadata_stat), fill = group_by, title = "Aggregate Statistics") +
         ggplot2::guides(color = FALSE)+
         ggplot2::theme(text = ggplot2::element_text(size = text_size))+
         ggplot2::scale_y_continuous(trans = y_axis_choice)
@@ -136,7 +136,7 @@ stat_hist <- function(your_SE,
         ggplot2::ggplot(meta_data, ggplot2::aes(x = meta_data[,metadata_stat]))+
           ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
           ggplot2::theme_classic()+
-          ggplot2::labs(x = paste0("metadata: ",metadata_stat))+
+          ggplot2::labs(x = paste0("metadata: ",metadata_stat), title = "Aggregate Statistics")+
           ggplot2::theme(text = ggplot2::element_text(size = text_size))+
           ggplot2::scale_y_continuous(trans = y_axis_choice)
       )
