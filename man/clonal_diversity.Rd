@@ -10,9 +10,10 @@ clonal_diversity(
   plot_over_display_choices = NULL,
   group_by,
   index_type = "shannon",
-  point_size = 5,
+  point_size = 3,
   line_size = 2,
-  text_size = 15
+  text_size = 12,
+  your_title = NULL
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ clonal_diversity(
 \item{line_size}{Numeric. Size of lines.}
 
 \item{text_size}{Numeric. Size of text in plot.}
+
+\item{your_title}{The title for the plot.}
 }
 \value{
 Outputs plot of a diversity measure tracked for groups over a factor.

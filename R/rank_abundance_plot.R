@@ -7,6 +7,7 @@
 #'@param point_size Numeric. Size of the points.
 #'@param your_title The title for the plot.
 #'@param scale_rank Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.
+#'@param text_size Numeric. Size of text in plot.
 #'@return Displays a rank-abundance plot (made by ggplot2) of the samples chosen.
 #'
 #'@importFrom magrittr %>%
@@ -18,7 +19,8 @@
 rank_abundance_plot = function(your_SE,
                                point_size = 3,
                                your_title = NULL,
-                               scale_rank = FALSE) {
+                               scale_rank = FALSE,
+                               text_size = 12) {
 
   your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
 
@@ -36,5 +38,5 @@ rank_abundance_plot = function(your_SE,
     ggplot2::geom_point(size = point_size)+
     ggplot2::theme_classic()+
     ggplot2::ggtitle(your_title)+
-    ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
+    ggplot2::theme(panel.grid = ggplot2::element_blank(), text = ggplot2::element_text(size=text_size))
 }

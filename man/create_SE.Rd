@@ -9,7 +9,7 @@ create_SE(
   meta_data = NULL,
   threshold = 5e-04,
   log_base = exp(1),
-  scale_factor = 4e+06
+  scale_factor = 1e+06
 )
 }
 \arguments{

@@ -10,6 +10,7 @@
 #'@param point_size Numeric. Size of points.
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
+#'@param your_title The title for the plot.
 #'
 #'@return Outputs plot of a diversity measure tracked for groups over a factor.
 #'
@@ -25,9 +26,10 @@ clonal_diversity <- function(your_SE,
                            plot_over_display_choices = NULL,
                            group_by,
                            index_type = "shannon",
-                           point_size = 5,
+                           point_size = 3,
                            line_size = 2,
-                           text_size = 15) {
+                           text_size = 12,
+                           your_title = NULL) {
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -82,7 +84,8 @@ clonal_diversity <- function(your_SE,
     ggplot2::geom_point(size = point_size)+
     ggplot2::labs(x = plot_over, col = group_by, y = paste0(index_type, ifelse(index_type == "counts" | index_type == "shannon_count", "", " index")))+
     ggplot2::theme_classic() +
-    ggplot2::theme(text = ggplot2::element_text(size=text_size))
+    ggplot2::theme(text = ggplot2::element_text(size=text_size))+
+    ggplot2::ggtitle(your_title)
 }
 
 

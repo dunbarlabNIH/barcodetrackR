@@ -8,7 +8,8 @@ rank_abundance_plot(
   your_SE,
   point_size = 3,
   your_title = NULL,
-  scale_rank = FALSE
+  scale_rank = FALSE,
+  text_size = 12
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ rank_abundance_plot(
 \item{your_title}{The title for the plot.}
 
 \item{scale_rank}{Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.}
+
+\item{text_size}{Numeric. Size of text in plot.}
 
 \item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
 }

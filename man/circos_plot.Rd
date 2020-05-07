@@ -4,7 +4,13 @@
 \alias{circos_plot}
 \title{Barcode Circos plot}
 \usage{
-circos_plot(your_SE, weighted = FALSE, plot_label = "SAMPLENAME", alpha = 1)
+circos_plot(
+  your_SE,
+  weighted = FALSE,
+  plot_label = "SAMPLENAME",
+  alpha = 1,
+  your_title = NULL
+)
 }
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
@@ -14,6 +20,8 @@ circos_plot(your_SE, weighted = FALSE, plot_label = "SAMPLENAME", alpha = 1)
 \item{plot_label}{Name of colData variable to use as labels for regions. Defaults to SAMPLENAME}
 
 \item{alpha}{Transparency of links. Default = 1 is opaque. 0 is completely transluscent}
+
+\item{your_title}{The title for the plot.}
 }
 \value{
 Displays a circos plot in the current plot window.

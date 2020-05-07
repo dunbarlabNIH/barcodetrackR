@@ -6,6 +6,7 @@
 #'@param weighted weighted = F which is default will make links based on # of shared clones. Weighted = T will make links based on their proportion.
 #'@param plot_label Name of colData variable to use as labels for regions. Defaults to SAMPLENAME
 #'@param alpha Transparency of links. Default = 1 is opaque. 0 is completely transluscent
+#'@param your_title The title for the plot.
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
@@ -22,7 +23,8 @@
 circos_plot <- function(your_SE,
                         weighted = FALSE,
                         plot_label = "SAMPLENAME",
-                        alpha = 1) {
+                        alpha = 1,
+                        your_title = NULL) {
   
 # Load data, remove data that is zero in all timepoints
 your_data <- SummarizedExperiment::assays(your_SE)$counts
@@ -61,9 +63,9 @@ for (i in 1:nrow(unique_count)){
   my_start <- my_counter
   my_end <- my_counter + count_vec[i] - 1
   if (my_start == my_end){
-    unique_prop[i,] <- temp_prop[my_start:my_end,]
+    unique_prop[i,] <- as.list(temp_prop[my_start:my_end,])
   } else {
-    unique_prop[i,] <- colSums(temp_prop[my_start:my_end,])
+    unique_prop[i,] <- as.list(colSums(temp_prop[my_start:my_end,]))
   }
   my_counter <- my_counter + as.numeric(unique_count$n[i])
 }
@@ -81,7 +83,9 @@ my_cols = viridis(nrow(unique_count))
 
 if (weighted == FALSE){
   # Initialize circos plot
+  par(mar = c(0.5, 0.5, 1, 0.5))
   circos.par(points.overflow.warning = FALSE)
+  # circos.par(cell.padding = c(0, 0, 0, 0))
   
   # Make x limits matrix
   xlims <- matrix(data = 0, nrow = length(colnames(your_data)), ncol = 2) # Just a placeholder
@@ -120,12 +124,13 @@ if (weighted == FALSE){
       count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"n"])
     }
   }
-  
-  circos.clear()
+  title(your_title, adj = 0)
+  # circos.clear()
 }
 
 else if (weighted == TRUE){
   # Initialize circos plot
+  par(mar = c(0.5, 0.5, 1, 0.5))
   circos.par(points.overflow.warning = FALSE)
   
   # Make x limits matrix
@@ -162,7 +167,8 @@ else if (weighted == TRUE){
       prop_count_index[cell_list[k]] <- prop_count_index[cell_list[k]] + as.numeric(unique_prop[i,cell_list[k]])
     }
   }
-  
+  title(your_title, adj = 0)
+  # circos.clear()
 }
 
 

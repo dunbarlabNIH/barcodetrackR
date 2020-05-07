@@ -10,7 +10,8 @@ mds_plot(
   method_dist = "bray",
   assay = "percentages",
   your_title = NULL,
-  point_size = 3
+  point_size = 3,
+  text_size = 12
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ mds_plot(
 \item{your_title}{The title for the plot.}
 
 \item{point_size}{The size of the points.}
+
+\item{text_size}{Numeric. Size of text in plot.}
 }
 \value{
 Plots pairwise correlation plot for the samples in your_SE.

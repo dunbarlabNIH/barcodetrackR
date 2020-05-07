@@ -373,7 +373,8 @@ bias_lineplot(your_SE = koelle_SE,
               split_bias_on = "celltype",
               bias_1 = "Gr",
               bias_2 = "Mono",
-              split_bias_over = "months")
+              split_bias_over = "months",
+              remove_unique = TRUE)
 ```
 
 

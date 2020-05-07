@@ -93,7 +93,8 @@ cor_plot = function(your_SE,
                    rect = ggplot2::element_blank(),
                    text = ggplot2::element_text(size = label_size),
                    axis.text.x = ggplot2::element_text(angle = 90, hjust = 0),
-                   axis.title = ggplot2::element_blank())
+                   axis.title = ggplot2::element_blank())+
+    ggplot2::ggtitle(your_title)
 
   if(plot_type == "color"){
     gg_corplot <- gg_corplot +

@@ -8,6 +8,7 @@
 #'@param display_corr Logical. Whether to display the computer correlation or not.
 #'@param point_size The size of the points being plotted.
 #'@param your_title The title for the plot.
+#'@param text_size Numeric. Size of text in plot.
 #'@return Plots scatter plot for the samples in your_SE.
 #'
 #'@importFrom rlang %||%
@@ -25,7 +26,8 @@ scatter_plot = function(your_SE,
                         method_corr ="pearson",
                         display_corr = TRUE,
                         point_size = 0.5,
-                        your_title = "") {
+                        your_title = "",
+                        text_size = 12) {
 
   #extracts assay from your_SE
   plotting_data <- SummarizedExperiment::assays(your_SE)[[assay]]
@@ -54,7 +56,8 @@ scatter_plot = function(your_SE,
     ggplot2::theme(panel.background  = ggplot2::element_rect(color = "black", fill = "white"), panel.grid = ggplot2::element_blank())+
     ggplot2::xlab(plotting_labels[1])+
     ggplot2::ylab(plotting_labels[2])+
-    ggplot2::ggtitle(paste0(your_title, "\n", correlation_label))
+    ggplot2::ggtitle(paste0(your_title, "\n", correlation_label))+
+    ggplot2::theme(text = ggplot2::element_text(size=text_size))
 
   gg_scatter
 

@@ -11,7 +11,8 @@ scatter_plot(
   method_corr = "pearson",
   display_corr = TRUE,
   point_size = 0.5,
-  your_title = ""
+  your_title = "",
+  text_size = 12
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ scatter_plot(
 \item{point_size}{The size of the points being plotted.}
 
 \item{your_title}{The title for the plot.}
+
+\item{text_size}{Numeric. Size of text in plot.}
 }
 \value{
 Plots scatter plot for the samples in your_SE.
