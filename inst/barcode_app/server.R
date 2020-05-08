@@ -108,9 +108,9 @@ shinyServer(
         tabPanel("Clonal Contribution",
                  uiOutput("ClonalContribution")),
         tabPanel("Chord Diagram",
-                 uiOutput("ChordDiagram"))
+                 uiOutput("ChordDiagram")),
         tabPanel("Ridge Plot",
-                 uiOutput("RidgePlot")),
+                 uiOutput("RidgePlot"))
 
         # tabPanel("Scatter Plot",
         #          uiOutput("ScatterPlot")),
