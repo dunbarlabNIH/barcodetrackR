@@ -129,8 +129,7 @@ clonal_contribution <- function(your_SE,
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_classic()+
       ggplot2::ggtitle(your_title)+
-      ggplot2::theme(text = ggplot2::element_text(size=text_size),
-                     plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
+      ggplot2::theme(text = ggplot2::element_text(size=text_size))
   }
 
   if(!is.null(y_limit)){
@@ -145,4 +144,5 @@ clonal_contribution <- function(your_SE,
     g + ggplot2::scale_x_discrete(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices) +
       ggplot2::theme(legend.position="none")
   }
+  
 }

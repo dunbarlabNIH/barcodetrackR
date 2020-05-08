@@ -102,8 +102,10 @@ shinyServer(
                  uiOutput("Heatmap")),
         tabPanel("Cor Plot",
                  uiOutput("CorPlot")),
-        tabPanel("Scatter Plot",
-                 uiOutput("ScatterPlot")),
+        # tabPanel("Scatter Plot",
+        #          uiOutput("ScatterPlot")),
+        tabPanel("Clonal Contribution",
+                 uiOutput("ClonalContribution")),
         tabPanel("Binary Heatmap",
                  uiOutput("BinaryHeatmap")),
         tabPanel("TernPlot",
@@ -426,67 +428,138 @@ shinyServer(
       )
     })
 
+    # #======================================================================================================
+    # #SCATTER PLOT TAB
+    # 
+    # output$ScatterPlot <- renderUI({
+    #   if(is.null(thresholded_data()))
+    #     return()
+    # 
+    #   scatterInput <- function(){
+    #     normdata <- 100*prop.table(as.matrix(scatter_data()), margin = 2)
+    #     plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize, pch = 20)
+    #     legend("topright", legend = paste("Correlation (R) =", cor(normdata[,1], normdata[,2])))
+    #   }
+    # 
+    #   output$viewscatter <- renderPlot({
+    #     scatterInput()
+    #     height = 700
+    #   })
+    # 
+    #   scatter_data <- reactive({
+    #     scf <- thresholded_data()
+    # 
+    #     scf <- scf[scf$GIVENNAME %in% c(input$scatter_Sample1, input$scatter_Sample2),] #subset samples
+    #     newcolnames <- scf$GIVENNAME
+    # 
+    #     scf$GIVENNAME <- NULL
+    #     scf$EXPERIMENT <- NULL
+    #     scf$CELLTYPE <- NULL
+    #     scf$MONTH <- NULL
+    #     scf$LOCATION <- NULL
+    #     scf$MISC <- NULL
+    # 
+    #     scf <- data.frame(t(scf))
+    #     colnames(scf) <- newcolnames
+    #     return(scf)
+    # 
+    #   })
+    # 
+    #   fluidRow(
+    #     column(3,
+    #            wellPanel(
+    #              selectInput("scatter_Sample1", label = "1. First Sample to Use", choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
+    #              selectInput("scatter_Sample2", label = "2. Second Sample to Use", choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
+    #              numericInput("scatter_Threshold", "3. Select Threshold", value = 0, step = 100, min = 0),
+    #              numericInput("scatter_Ylim", "4. Y Limit: ", value = 100, step = 0.1, min = 0),
+    #              numericInput("scatter_Xlim", "5. X Limit: ", value = 100, step = 0.1, min = 0),
+    #              numericInput("scatter_Dotsize","6. Dot Size: ", value = 5)
+    # 
+    #            )),
+    # 
+    # 
+    # 
+    #     column(6,
+    #            plotOutput('viewscatter', height = 700)
+    #     )
+    # 
+    #   )
+    # 
+    # 
+    # })
+    # 
+    
     #======================================================================================================
-    #SCATTER PLOT TAB
-
-    output$ScatterPlot <- renderUI({
-      if(is.null(thresholded_data()))
+    # Clonal Contribution TAB
+    output$ClonalContribution <- renderUI({
+      
+      if (is.null(thresholded_data()))
         return()
-
-      scatterInput <- function(){
-        normdata <- 100*prop.table(as.matrix(scatter_data()), margin = 2)
-        plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize, pch = 20)
-        legend("topright", legend = paste("Correlation (R) =", cor(normdata[,1], normdata[,2])))
+      
+      ClonalContributionInput <- function(){
+        print(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
+                                                 graph_type = input$cc_graph_type,
+                                                 filter_by = input$cc_filter_by,
+                                                 filter_selection = input$cc_filter_selection,
+                                                 SAMPLENAME_choice = input$cc_samplename_choice,
+                                                 plot_over = input$cc_plot_over,
+                                                 n_clones = input$cc_n_clones,
+                                                 keep_numeric = input$cc_keep_numeric,
+                                                 plot_non_selected = input$cc_plot_non_selected,
+                                                 linesize = input$cc_linesize,
+                                                 text_size = input$cc_text_size,
+                                                 your_title = input$cc_your_title,
+                                                 y_limit = input$cc_y_limit
+        ))
       }
-
-      output$viewscatter <- renderPlot({
-        scatterInput()
-        height = 700
+      
+      
+      output$view_cc_plot <- renderPlot({
+        ClonalContributionInput()
       })
-
-      scatter_data <- reactive({
-        scf <- thresholded_data()
-
-        scf <- scf[scf$GIVENNAME %in% c(input$scatter_Sample1, input$scatter_Sample2),] #subset samples
-        newcolnames <- scf$GIVENNAME
-
-        scf$GIVENNAME <- NULL
-        scf$EXPERIMENT <- NULL
-        scf$CELLTYPE <- NULL
-        scf$MONTH <- NULL
-        scf$LOCATION <- NULL
-        scf$MISC <- NULL
-
-        scf <- data.frame(t(scf))
-        colnames(scf) <- newcolnames
-        return(scf)
-
-      })
+      
+      
+      # Helper function
+      # filter_data_available <- reactive({
+      #   filter_data_available <- unique(colData(thresholded_data())[,input$cc_filter_by])
+      # })
+      
+      observeEvent(input$cc_filter_by, {updateSelectizeInput(session,
+                                                             inputId = 'cc_filter_selection',
+                                                             choices = unique(colData(thresholded_data())[,input$cc_filter_by]))})
+      
 
       fluidRow(
         column(3,
                wellPanel(
-                 selectInput("scatter_Sample1", label = "1. First Sample to Use", choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
-                 selectInput("scatter_Sample2", label = "2. Second Sample to Use", choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = FALSE),
-                 numericInput("scatter_Threshold", "3. Select Threshold", value = 0, step = 100, min = 0),
-                 numericInput("scatter_Ylim", "4. Y Limit: ", value = 100, step = 0.1, min = 0),
-                 numericInput("scatter_Xlim", "5. X Limit: ", value = 100, step = 0.1, min = 0),
-                 numericInput("scatter_Dotsize","6. Dot Size: ", value = 5)
-
-               )),
-
-
-
-        column(6,
-               plotOutput('viewscatter', height = 700)
+                 selectInput("cc_graph_type", "Chooose Graph Type", choices = c("bar", "line"), selected = "bar"),
+                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE), 
+                 selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
+                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 numericInput("cc_n_clones", "Number of clones to color", value = 10),
+                 textInput("cc_your_title", "Title", value = ""),
+                 strong("Options"),
+                 checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = TRUE),
+                 checkboxInput("cc_plot_non_selected", "Plot non-selected", value = TRUE),
+                 numericInput("cc_linesize", "Line size", value = 0.2),
+                 numericInput("cc_text_size", "Text size", value = 12),
+                 numericInput("cc_y_limit", "Manually set y limit", value = NULL)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_cc_plot', height = 600)
         )
-
       )
-
-
+      
+      
+      
     })
-
-    #======================================================================================================
+    
+    
+    
+    # #======================================================================================================
     #Binary Heatmap TAB
 
     output$BinaryHeatmap <- renderUI({
