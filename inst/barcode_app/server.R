@@ -100,20 +100,26 @@ shinyServer(
                   uiOutput("DataStatistics")),
         tabPanel("Heatmap",
                  uiOutput("Heatmap")),
-        tabPanel("Cor Plot",
+        tabPanel("Correlation Plot",
                  uiOutput("CorPlot")),
-        # tabPanel("Scatter Plot",
-        #          uiOutput("ScatterPlot")),
         tabPanel("Clonal Contribution",
                  uiOutput("ClonalContribution")),
-        tabPanel("Binary Heatmap",
-                 uiOutput("BinaryHeatmap")),
-        tabPanel("TernPlot",
-                 uiOutput("TernPlot")),
-        tabPanel("RankAbundance",
-                 uiOutput("RankAbundance")),
-        tabPanel("ClonalBias",
-                 uiOutput("ClonalBias"))
+        tabPanel("Clonal Diversity",
+                 uiOutput("ClonalDiversity")),
+        tabPanel("Ridge Plot",
+                 uiOutput("RidgePlot")),
+        tabPanel("Chord Diagram",
+                 uiOutput("ChordDiagram"))
+        # tabPanel("Scatter Plot",
+        #          uiOutput("ScatterPlot")),
+        # tabPanel("Binary Heatmap",
+        #          uiOutput("BinaryHeatmap")),
+        # tabPanel("TernPlot",
+        #          uiOutput("TernPlot")),
+        # tabPanel("RankAbundance",
+        #          uiOutput("RankAbundance")),
+        # tabPanel("ClonalBias",
+        #          uiOutput("ClonalBias"))
       )
     })
 
@@ -127,7 +133,7 @@ shinyServer(
       return()
     
       stat_histInput <- function(){
-        print(stat_hist(your_SE = thresholded_data(),
+        print(barcodetrackR::stat_hist(your_SE = thresholded_data(),
                                        data_choice = input$stat_hist_data_choice, 
                                        assay_choice = input$stat_hist_assay_choice, 
                                        sample_select = input$stat_hist_sample_select,
@@ -150,14 +156,14 @@ shinyServer(
                wellPanel(
                  # div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
                  selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
-                 selectInput("stat_hist_data_choice", "Select Hhistogram Display Option",
+                 selectInput("stat_hist_data_choice", "Select Histogram Display Option",
                              choices = c("barcode_stats", "aggregate_stats"),
                              selected = "barcode_stats"),
                  selectInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(assays(thresholded_data())), multiple = FALSE),
-                 br(),
-                 selectizeInput("stat_hist_metadata_stat", label = "Choose metadata", choices = colnames(colData(thresholded_data()))[unlist(lapply(colData(thresholded_data()), is.numeric))], multiple = FALSE),
+                 # br(),
+                 selectizeInput("stat_hist_metadata_stat", label = "Choose Metadata", choices = colnames(colData(thresholded_data()))[unlist(lapply(colData(thresholded_data()), is.numeric))], multiple = FALSE),
                  selectInput("stat_hist_group_by", label = "Group by", choices = colnames(colData(thresholded_data())), multiple = FALSE, selected = FALSE, selectize = FALSE, size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
-                 br(),
+                 # br(),
                  strong("Options"),
                  checkboxInput("stat_hist_scale_all_y", label = "Scale all y", value = FALSE),
                  checkboxInput("stat_hist_y_log_axis", label = "Y log axis", value = FALSE),
@@ -168,16 +174,13 @@ shinyServer(
                )
         ),
         column(8,
-               plotOutput('viewDataStatistics', height = 800)
+               plotOutput('viewDataStatistics', height = 600)
         )
       )
     })                                
                                        
               
-
-
     #======================================================================================================
-
     #HEATMAP TAB
 
     output$Heatmap <- renderUI({
@@ -249,8 +252,6 @@ shinyServer(
         HeatmapInput()
       })
  
-
-
       Heatmap_data <- reactive({
         # df <- thresholded_data()
         se <- thresholded_data()
@@ -288,8 +289,6 @@ shinyServer(
                  div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
                  selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
                  # downloadButton("Heatmap_download_samples", "Download This Sample List"),
-                 br(),
-                 br(),
                  numericInput("Heatmap_top_clones", "Number of top clones", value = 10),
                  strong("Options"),
                  checkboxInput("Heatmap_grid", label = "Grid", value = TRUE),
@@ -311,7 +310,7 @@ shinyServer(
                  # selectInput("Heatmap_scale", "11. Select Log",
                  #             choices = c("2", "e", "10", "100"),
                  #             selected = "e"),
-                 numericInput("Heatmap_clusters", "Select number of clusters to cut", value = 0, step = 1, min = 1, max = 11),
+                 numericInput("Heatmap_clusters", "Select number of clusters to show", value = 0, step = 1, min = 1, max = 11),
                  selectInput("Heatmap_row_order", "How to order rows", choices = c("hierarchical", "emergence"), selected = "hierarchical"),
                  # selectInput("Heatmap_table_option", "14. Select Format for Key (below)",
                  #             choices = c("logs", "reads", "percents", "ranks"),
@@ -332,8 +331,8 @@ shinyServer(
       )
     })
 
+    
     #======================================================================================================
-
     #CORPLOT TAB
 
     output$CorPlot <- renderUI({
@@ -353,7 +352,7 @@ shinyServer(
                                 plot_type = input$corplot_Type,
                                 no_negatives = input$corplot_excludeneg,
                                 grid = input$corplot_Grid,
-                                color_scale = input$corplot_Colors,
+                               # color_scale = input$corplot_Colors,
                                 number_size = input$corplot_number_size,
                                 point_scale = input$corplot_point_scale)
       }
@@ -378,8 +377,6 @@ shinyServer(
         },
         contentType = "application/zip"
       )
-
-
 
       output$viewcorplot <- renderPlot({
         corplotInput()
@@ -407,12 +404,11 @@ shinyServer(
                  #numericInput("corplot_thresh", "2. Reads threshold", value = 0),
                  selectInput("corplot_Method", "Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
                  selectInput("corplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"), 
-                 br(), 
                  textInput("corplot_Title", "Title", value = ""),
                  strong("Options"),
                  checkboxInput("corplot_excludeneg", "Exclude negatives", value = FALSE),
                  checkboxInput("corplot_Grid", "Grid", value = TRUE),
-                 selectInput("corplot_Colors", "Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
+                # selectInput("corplot_Colors", "Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
                  numericInput("corplot_Labels", "Set Label Size", value = 12),
                  numericInput("corplot_number_size", "Set Number Size", value = 4),
                  numericInput("corplot_point_scale", "Set Point Scale", value = 4),
@@ -427,7 +423,236 @@ shinyServer(
         )
       )
     })
+    
 
+    #======================================================================================================
+    # Clonal Contribution TAB
+    output$ClonalContribution <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      ClonalContributionInput <- function(){
+        print(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
+                                                 graph_type = input$cc_graph_type,
+                                                 filter_by = input$cc_filter_by,
+                                                 filter_selection = input$cc_filter_selection,
+                                                 SAMPLENAME_choice = input$cc_samplename_choice,
+                                                 plot_over = input$cc_plot_over,
+                                                 # plot_over_display_choices = input$cc_plot_over_choices,
+                                                 n_clones = input$cc_n_clones,
+                                                 keep_numeric = input$cc_keep_numeric,
+                                                 plot_non_selected = input$cc_plot_non_selected,
+                                                 linesize = input$cc_linesize,
+                                                 text_size = input$cc_text_size,
+                                                 your_title = input$cc_your_title,
+                                                 y_limit = input$cc_y_limit
+        ))
+      }
+      
+      
+      output$view_cc_plot <- renderPlot({
+        ClonalContributionInput()
+      })
+      
+      
+      # Helper function
+      # filter_data_available <- reactive({
+      #   filter_data_available <- unique(colData(thresholded_data())[,input$cc_filter_by])
+      # })
+      
+      observeEvent(input$cc_filter_by, {updateSelectizeInput(session,
+                                                             inputId = 'cc_filter_selection',
+                                                             choices = unique(colData(thresholded_data())[,input$cc_filter_by]))})
+      
+      # observeEvent(input$cc_plot_over, {updateSelectizeInput(session,
+      #                                                        inputId = 'cc_plot_over_choices',
+      #                                                        choices = unique(colData(thresholded_data())[,input$cc_plot_over]))})
+
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("cc_graph_type", "Chooose Graph Type", choices = c("bar", "line"), selected = "bar"),
+                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE), 
+                 selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
+                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                # selectizeInput("cc_plot_over_choices", label = "Choose values to plot over", choices = c(""), multiple = TRUE), 
+                 numericInput("cc_n_clones", "Number of clones to color", value = 10),
+                 textInput("cc_your_title", "Title", value = ""),
+                 strong("Options"),
+                 checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = TRUE),
+                 checkboxInput("cc_plot_non_selected", "Plot non-selected", value = TRUE),
+                 numericInput("cc_linesize", "Line size", value = 0.2),
+                 numericInput("cc_text_size", "Text size", value = 16),
+                 numericInput("cc_y_limit", "Manually set y limit", value = NULL)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_cc_plot', height = 500)
+        )
+      )
+
+    })
+    
+
+    #======================================================================================================
+    # Clonal Diversity TAB
+    output$ClonalDiversity <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      ClonalDiversityInput <- function(){
+        print(barcodetrackR::clonal_diversity(your_SE = thresholded_data(),
+                                              index_type = input$div_index,
+                                              group_by = input$div_group_by,
+                                              plot_over = input$div_plot_over,
+                                              line_size = input$div_line_size,
+                                              point_size = input$div_point_size,
+                                              text_size = input$div_text_size,
+                                              your_title = input$div_your_title
+        ))
+      }
+      
+      
+      output$view_div_plot <- renderPlot({
+        ClonalDiversityInput()
+      })
+      
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("div_index", "Chooose Diversity Index",
+                             choices = c("count","shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
+                 selectInput("div_group_by", label = "Group By", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("div_plot_over", label = "Plot Over", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 textInput("div_your_title", "Title", value = ""),
+                 br(),
+                 numericInput("div_line_size", "Line size", value = 2),
+                 numericInput("div_point_size", "Point size", value = 3),
+                 numericInput("div_text_size", "Text size", value = 16)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_div_plot', height = 500)
+        )
+      )
+      
+    })
+    
+
+    #======================================================================================================
+    # Ridge Plot TAB
+    output$RidgePlot <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      RidgePlotInput <- function(){
+        print(barcodetrackR::ridge_plot(your_SE = thresholded_data(),
+                                        split_bias_on = input$ridge_split_bias_on,
+                                        bias_1 = input$ridge_bias1,
+                                        bias_2 = input$ridge_bias2,
+                                        split_bias_over = input$ridge_split_bias_over,
+                                        remove_unique = input$ridge_rem_unique,
+                                        weighted = input$ridge_weighted,
+                                        text_size = input$ridge_text_size,
+                                        add_dots = input$ridge_add_dots
+        ))
+      }
+      
+      
+      output$view_ridge_plot <- renderPlot({
+        RidgePlotInput()
+      })
+      
+      # Helper function to get unique values of the split_bias_on parameter
+      observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
+                                                             inputId = 'ridge_bias1',
+                                                             choices = unique(colData(thresholded_data())[,input$ridge_split_bias_on]))})
+      
+      observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
+                                                             inputId = 'ridge_bias2',
+                                                             choices = unique(colData(thresholded_data())[,input$ridge_split_bias_on]))})
+      
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("ridge_split_bias_on", label = "Compare Samples by", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("ridge_bias1", label = "Selection 1", choices = c(""), multiple = FALSE), 
+                 selectInput("ridge_bias2", label = "Selection 2", choices = c(""), multiple = FALSE), 
+                 selectInput("ridge_split_bias_over", label = "Plot Over", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
+                 strong("Options"),
+                 checkboxInput("ridge_weighted", "Weighted", value = FALSE),
+                 checkboxInput("ridge_rem_unique", "Remove unique barcodes", value = FALSE),
+                 checkboxInput("ridge_add_dots", "Add dots", value = TRUE),
+                 numericInput("ridge_text_size", "Text size", value = 16)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_ridge_plot', height = 500)
+        )
+      )
+
+      
+    })
+    
+    
+    #======================================================================================================
+    # Chord Diagram TAB
+    output$ChordDiagram <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      ChordDiagramInput <- function(){
+        print(barcodetrackR::circos_plot(your_SE = circos_data(),
+                                         weighted = input$circos_weighted,
+                                         your_title = input$circos_title,
+                                         plot_label = input$circos_plot_label,
+                                         alpha = input$circos_alpha
+        ))
+      }
+      
+      circos_data <- reactive({
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$circos_Samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$circos_Samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
+      })
+      
+      output$view_circos_plot <- renderPlot({
+        ChordDiagramInput()
+      })
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectizeInput("circos_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 strong("Options"),
+                 checkboxInput("circos_weighted", "Weighted", value = FALSE),
+                 selectInput("circos_plot_label", "Plot labels",choices = colnames(colData(thresholded_data())), multiple = FALSE),
+                 textInput("circos_title", "Title", value = ""),
+                 numericInput("circos_alpha", "Alpha", value = 1)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_circos_plot', height = 400)
+        )
+      )
+      
+    })
+    
+  
+    
     # #======================================================================================================
     # #SCATTER PLOT TAB
     # 
@@ -489,314 +714,246 @@ shinyServer(
     # })
     # 
     
-    #======================================================================================================
-    # Clonal Contribution TAB
-    output$ClonalContribution <- renderUI({
-      
-      if (is.null(thresholded_data()))
-        return()
-      
-      ClonalContributionInput <- function(){
-        print(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
-                                                 graph_type = input$cc_graph_type,
-                                                 filter_by = input$cc_filter_by,
-                                                 filter_selection = input$cc_filter_selection,
-                                                 SAMPLENAME_choice = input$cc_samplename_choice,
-                                                 plot_over = input$cc_plot_over,
-                                                 n_clones = input$cc_n_clones,
-                                                 keep_numeric = input$cc_keep_numeric,
-                                                 plot_non_selected = input$cc_plot_non_selected,
-                                                 linesize = input$cc_linesize,
-                                                 text_size = input$cc_text_size,
-                                                 your_title = input$cc_your_title,
-                                                 y_limit = input$cc_y_limit
-        ))
-      }
-      
-      
-      output$view_cc_plot <- renderPlot({
-        ClonalContributionInput()
-      })
-      
-      
-      # Helper function
-      # filter_data_available <- reactive({
-      #   filter_data_available <- unique(colData(thresholded_data())[,input$cc_filter_by])
-      # })
-      
-      observeEvent(input$cc_filter_by, {updateSelectizeInput(session,
-                                                             inputId = 'cc_filter_selection',
-                                                             choices = unique(colData(thresholded_data())[,input$cc_filter_by]))})
-      
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("cc_graph_type", "Chooose Graph Type", choices = c("bar", "line"), selected = "bar"),
-                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE), 
-                 selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
-                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(colData(thresholded_data())), multiple = FALSE), 
-                 numericInput("cc_n_clones", "Number of clones to color", value = 10),
-                 textInput("cc_your_title", "Title", value = ""),
-                 strong("Options"),
-                 checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = TRUE),
-                 checkboxInput("cc_plot_non_selected", "Plot non-selected", value = TRUE),
-                 numericInput("cc_linesize", "Line size", value = 0.2),
-                 numericInput("cc_text_size", "Text size", value = 12),
-                 numericInput("cc_y_limit", "Manually set y limit", value = NULL)
-               )
-        ),
-        
-        column(8,
-               plotOutput('view_cc_plot', height = 600)
-        )
-      )
-      
-      
-      
-    })
-    
-    
-    
+    # 
+    # 
+    # # #======================================================================================================
+    # #Binary Heatmap TAB
+    # 
+    # output$BinaryHeatmap <- renderUI({
+    # 
+    # 
+    #   if (is.null(thresholded_data()))
+    #     return()
+    # 
+    # 
+    #   BinaryheatmapInput <- function(){
+    #     print(barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
+    #                                                 label_size = input$Binaryheatmap_labels,
+    #                                                 percent_threshold = input$Binaryheatmap_threshold
+    #     ))
+    #   }
+    # 
+    #   output$viewBinaryheatmap <- renderPlot({
+    #     BinaryheatmapInput()
+    #     height = 900
+    #   })
+    # 
+    # 
+    #   Binaryheatmap_data <- reactive({
+    #     BBdf <- thresholded_data()
+    #     BBdf <- BBdf[BBdf$GIVENNAME %in% input$Binaryheatmap_samples,] #subset samples
+    #     BBdf$GIVENNAME <- factor(BBdf$GIVENNAME, levels = input$Binaryheatmap_samples)
+    #     BBdf <- BBdf[order(BBdf$GIVENNAME),]
+    #     newcolnames <- BBdf$GIVENNAME
+    #     BBdf$GIVENNAME <- NULL
+    #     BBdf$EXPERIMENT <- NULL
+    #     BBdf$CELLTYPE <- NULL
+    #     BBdf$MONTH <- NULL
+    #     BBdf$LOCATION <- NULL
+    #     BBdf$MISC <- NULL
+    #     BBdf <- data.frame(t(BBdf))
+    #     colnames(BBdf) <- newcolnames
+    #     return(BBdf)
+    #   })
+    # 
+    #   fluidRow(
+    #     column(3,
+    #            wellPanel(
+    #              selectizeInput("Binaryheatmap_samples", label = "1. Which Samples to Use (in order)",
+    #                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+    #              numericInput("Binaryheatmap_threshold", "2. Set Threshold", value = 0),
+    #              numericInput("Binaryheatmap_labels", "3. Set Column Label Size", value = 15)
+    #            )
+    #     ),
+    #     column(8,
+    #            plotOutput('viewBinaryheatmap', height = 700)
+    #     )
+    # 
+    #   )
+    # 
+    # })
+    # 
     # #======================================================================================================
-    #Binary Heatmap TAB
-
-    output$BinaryHeatmap <- renderUI({
-
-
-      if (is.null(thresholded_data()))
-        return()
-
-
-      BinaryheatmapInput <- function(){
-        print(barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
-                                                    label_size = input$Binaryheatmap_labels,
-                                                    percent_threshold = input$Binaryheatmap_threshold
-        ))
-      }
-
-      output$viewBinaryheatmap <- renderPlot({
-        BinaryheatmapInput()
-        height = 900
-      })
-
-
-      Binaryheatmap_data <- reactive({
-        BBdf <- thresholded_data()
-        BBdf <- BBdf[BBdf$GIVENNAME %in% input$Binaryheatmap_samples,] #subset samples
-        BBdf$GIVENNAME <- factor(BBdf$GIVENNAME, levels = input$Binaryheatmap_samples)
-        BBdf <- BBdf[order(BBdf$GIVENNAME),]
-        newcolnames <- BBdf$GIVENNAME
-        BBdf$GIVENNAME <- NULL
-        BBdf$EXPERIMENT <- NULL
-        BBdf$CELLTYPE <- NULL
-        BBdf$MONTH <- NULL
-        BBdf$LOCATION <- NULL
-        BBdf$MISC <- NULL
-        BBdf <- data.frame(t(BBdf))
-        colnames(BBdf) <- newcolnames
-        return(BBdf)
-      })
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectizeInput("Binaryheatmap_samples", label = "1. Which Samples to Use (in order)",
-                                choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("Binaryheatmap_threshold", "2. Set Threshold", value = 0),
-                 numericInput("Binaryheatmap_labels", "3. Set Column Label Size", value = 15)
-               )
-        ),
-        column(8,
-               plotOutput('viewBinaryheatmap', height = 700)
-        )
-
-      )
-
-    })
-
-    #======================================================================================================
-    #TERNPLOT TAB
-
-    output$TernPlot <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
-
-      ternplotInput <- function(){
-        print(barcodetrackR::ternary_plot(ternplot_data(),
-                                          show_arrows = input$ternplot_Showarrows,
-                                          show_ticks = input$ternplot_Showticks,
-                                          density_mode = input$ternplot_Density))
-
-      }
-
-      output$viewternplot<- renderPlot({
-        ternplotInput()
-        height = 700
-      })
-
-      ternplot_data <- reactive({
-        terndf <- thresholded_data()
-
-        terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
-        terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
-        terndf <- terndf[order(terndf$GIVENNAME),]
-        newcolnames <- terndf$GIVENNAME
-
-        terndf$GIVENNAME <- NULL
-        terndf$EXPERIMENT <- NULL
-        terndf$CELLTYPE <- NULL
-        terndf$MONTH <- NULL
-        terndf$LOCATION <- NULL
-        terndf$MISC <- NULL
-
-        terndf <- data.frame(t(terndf))
-        colnames(terndf) <- newcolnames
-        return(terndf)
-
-      })
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 strong("2. Options"),
-                 checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
-                 checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
-                 checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE)
-               )),
-
-
-
-        column(9,
-               plotOutput('viewternplot', height = 700)
-        )
-
-      )
-
-
-
-
-
-
-    })
-
-
-    #======================================================================================================
-    #RANKABUNDANCE TAB
-
-    output$RankAbundance <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
-
-      rankabundanceInput <- function(){
-        print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
-                                                 dot_size = input$rankabundance_Dotsize,
-                                                 text_size = input$rankabundance_Textsize))
-
-      }
-
-      output$viewrankabundance<- renderPlot({
-        rankabundanceInput()
-        height = 700
-      })
-
-      rankabundance_data <- reactive({
-        rankabdf <- thresholded_data()
-        rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
-        rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
-        rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
-        newcolnames <- rankabdf$GIVENNAME
-
-        rankabdf$GIVENNAME <- NULL
-        rankabdf$EXPERIMENT <- NULL
-        rankabdf$CELLTYPE <- NULL
-        rankabdf$MONTH <- NULL
-        rankabdf$LOCATION <- NULL
-        rankabdf$MISC <- NULL
-
-        rankabdf <- data.frame(t(rankabdf))
-        colnames(rankabdf) <- newcolnames
-        return(rankabdf)
-
-      })
-
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
-                 numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
-               )),
-
-
-
-        column(9,
-               plotOutput('viewrankabundance', height = 700)
-        )
-
-      )
-
-
-
-
-
-
-    })
-
-    #======================================================================================================
-    #CLONALBIAS TAB
-
-    output$ClonalBias <- renderUI({
-      if(is.null(thresholded_data()))
-        return()
-
-      clonalbiasInput <- function(){
-        if(input$clonalbias_Type == "Dots"){
-          print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
-        } else if(input$clonalbias_Type == "Bars"){
-          print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
-        }
-      }
-
-      output$viewclonalbias<- renderPlot({
-        clonalbiasInput()
-        height = 700
-      })
-
-      clonalbias_data <- reactive({
-        cb_df <- thresholded_data()
-        cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
-        cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
-        cb_df <- cb_df[order(cb_df$GIVENNAME),]
-        newcolnames <- cb_df$GIVENNAME
-        cb_df$GIVENNAME <- NULL
-        cb_df$EXPERIMENT <- NULL
-        cb_df$CELLTYPE <- NULL
-        cb_df$MONTH <- NULL
-        cb_df$LOCATION <- NULL
-        cb_df$MISC <- NULL
-        cb_df <- data.frame(t(cb_df))
-        colnames(cb_df) <- newcolnames
-        return(cb_df)
-      })
-      fluidRow(
-        column(3,
-               wellPanel(
-                 selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
-                             choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
-                 numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15),
-                 selectInput("clonalbias_Type", label = "3. Pick type of plot",
-                             choices = c("Dots", "Bars"))
-               )),
-        column(9,
-               plotOutput('viewclonalbias', height = 700)
-        )
-      )
-    })
+    # #TERNPLOT TAB
+    # 
+    # output$TernPlot <- renderUI({
+    #   if(is.null(thresholded_data()))
+    #     return()
+    # 
+    #   ternplotInput <- function(){
+    #     print(barcodetrackR::ternary_plot(ternplot_data(),
+    #                                       show_arrows = input$ternplot_Showarrows,
+    #                                       show_ticks = input$ternplot_Showticks,
+    #                                       density_mode = input$ternplot_Density))
+    # 
+    #   }
+    # 
+    #   output$viewternplot<- renderPlot({
+    #     ternplotInput()
+    #     height = 700
+    #   })
+    # 
+    #   ternplot_data <- reactive({
+    #     terndf <- thresholded_data()
+    # 
+    #     terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
+    #     terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
+    #     terndf <- terndf[order(terndf$GIVENNAME),]
+    #     newcolnames <- terndf$GIVENNAME
+    # 
+    #     terndf$GIVENNAME <- NULL
+    #     terndf$EXPERIMENT <- NULL
+    #     terndf$CELLTYPE <- NULL
+    #     terndf$MONTH <- NULL
+    #     terndf$LOCATION <- NULL
+    #     terndf$MISC <- NULL
+    # 
+    #     terndf <- data.frame(t(terndf))
+    #     colnames(terndf) <- newcolnames
+    #     return(terndf)
+    # 
+    #   })
+    # 
+    #   fluidRow(
+    #     column(3,
+    #            wellPanel(
+    #              selectInput("ternplot_Samples", label = "1. Which Samples to Use (3)",
+    #                          choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+    #              strong("2. Options"),
+    #              checkboxInput("ternplot_Density", label = "Density Mode", value = FALSE),
+    #              checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
+    #              checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE)
+    #            )),
+    # 
+    # 
+    # 
+    #     column(9,
+    #            plotOutput('viewternplot', height = 700)
+    #     )
+    # 
+    #   )
+    # 
+    # 
+    # 
+    # 
+    # 
+    # 
+    # })
+    # 
+    # 
+    # #======================================================================================================
+    # #RANKABUNDANCE TAB
+    # 
+    # output$RankAbundance <- renderUI({
+    #   if(is.null(thresholded_data()))
+    #     return()
+    # 
+    #   rankabundanceInput <- function(){
+    #     print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
+    #                                              dot_size = input$rankabundance_Dotsize,
+    #                                              text_size = input$rankabundance_Textsize))
+    # 
+    #   }
+    # 
+    #   output$viewrankabundance<- renderPlot({
+    #     rankabundanceInput()
+    #     height = 700
+    #   })
+    # 
+    #   rankabundance_data <- reactive({
+    #     rankabdf <- thresholded_data()
+    #     rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
+    #     rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
+    #     rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
+    #     newcolnames <- rankabdf$GIVENNAME
+    # 
+    #     rankabdf$GIVENNAME <- NULL
+    #     rankabdf$EXPERIMENT <- NULL
+    #     rankabdf$CELLTYPE <- NULL
+    #     rankabdf$MONTH <- NULL
+    #     rankabdf$LOCATION <- NULL
+    #     rankabdf$MISC <- NULL
+    # 
+    #     rankabdf <- data.frame(t(rankabdf))
+    #     colnames(rankabdf) <- newcolnames
+    #     return(rankabdf)
+    # 
+    #   })
+    # 
+    #   fluidRow(
+    #     column(3,
+    #            wellPanel(
+    #              selectInput("rankabundance_Samples", label = "1. Which Samples to Use",
+    #                          choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+    #              numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
+    #              numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
+    #            )),
+    # 
+    # 
+    # 
+    #     column(9,
+    #            plotOutput('viewrankabundance', height = 700)
+    #     )
+    # 
+    #   )
+    # 
+    # 
+    # 
+    # 
+    # 
+    # 
+    # })
+    # 
+    # #======================================================================================================
+    # #CLONALBIAS TAB
+    # 
+    # output$ClonalBias <- renderUI({
+    #   if(is.null(thresholded_data()))
+    #     return()
+    # 
+    #   clonalbiasInput <- function(){
+    #     if(input$clonalbias_Type == "Dots"){
+    #       print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+    #     } else if(input$clonalbias_Type == "Bars"){
+    #       print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
+    #     }
+    #   }
+    # 
+    #   output$viewclonalbias<- renderPlot({
+    #     clonalbiasInput()
+    #     height = 700
+    #   })
+    # 
+    #   clonalbias_data <- reactive({
+    #     cb_df <- thresholded_data()
+    #     cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
+    #     cb_df$GIVENNAME <- factor(cb_df$GIVENNAME, levels = input$clonalbias_Samples)
+    #     cb_df <- cb_df[order(cb_df$GIVENNAME),]
+    #     newcolnames <- cb_df$GIVENNAME
+    #     cb_df$GIVENNAME <- NULL
+    #     cb_df$EXPERIMENT <- NULL
+    #     cb_df$CELLTYPE <- NULL
+    #     cb_df$MONTH <- NULL
+    #     cb_df$LOCATION <- NULL
+    #     cb_df$MISC <- NULL
+    #     cb_df <- data.frame(t(cb_df))
+    #     colnames(cb_df) <- newcolnames
+    #     return(cb_df)
+    #   })
+    #   fluidRow(
+    #     column(3,
+    #            wellPanel(
+    #              selectInput("clonalbias_Samples", label = "1. Which Samples to Use",
+    #                          choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE),
+    #              numericInput("clonalbias_Textsize", "2. Enter Text Size: ", value = 15),
+    #              selectInput("clonalbias_Type", label = "3. Pick type of plot",
+    #                          choices = c("Dots", "Bars"))
+    #            )),
+    #     column(9,
+    #            plotOutput('viewclonalbias', height = 700)
+    #     )
+    #   )
+    # })
 
 
 
