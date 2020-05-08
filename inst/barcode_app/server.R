@@ -103,14 +103,15 @@ shinyServer(
                  uiOutput("Heatmap")),
         tabPanel("Correlation Plot",
                  uiOutput("CorPlot")),
-        tabPanel("Clonal Contribution",
-                 uiOutput("ClonalContribution")),
         tabPanel("Clonal Diversity",
                  uiOutput("ClonalDiversity")),
-        tabPanel("Ridge Plot",
-                 uiOutput("RidgePlot")),
+        tabPanel("Clonal Contribution",
+                 uiOutput("ClonalContribution")),
         tabPanel("Chord Diagram",
                  uiOutput("ChordDiagram"))
+        tabPanel("Ridge Plot",
+                 uiOutput("RidgePlot")),
+
         # tabPanel("Scatter Plot",
         #          uiOutput("ScatterPlot")),
         # tabPanel("Binary Heatmap",
@@ -156,11 +157,12 @@ shinyServer(
         column(3,
                wellPanel(
                  # div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
-                 selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
                  selectInput("stat_hist_data_choice", "Select Histogram Display Option",
                              choices = c("barcode_stats", "aggregate_stats"),
                              selected = "barcode_stats"),
+                 selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
                  selectInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE),
+                 numericInput("stat_hist_n_cols", "Number of columns", value = 1),
                  # br(),
                  selectizeInput("stat_hist_metadata_stat", label = "Choose Metadata", choices = colnames(SummarizedExperiment::colData(thresholded_data()))[unlist(lapply(SummarizedExperiment::colData(thresholded_data()), is.numeric))], multiple = FALSE),
                  selectInput("stat_hist_group_by", label = "Group by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = FALSE, selectize = FALSE, size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
@@ -170,7 +172,6 @@ shinyServer(
                  checkboxInput("stat_hist_y_log_axis", label = "Y log axis", value = FALSE),
                  numericInput("stat_hist_text_size", "Text size", value = 12),
                  numericInput("stat_hist_n_bins", "Number of bins", value = 10),
-                 numericInput("stat_hist_n_cols", "Number of columns", value = 1),
                  numericInput("stat_hist_alpha", "Alpha", value = 0.5)
                )
         ),
