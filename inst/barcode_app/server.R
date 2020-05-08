@@ -283,7 +283,7 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
+                 div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
                  selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
                  # downloadButton("Heatmap_download_samples", "Download This Sample List"),
                  br(),
@@ -340,20 +340,20 @@ shinyServer(
       if (is.null(thresholded_data()))
         return()
 
-      observeEvent(input$corplot_Copier, {updateSelectizeInput(session, inputId = 'corplot_Samples', selected = input$Heatmap_samples)})
-
+     
 
       corplotInput <- function(){
-        barcodetrackR::cor_plot(your_data = corplot_data(),
-                                names = colnames(corplot_data()),
-                                thresh = input$corplot_thresh,
+        barcodetrackR::cor_plot(your_SE = corplot_data(),
+                                # thresh = input$corplot_thresh,
                                 your_title = input$corplot_Title,
                                 method_corr = input$corplot_Method,
-                                labelsizes = input$corplot_Labels,
-                                plottype = input$corplot_Type,
+                                label_size = input$corplot_Labels,
+                                plot_type = input$corplot_Type,
                                 no_negatives = input$corplot_excludeneg,
-                                show_grid = input$corplot_Grid,
-                                colorscale = input$corplot_Colors)
+                                grid = input$corplot_Grid,
+                                color_scale = input$corplot_Colors,
+                                number_size = input$corplot_number_size,
+                                point_scale = input$corplot_point_scale)
       }
 
       output$downloadcorplotzip <- downloadHandler(
@@ -361,10 +361,13 @@ shinyServer(
         content = function(file){
           tmpdir <- tempdir()
           setwd(tmpdir)
-          listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(), names = colnames(corplot_data()),
-                                                 thresh = input$corplot_thresh, your_title = input$corplot_Title,
-                                                 method_corr = input$corplot_Method, labelsizes = input$corplot_Labels,
-                                                 plottype = input$corplot_Type, printtables = TRUE)
+          listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(),
+                                                 # thresh = input$corplot_thresh, 
+                                                 your_title = input$corplot_Title,
+                                                 method_corr = input$corplot_Method,
+                                                 label_size = input$corplot_Labels,
+                                                 plot_type = input$corplot_Type,
+                                                 return_table = TRUE)
           for(i in seq_along(listoffiles)){
             write.table(listoffiles[[i]], file = paste0(names(listoffiles)[i], ".txt"), quote = FALSE, sep = '\t')
           }
@@ -381,39 +384,37 @@ shinyServer(
       })
 
       corplot_data <- reactive({
-        cf <- thresholded_data()
-        cf <- cf[cf$GIVENNAME %in% input$corplot_Samples,] #subset samples
-        cf$GIVENNAME <- factor(cf$GIVENNAME, levels = input$corplot_Samples)
-        cf <- cf[order(cf$GIVENNAME),]
-        newcolnames <- cf$GIVENNAME
-        cf$GIVENNAME <- NULL
-        cf <- data.frame(t(cf))
-        colnames(cf) <- newcolnames
-        return(cf)
-
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$corplot_Samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$corplot_Samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
       })
 
       #======================================================================================================
-
+      observeEvent(input$corplot_Copier, {updateSelectizeInput(session, inputId = 'corplot_Samples', selected = input$Heatmap_samples)})
+      
 
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("corplot_Samples", label = "1. Which Samples to Use (order matters)",
-                                choices = as.vector(unique(thresholded_data()$GIVENNAME)), multiple = TRUE, selected = ""),
-                 actionButton("corplot_Copier", label = "Copy BCHM Samples"),
+                 selectizeInput("corplot_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 actionButton("corplot_Copier", label = "Copy Samples from heatmap"),
                  br(),
                  br(),
-                 numericInput("corplot_thresh", "2. Reads threshold", value = 0),
-                 textInput("corplot_Title", "3. Title", value = ""),
-                 selectInput("corplot_Type", '4. Choose Type of Plot', choices = c("circle", "square", "ellipse", "color", "number", "shade", "pie"), selected = "square"),
-                 strong("5. Options"),
+                 #numericInput("corplot_thresh", "2. Reads threshold", value = 0),
+                 selectInput("corplot_Method", "Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
+                 selectInput("corplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"), 
+                 br(), 
+                 textInput("corplot_Title", "Title", value = ""),
+                 strong("Options"),
                  checkboxInput("corplot_excludeneg", "Exclude negatives", value = FALSE),
-                 checkboxInput("corplot_Grid", "Grid ON/OFF", value = TRUE),
-                 selectInput("corplot_Method", "6. Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
-                 selectInput("corplot_Colors", "7. Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
-                 numericInput("corplot_Labels", "8. Set Label Size", value = 2),
-                 strong("9. Press button to downlaod CorPlot Files as .zip"),
+                 checkboxInput("corplot_Grid", "Grid", value = TRUE),
+                 selectInput("corplot_Colors", "Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
+                 numericInput("corplot_Labels", "Set Label Size", value = 12),
+                 numericInput("corplot_number_size", "Set Number Size", value = 4),
+                 numericInput("corplot_point_scale", "Set Point Scale", value = 4),
+                 strong("Press button to downlaod CorPlot Files as .zip"),
                  br(),
                  downloadButton('downloadcorplotzip', 'corr_plot.zip')
                )
