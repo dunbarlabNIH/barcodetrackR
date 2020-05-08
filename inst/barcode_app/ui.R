@@ -15,7 +15,7 @@ shinyUI(
       ),
       column(4,
              h4("3. Set threshold"),
-             div(style="display:inline-block; width:100%;",numericInput("thresholdvalue", "3. Set threshold", value = 0.0000)),
+             div(style="display:inline-block; width:100%;",numericInput("thresholdvalue", NULL, value = 0.0000)),
              div(style="display:inline-block; width:100%;",uiOutput("thresholdPanel")),
              div(style="display:inline-block; width:100%;", uiOutput("thresholdInfo"))
       ),
