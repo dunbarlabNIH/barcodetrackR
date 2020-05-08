@@ -300,7 +300,7 @@ shinyServer(
                              choices = c("stars", "reads", "percentages"),
                              selected = "stars"),
                  numericInput("Heatmap_labels", "Set Column Label Size", value = 14),
-                 numericInput("Heatmap_starsize", "Set Cell Label Size", value = 8),
+                 numericInput("Heatmap_starsize", "Set Cell Label Size", value = 6),
                  textInput("Heatmap_title", "Title for Heatmap", value = ""),
                  selectInput("Heatmap_distance", "Select Distance Metric/Function",
                              choices = sort(as.vector(unlist(summary(proxy::pr_DB)[1]))),
@@ -484,7 +484,7 @@ shinyServer(
                  textInput("cc_your_title", "Title", value = ""),
                  strong("Options"),
                  checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = TRUE),
-                 checkboxInput("cc_plot_non_selected", "Plot non-selected", value = TRUE),
+                 checkboxInput("cc_plot_non_selected", "Plot non-selected", value = FALSE),
                  numericInput("cc_linesize", "Line size", value = 0.2),
                  numericInput("cc_text_size", "Text size", value = 16),
                  numericInput("cc_y_limit", "Manually set y limit", value = NULL)
@@ -534,7 +534,7 @@ shinyServer(
                  textInput("div_your_title", "Title", value = ""),
                  br(),
                  numericInput("div_line_size", "Line size", value = 2),
-                 numericInput("div_point_size", "Point size", value = 3),
+                 numericInput("div_point_size", "Point size", value = 5),
                  numericInput("div_text_size", "Text size", value = 16)
                )
         ),
