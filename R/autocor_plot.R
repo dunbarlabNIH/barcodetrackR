@@ -107,11 +107,17 @@ autocor_plot = function(your_SE,
   gg_autocorplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = target_sample, y = correlation_value, group = grouping_sample, color = grouping_sample)) +
     ggplot2::geom_line(size=line_size)+
     ggplot2::geom_point(size=point_size)+
-    ggplot2::scale_y_continuous(name = "correlation", limits = c(min(plotting_data_longer$correlation_value), 1))+
+    ggplot2::scale_y_continuous(name = "correlation")+
     ggplot2::theme_classic()+
     ggplot2::scale_color_discrete("sample")+
     ggplot2::ggtitle(your_title)+
     ggplot2::theme(text = ggplot2::element_text(size=text_size))
+
+  if(no_negatives){
+    gg_autocorplot <- gg_autocorplot + ggplot2::coord_cartesian(ylim = c(0, 1))
+  } else {
+    gg_autocorplot <- gg_autocorplot + ggplot2::coord_cartesian(ylim = c(min(plotting_data_longer$correlation_value), 1))
+  }
 
   if(is.numeric(plot_over_display_choices) & keep_numeric){
     gg_autocorplot <-
