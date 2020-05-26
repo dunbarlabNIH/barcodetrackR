@@ -17,8 +17,6 @@ Imports:
     ggplot2,
     ggdendro,
     ggtern,
-    gdata,
-    gplots,
     gridExtra,
     gtable,
     gtools,
@@ -29,15 +27,13 @@ Imports:
     proxy,
     proto,
     Rcpp,
-    reshape2,
+    RCircos,
     scales,
     shiny,
     shinyBS,
     stringr,
     stringi,
-    treemap,
-    vegan,
-    xtable
+    vegan
 RoxygenNote: 7.1.0
 Suggests: 
     BiocStyle,
