@@ -29,9 +29,7 @@
 #'
 #'@return Displays a heatmap in the current plot window.
 #'
-#'@import tidyverse
 #'@importFrom rlang %||%
-#'@importFrom dplyr mutate_all
 #'
 #'@export
 #'
@@ -62,26 +60,26 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    clusters = 0,
                                    percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
                                    color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
-  
+
   # Apply bc_threshold
   bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$percentages, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
   your_SE <- your_SE[bc_passing_threshold,]
-  
+
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
   if(length(plot_labels) != ncol(your_SE)){
     stop("plot_labels must be same length as number of columns being plotted")
   }
-  
+
   #error checking
   if (stat_test != "chi-squared" & stat_test != "fisher"){
     stop("stat_test must be either 'chi-squared' or 'fisher' for now.")
   }
-  
+
   if (cellnote_assay != "stars" & cellnote_assay != "reads" & cellnote_assay != "percentages" & cellnote_assay != "p_val"){
     stop("cellnote_assay must be one of 'stars', 'reads', 'percentages' or 'p_val'. ")
   }
-  
+
   if(length(percent_scale) != length(color_scale)){
     stop("percent_scale and color_scale must be vectors of the same length.")
   }
@@ -91,10 +89,10 @@ barcode_ggheatmap_stat <- function(your_SE,
   if (stat_display == "top"){
     top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
     your_SE <- your_SE[top_clones_choices,]
-    
+
     # Initialize p value matrix
-    p_mat <- SummarizedExperiment::assays(your_SE)$percentages 
-    
+    p_mat <- SummarizedExperiment::assays(your_SE)$percentages
+
     if (stat_option == "subsequent"){
       stat_ref_index <- 1 # for book-keeping
       stat_test_index <- 2:length(colnames(your_SE))
@@ -112,8 +110,8 @@ barcode_ggheatmap_stat <- function(your_SE,
                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
                                                                                   sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
         }
-        
-      } 
+
+      }
     } else if (stat_option == "reference"){
       stat_ref_choice <- reference_sample %||% colnames(your_SE)[1]
       # Error checking
@@ -124,7 +122,7 @@ barcode_ggheatmap_stat <- function(your_SE,
       stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
       stat_test_index <- stat_test_index[!stat_test_index %in% stat_ref_index] # Remove reference column
       p_mat[,stat_ref_index] <- rep(1, times = nrow(your_SE)) # Fill reference column with p value of 1
-      
+
       for (i in stat_test_index){
         # Perform statistical test compared to reference
         if (stat_test == "chi-squared"){
@@ -139,12 +137,12 @@ barcode_ggheatmap_stat <- function(your_SE,
                                                                                    sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
         }
       }
-      
+
     }
-    
+
     # Add results of statistical testing into SE
     SummarizedExperiment::assays(your_SE)$p_val <- p_mat
-    
+
   } else if (stat_display == "change" | stat_display == "increase" | stat_display == "decrease"){
     # Must perform statistical testing on all rows in order to rank most significant
     p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initialize matrix to store p values
@@ -165,7 +163,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                                                                  c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
                                                                                    sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
         }
-      } 
+      }
     } else if (stat_option == "reference"){
       stat_ref_choice <- reference_sample %||% colnames(your_SE)[1]
       # Error checking
@@ -192,10 +190,10 @@ barcode_ggheatmap_stat <- function(your_SE,
         }
       }
     }
-    
+
     # Add results of statistical testing into SE
     SummarizedExperiment::assays(your_SE)$p_val <- p_mat
-    
+
     # Create reference table for increasing or decreasing clones
     if (stat_display == "increase" | stat_display == "decrease"){
       increase_matrix = SummarizedExperiment::assays(your_SE)$percentages # Initialize
@@ -205,7 +203,7 @@ barcode_ggheatmap_stat <- function(your_SE,
       }
       SummarizedExperiment::assays(your_SE)$increasing <- increase_matrix
     }
-    
+
     # Artificially set p-values to one for decreasing fold changes when the stat_display is set to increasing
     p_mat_fake <- p_mat
     if (stat_display == "increase"){
@@ -213,28 +211,28 @@ barcode_ggheatmap_stat <- function(your_SE,
         p_mat_fake[,i][increase_matrix[,i] == FALSE] <- rep(1,length(p_mat_fake[,i][increase_matrix[,i] == FALSE]))
       }
     } else if (stat_display == "decrease"){
-      for (i in stat_test_index){ 
+      for (i in stat_test_index){
       p_mat_fake[,i][increase_matrix[,i] == TRUE] <- rep(1,length(p_mat_fake[,i][increase_matrix[,i] == TRUE]))
       }
     }
     SummarizedExperiment::assays(your_SE)$p_val_fake <- p_mat_fake
-    
+
     stat_significant_clones <- apply(SummarizedExperiment::assays(your_SE)$p_val_fake, 1, function(x){any(x<=p_threshold, na.rm = TRUE)})
     your_SE <- your_SE[stat_significant_clones,]
-    
+
     p_val_ranks <-  as.data.frame(apply(SummarizedExperiment::assays(your_SE)$p_val, 2, rank, ties.method = "min", na.last = "keep"))
     p_val_ranks[,stat_ref_index] <- rep(n_clones + 1, nrow(your_SE))
     SummarizedExperiment::assays(your_SE)$p_val_ranks <- p_val_ranks
-    
+
     if (show_all_significant == FALSE){
       top_significant_clone_choices <- apply(SummarizedExperiment::assays(your_SE)$p_val_ranks, 1, function(x){any(x<=n_clones, na.rm = TRUE)})
       your_SE <- your_SE[top_significant_clone_choices,]
     }
   }
 
-  
+
 # Below here is normal barcode_ggheatmap
-    
+
     #creates data frame with '*' for those cells w/ top clones, "NA" for those who are not. Then adds this back to the SE.
     cellnote_matrix = SummarizedExperiment::assays(your_SE)$p_val
     # Convert NaNs to NAs
@@ -247,7 +245,7 @@ barcode_ggheatmap_stat <- function(your_SE,
 
     #subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
     if(row_order == "hierarchical" | row_order == "emergence") {
-    
+
     #this does the heavy duty plotting set-up. It sets the order of the data on the heatmap and the dendrogram/cluster cuts
     if(row_order == "hierarchical"){
       clustering_data <- SummarizedExperiment::assays(your_SE)[["logs"]]
@@ -274,10 +272,10 @@ barcode_ggheatmap_stat <- function(your_SE,
     your_SE <- your_SE[row_order,]
     barcode_order <- row_order
   }
-    
+
   # set column names as plot_labels
   colnames(your_SE) <- plot_labels
-    
+
   #create scale for plotting
   log_used <- S4Vectors::metadata(your_SE)$log_base
   scale_factor_used <- S4Vectors::metadata(your_SE)$scale_factor
