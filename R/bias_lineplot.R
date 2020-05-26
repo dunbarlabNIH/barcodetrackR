@@ -14,7 +14,6 @@
 #'@return Bias line plot for two lineages over time.
 #'
 #'@importFrom rlang %||%
-#'@import ggplot2
 #'
 #'@examples
 #'bias_lineplot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")

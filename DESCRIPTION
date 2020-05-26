@@ -2,36 +2,23 @@ Package: barcodetrackR
 Type: Package
 Title: Functions for Analyzing Cellular Barcoding Data
 Version: 0.1
-Date: 2015-12-04
+Date: 2020-05-26
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
 Description: TBA
 URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
 Imports:
-    bitops,
-    caTools,
     circlize,
     corrplot,
     dplyr,
-    fmsb,
     ggplot2,
     ggdendro,
-    gtable,
-    gtools,
-    htmltools,
-    httpuv,
     magrittr,
     plyr,
     proxy,
-    proto,
-    Rcpp,
-    RCircos,
     scales,
     shiny,
-    shinyBS,
-    stringr,
-    stringi,
     vegan
 RoxygenNote: 7.1.0
 Suggests: 
