@@ -8,6 +8,7 @@ Description: TBA
 URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
+Encoding: UTF-8
 Imports:
     circlize,
     corrplot,
