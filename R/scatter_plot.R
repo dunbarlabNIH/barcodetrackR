@@ -4,6 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object of two samples.
 #'@param assay The choice of assay to plot on the scatter plot
+#'@param plot_labels The labels for the X and Y axis of the plot
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.
 #'@param display_corr Logical. Whether to display the computer correlation or not.
 #'@param point_size The size of the points being plotted.
@@ -37,7 +38,6 @@ scatter_plot = function(your_SE,
 
 
   colnames(plotting_data) <- plot_labels
-  plotting_labels <- paste0(colnames(plotting_data), " ", assay)
 
   plotting_data <- plotting_data[rowSums(plotting_data) > 0,]
   if(display_corr){
@@ -54,8 +54,8 @@ scatter_plot = function(your_SE,
                                                              y = as.name(colnames(plotting_data)[2]))) +
     ggplot2::geom_point(size = point_size, color = 'black')+
     ggplot2::theme(panel.background  = ggplot2::element_rect(color = "black", fill = "white"), panel.grid = ggplot2::element_blank())+
-    ggplot2::xlab(plotting_labels[1])+
-    ggplot2::ylab(plotting_labels[2])+
+    ggplot2::xlab(plot_labels[1])+
+    ggplot2::ylab(plot_labels[2])+
     ggplot2::ggtitle(paste0(your_title, "\n", correlation_label))+
     ggplot2::theme(text = ggplot2::element_text(size=text_size))
 

@@ -20,6 +20,8 @@ scatter_plot(
 
 \item{assay}{The choice of assay to plot on the scatter plot}
 
+\item{plot_labels}{The labels for the X and Y axis of the plot}
+
 \item{method_corr}{Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.}
 
 \item{display_corr}{Logical. Whether to display the computer correlation or not.}
