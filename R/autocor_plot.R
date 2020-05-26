@@ -116,7 +116,8 @@ autocor_plot = function(your_SE,
   if(no_negatives){
     gg_autocorplot <- gg_autocorplot + ggplot2::coord_cartesian(ylim = c(0, 1))
   } else {
-    gg_autocorplot <- gg_autocorplot + ggplot2::coord_cartesian(ylim = c(min(plotting_data_longer$correlation_value), 1))
+    my_min <- min(c(plotting_data_longer$correlation_value, 0))
+    gg_autocorplot <- gg_autocorplot + ggplot2::coord_cartesian(ylim = c(my_min,1))
   }
 
   if(is.numeric(plot_over_display_choices) & keep_numeric){
