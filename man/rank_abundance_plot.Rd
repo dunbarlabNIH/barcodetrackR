@@ -6,6 +6,7 @@
 \usage{
 rank_abundance_plot(
   your_SE,
+  sample_labels = colnames(your_SE),
   point_size = 3,
   your_title = NULL,
   scale_rank = FALSE,
@@ -13,6 +14,8 @@ rank_abundance_plot(
 )
 }
 \arguments{
+\item{sample_labels}{Vector of legend labels. Defaults to colnames(your_SE).}
+
 \item{point_size}{Numeric. Size of the points.}
 
 \item{your_title}{The title for the plot.}

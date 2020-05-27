@@ -4,6 +4,7 @@
 #' samples eventually reach 100%.
 #'
 #'@param your_data A data frame. Usually individual barcodes in rows and samples in columns.
+#'@param sample_labels Vector of legend labels. Defaults to colnames(your_SE).
 #'@param point_size Numeric. Size of the points.
 #'@param your_title The title for the plot.
 #'@param scale_rank Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.
@@ -17,6 +18,7 @@
 #'@examples
 #'rank_abundance_plot(your_data = wu_SE, point_size = 4)
 rank_abundance_plot = function(your_SE,
+                               sample_labels = colnames(your_SE),
                                point_size = 3,
                                your_title = NULL,
                                scale_rank = FALSE,
