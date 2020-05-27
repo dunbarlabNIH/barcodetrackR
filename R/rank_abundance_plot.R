@@ -32,12 +32,15 @@ rank_abundance_plot = function(your_SE,
       dplyr::arrange(desc(percentage)) %>%
       dplyr::mutate(cumulative_sum = cumsum(percentage), rank = dplyr::row_number()) %>%
       dplyr::mutate(scaled_rank = dplyr::percent_rank(-percentage))
-  }) %>% do.call(rbind, .) %>% dplyr::mutate(sample_name = factor(sample_name, levels = colnames(your_data))) -> plotting_data
+  }) %>%
+    do.call(rbind, .) %>%
+    dplyr::mutate(sample_name = factor(sample_name, levels = colnames(your_data))) -> plotting_data
 
   scale_rank_choice <- ifelse(scale_rank, "scaled_rank", "rank")
 
   ggplot2::ggplot(plotting_data, ggplot2::aes_string(x = scale_rank_choice, y = "cumulative_sum", group = "sample_name", color = "sample_name"))+
     ggplot2::geom_point(size = point_size)+
+    ggplot2::scale_color_discrete(labels = sample_labels)+
     ggplot2::theme_classic()+
     ggplot2::ggtitle(your_title)+
     ggplot2::theme(panel.grid = ggplot2::element_blank(), text = ggplot2::element_text(size=text_size))
