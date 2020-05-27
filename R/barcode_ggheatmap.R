@@ -106,7 +106,7 @@ barcode_ggheatmap <- function(your_SE,
   #organizing data for plotting
   plotting_data <- tibble::rownames_to_column(SummarizedExperiment::assays(your_SE)[["logs"]], var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
-  plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
+  plotting_data$sample_name <- factor(plotting_data$sample_name, levels = colnames(your_SE))
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
 
   #organizing labels for plotting overlay
@@ -141,7 +141,7 @@ barcode_ggheatmap <- function(your_SE,
       labels = paste0(percent_scale*100, "%"),
       expand = c(0,0))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
-    ggplot2::scale_x_discrete(expand = c(0,0))+
+    ggplot2::scale_x_discrete(expand = c(0,0), labels = plot_labels)+
     ggplot2::ylab(NULL)+
     ggplot2::xlab(NULL)+
     ggplot2::ggtitle(your_title)+
