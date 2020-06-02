@@ -163,8 +163,10 @@ else if (weighted == TRUE){
     }
   }
   title(your_title, adj = 0)
-  # circos.clear()
+  # circlize::circos.clear()
 }
+my_p  <-par()
+circlize::circos.clear()
 
-
+invisible(my_p)
 }
