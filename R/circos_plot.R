@@ -7,6 +7,7 @@
 #'@param plot_label Name of colData variable to use as labels for regions. Defaults to SAMPLENAME
 #'@param alpha Transparency of links. Default = 1 is opaque. 0 is completely transluscent
 #'@param your_title The title for the plot.
+#'@param text_size Size of region labels
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
@@ -19,7 +20,8 @@ circos_plot <- function(your_SE,
                         weighted = FALSE,
                         plot_label = "SAMPLENAME",
                         alpha = 1,
-                        your_title = NULL) {
+                        your_title = NULL,
+                        text_size = 12) {
 
 # Load data, remove data that is zero in all timepoints
 your_data <- SummarizedExperiment::assays(your_SE)$counts
@@ -96,7 +98,7 @@ if (weighted == FALSE){
   circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
-                             niceFacing = T)
+                             niceFacing = T, cex = text_size/12)
 
   # Loop through rows of unique_count
   for (i in 1:nrow(unique_count)){
@@ -139,7 +141,7 @@ else if (weighted == TRUE){
   circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
-                             niceFacing = T)
+                             niceFacing = T, cex = text_size/12)
 
   # Loop through rows of unique_count
   for (i in 1:nrow(unique_prop)){
