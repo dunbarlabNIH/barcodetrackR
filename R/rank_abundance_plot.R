@@ -20,10 +20,18 @@ rank_abundance_plot = function(your_SE,
                                point_size = 3,
                                your_title = NULL,
                                scale_rank = FALSE,
-                               text_size = 12) {
+                               text_size = 12,
+                               plot_labels = NULL) {
 
+  #get labels 
+  plot_labels <- plot_labels %||% colnames(your_SE)
+  if(length(plot_labels) != ncol(your_SE)){
+    stop("plot_labels must be same length as number of columns being plotted")
+  }
+  colnames(your_SE) <- plot_labels
+  
   your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
-
+  
   lapply(1:ncol(your_data), function(i){
     tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%
       dplyr::filter(percentage > 0) %>%
