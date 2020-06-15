@@ -17,7 +17,7 @@
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
                                    threshold = 0,
-                                   your_title = "",
+                                   your_title = NULL,
                                    label_size = 12) {
 
   #get labels for heatmap
@@ -53,9 +53,11 @@ barcode_binary_heatmap <- function(your_SE,
     ggplot2::xlab(NULL)+
     ggplot2::ggtitle(your_title)+
     ggplot2::theme(
-      plot.title = ggplot2::element_text(size = 20),
+      plot.title = ggplot2::element_text(size = label_size),
       axis.text.x = ggplot2::element_text(angle=90, hjust = 1, vjust = 0.5, size = label_size),
-      legend.title = ggplot2::element_text(size =  15),
+      legend.title = ggplot2::element_text(size =  label_size),
+      legend.key.width=ggplot2::unit(0.2, "cm"),
+      legend.text = ggplot2::element_text(size = label_size),
       axis.ticks = ggplot2::element_blank(),
       panel.border = ggplot2::element_rect(colour = "black", fill=NA, size=1)
     )

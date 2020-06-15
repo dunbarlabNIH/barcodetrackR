@@ -319,21 +319,22 @@ barcode_ggheatmap_stat <- function(your_SE,
       labels = paste0(percent_scale*100, "%"),
       expand = c(0,0))+
     ggplot2::scale_y_discrete(labels = NULL, breaks = NULL, expand = c(0,0))+
-    ggplot2::scale_x_discrete(expand = c(0,0))+
+    ggplot2::scale_x_discrete(expand = c(0,0), labels = plot_labels)+
     ggplot2::ylab(NULL)+
     ggplot2::xlab(NULL)+
     ggplot2::ggtitle(your_title)+
     ggplot2::theme(
-      plot.margin = ggplot2::unit(c(0,0,0,0), "cm"),
-      plot.title = ggplot2::element_text(size = 20),
+      plot.title = ggplot2::element_text(size = label_size),
       axis.text.x = ggplot2::element_text(angle=90, hjust = 1, vjust = 0.5, size = label_size),
-      #legend.text = ggplot2::element_text(size =  15, face = 'bold'),
-      legend.title = ggplot2::element_text(size =  15),
+      legend.title = ggplot2::element_text(size = label_size),
+      legend.key.width=ggplot2::unit(0.2, "cm"),
+      legend.text = ggplot2::element_text(size = label_size),
       axis.ticks = ggplot2::element_blank())
 
   if(row_order != 'emergence'){
 
     if(dendro){
+      g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
       g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
         ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
         ggplot2::scale_x_discrete(expand = c(.5/nrow(your_SE),0.01))+
@@ -342,30 +343,35 @@ barcode_ggheatmap_stat <- function(your_SE,
         ggplot2::ylab(NULL)+
         ggplot2::xlab(NULL)+
         ggplot2::theme(
-          plot.margin = ggplot2::unit(c(0,0,0,0), "cm"),
-          plot.title = ggplot2::element_text(size = 20),
+          plot.margin = ggplot2::unit(c(5.5,0.1,5.5,5.5), "pt"),
+          plot.title = ggplot2::element_text(size = label_size),
           axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
           panel.background = ggplot2::element_rect(fill = "white",colour = "white"),
           axis.ticks = ggplot2::element_blank()
         )
-      if(!is.null(your_title )){
-        g2_dendrogram <- g2_dendrogram + ggplot2::ggtitle("\n")
+      if(!is.null(your_title)){
+        g2_dendrogram <- g2_dendrogram + ggplot2::ggtitle("")
       }
     }
     if(clusters > 0){
-      g3_clusters <-ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
+      g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
+      g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
+        ggplot2::scale_y_discrete(expand=c(0,0))+
         ggplot2::theme(
-          plot.margin = ggplot2::unit(c(0,0.1,0,0), "cm"),
-          plot.title = ggplot2::element_text(size = 20),
+          plot.margin = ggplot2::unit(c(5.5,1,5.5,5.5), "pt"),
+          plot.title = ggplot2::element_text(size = label_size),
           axis.title=ggplot2::element_blank(),
           axis.ticks=ggplot2::element_blank(),
           axis.text.y=ggplot2::element_blank(),
           axis.text.x = ggplot2::element_text(colour = 'white', angle=90, hjust = 1, vjust = 0.5, size = label_size),
           legend.position="none")
+      if(dendro){
+        g3_clusters <- g3_clusters + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,1,5.5,1), "pt"))
+      }
       if(!is.null(your_title )){
-        g3_clusters <- g3_clusters + ggplot2::ggtitle("\n")
+        g3_clusters <- g3_clusters + ggplot2::ggtitle("")
       }
 
     }
@@ -380,7 +386,7 @@ barcode_ggheatmap_stat <- function(your_SE,
   } else if (clusters == 0 & dendro){
     cowplot::plot_grid(g2_dendrogram, g1_heatmap, rel_widths = c(1, 4), ncol = 2)
   } else if (clusters > 0 & !dendro){
-    cowplot::plot_grid(g3_clusters, g1_heatmap, rel_widths = c(1, .2), ncol = 2)
+    cowplot::plot_grid(g3_clusters, g1_heatmap, rel_widths = c(.2, 4), ncol = 2)
   } else if (clusters == 0 & !dendro){
     g1_heatmap
   }
