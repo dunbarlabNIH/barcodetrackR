@@ -329,6 +329,8 @@ barcode_ggheatmap_stat <- function(your_SE,
       legend.title = ggplot2::element_text(size = label_size),
       legend.key.width=ggplot2::unit(0.2, "cm"),
       legend.text = ggplot2::element_text(size = label_size),
+      #legend.text = ggplot2::element_text(size =  15, face = 'bold'),
+      legend.title = ggplot2::element_text(size =  label_size, face = "bold"),
       axis.ticks = ggplot2::element_blank())
 
   if(row_order != 'emergence'){

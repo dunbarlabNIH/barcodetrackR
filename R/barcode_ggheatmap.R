@@ -103,6 +103,8 @@ barcode_ggheatmap <- function(your_SE,
     barcode_order <- row_order
   }
 
+  # set column names as plot_labels
+  colnames(your_SE) <- plot_labels
 
   #create scale for plotting
   log_used <- S4Vectors::metadata(your_SE)$log_base
@@ -157,6 +159,8 @@ barcode_ggheatmap <- function(your_SE,
       legend.title = ggplot2::element_text(size = label_size),
       legend.key.width=ggplot2::unit(0.2, "cm"),
       legend.text = ggplot2::element_text(size = label_size),
+      #legend.text = ggplot2::element_text(size =  15, face = 'bold'),
+      legend.title = ggplot2::element_text(size =  label_size, face = "bold"),
       axis.ticks = ggplot2::element_blank())
 
   if(row_order != 'emergence'){
