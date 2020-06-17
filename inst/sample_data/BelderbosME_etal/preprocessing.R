@@ -25,7 +25,6 @@ belderbos_metadata <- data.frame(SAMPLENAME = colnames(raw_belderbos_data),
                                  organ = c(rep("PB", 6), rep("BM_Front", 3),
                                            rep("BM_Left", 3), rep("BM_Right", 4),
                                            rep("BM_Spine", 4), rep("BM_Pelvis",2), "Spleen"))
-belderbos_metadata$SAMPLENAME <- ifelse(belderbos_metadata$weeks == "sac", paste0("sac_", belderbos_metadata$SAMPLENAME), belderbos_metadata$SAMPLENAME)
 
 write.table(file = "inst/sample_data/BelderbosME_etal/count_matrix_mouse_C21.txt", raw_belderbos_data, sep = '\t', quote = FALSE)
 write.table(file = "inst/sample_data/BelderbosME_etal/metadata_mouse_C21.txt", belderbos_metadata, sep = '\t', quote = FALSE)
