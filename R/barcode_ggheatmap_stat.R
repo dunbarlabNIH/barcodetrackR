@@ -7,7 +7,7 @@
 #'@param stat_test The statistical test to use on the constructed contingency table for each barcoe. Options are "chi-squared" and "fisher."
 #'@param stat_option For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.
 #'@param reference_sample Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
-#'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
+#'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
 #'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
 #'@param bc_threshold Clones must be above this proportion in at least one sample to be included in statistical testing.
@@ -329,8 +329,7 @@ barcode_ggheatmap_stat <- function(your_SE,
       legend.title = ggplot2::element_text(size = label_size),
       legend.key.width=ggplot2::unit(0.2, "cm"),
       legend.text = ggplot2::element_text(size = label_size),
-      #legend.text = ggplot2::element_text(size =  15, face = 'bold'),
-      legend.title = ggplot2::element_text(size =  label_size, face = "bold"),
+      plot.margin = ggplot2::unit(c(5.5,5.5,5.5,5.5), "pt"),
       axis.ticks = ggplot2::element_blank())
 
   if(row_order != 'emergence'){
