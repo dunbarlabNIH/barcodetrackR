@@ -9,7 +9,8 @@ circos_plot(
   weighted = FALSE,
   plot_label = "SAMPLENAME",
   alpha = 1,
-  your_title = NULL
+  your_title = NULL,
+  text_size = 12
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ circos_plot(
 \item{alpha}{Transparency of links. Default = 1 is opaque. 0 is completely transluscent}
 
 \item{your_title}{The title for the plot.}
+
+\item{text_size}{Size of region labels}
 }
 \value{
 Displays a circos plot in the current plot window.

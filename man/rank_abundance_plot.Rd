@@ -10,7 +10,8 @@ rank_abundance_plot(
   point_size = 3,
   your_title = NULL,
   scale_rank = FALSE,
-  text_size = 12
+  text_size = 12,
+  plot_labels = NULL
 )
 }
 \arguments{

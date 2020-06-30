@@ -8,7 +8,7 @@ barcode_binary_heatmap(
   your_SE,
   plot_labels = NULL,
   threshold = 0,
-  your_title = "",
+  your_title = NULL,
   label_size = 12
 )
 }

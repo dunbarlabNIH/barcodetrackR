@@ -42,7 +42,7 @@ barcode_ggheatmap_stat(
 
 \item{reference_sample}{Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.}
 
-\item{stat_display}{Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abduncance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.}
+\item{stat_display}{Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.}
 
 \item{p_threshold}{The p_value threshold to use for statistical testing}
 
