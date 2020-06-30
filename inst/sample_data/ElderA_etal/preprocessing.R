@@ -39,5 +39,11 @@ my_counts <- read.delim("GSE148170_matrix.txt")
 L4951_metadata <- my_metadata %>% filter(sample_origin == "L4951") %>% mutate(SAMPLENAME = my_metadata.geo_accession)
 L4951_counts <- my_counts[,L4951_metadata$my_metadata.geo_accession]
 
+
+short_organ <- L4951_metadata$organ %>% gsub("left", "L", .) %>% gsub("right", "R", .) %>% gsub(" part", "", .)
+short_sample_type <- L4951_metadata$sample_type %>% gsub("primary transplant", "pri", .) %>% gsub("secondary of AE12 spleen", "sec AE12", .) %>% gsub("secondary of AE6 spleen", "sec AE6", .) %>% gsub("tertiary of AE32 spleen", "ter AE32", .) %>% gsub("tertiary of AE36 spleen", "ter AE36", .)
+
+L4951_metadata$short_name <- paste0(L4951_metadata$mouse, " ", short_organ, " ", short_sample_type)
+
 write.table(file = "L4951_count_matrix.txt", L4951_counts, sep = '\t', quote = FALSE, row.names = TRUE)
 write.table(file = "L4951_metadata.txt", L4951_metadata, sep = '\t', quote = FALSE, row.names = FALSE)

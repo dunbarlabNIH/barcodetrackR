@@ -36,12 +36,14 @@ barcode_binary_heatmap <- function(your_SE,
   #organizing data for plotting
   plotting_data <- tibble::rownames_to_column(plotting_data, var = "sequence")
   plotting_data <- tidyr::pivot_longer(plotting_data, cols = -sequence, names_to = "sample_name", values_to = "value")
-  plotting_data$sample_name <- factor(plotting_data$sample_name, levels = plot_labels)
+  plotting_data$sample_name <- factor(plotting_data$sample_name, levels = colnames(your_SE))
   plotting_data$value <- factor(plotting_data$value, levels = c(0,1))
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
+  x_column <- plyr::mapvalues(plotting_data$sample_name, from = colnames(your_SE), to = plot_labels)
+  plotting_data$x_labels <- factor(x_column, levels = plot_labels)
 
 
-  ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
+  ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_labels, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value))+
     ggplot2::scale_fill_manual(paste0("Detection"),
                                values = c("0" = "white", "1" = "#4575B4"),
@@ -58,7 +60,6 @@ barcode_binary_heatmap <- function(your_SE,
       legend.title = ggplot2::element_text(size =  label_size),
       legend.key.width=ggplot2::unit(0.2, "cm"),
       legend.text = ggplot2::element_text(size = label_size),
-      legend.title = ggplot2::element_text(size =  label_size, face = "bold"),
       axis.ticks = ggplot2::element_blank(),
       panel.border = ggplot2::element_rect(colour = "black", fill=NA, size=1)
     )
