@@ -74,7 +74,7 @@ count_clones <- function(your_SE,
     
     # Order tidy counts by desired order
     tidy_counts %>%
-      arrange(factor(plot_over, levels = plot_over_display_choices),group_by) -> tidy_counts_ordered
+      arrange(group_by,factor(plot_over, levels = plot_over_display_choices)) -> tidy_counts_ordered
     
     # Only keep the first occurence of each barcode within each group_by category
     tidy_counts_ordered %>%
@@ -93,6 +93,25 @@ count_clones <- function(your_SE,
       dplyr::select(sample,cumulative_count) %>% 
       dplyr::rename(SAMPLENAME = sample, index = cumulative_count) %>% 
       dplyr::mutate(index_type = index_type) -> calculated_index
+    
+    # Fix the fact that certain samples will be dropped if they have 0 new clones
+    # Hacky way to do it. Need to go back and make it better later.
+    if (length(unique(tidy_counts_filtered$sample)) < length(unique(tidy_counts_ordered$sample))){
+      samples_not_found <- unique(tidy_counts_ordered$sample)[unique(tidy_counts_ordered$sample) %in% unique(tidy_counts_filtered$sample) == FALSE]
+      calculated_index <- rbind(calculated_index, data.frame(SAMPLENAME = samples_not_found,
+                                                             index = rep(0,length(samples_not_found)),
+                                                             index_type = rep(index_type, length(samples_not_found))))
+      # Reorder
+      calculated_index %>%
+        dplyr::arrange(factor(SAMPLENAME), levels = unique(tidy_counts_ordered$sample)) -> calculated_index
+      
+      # Give the missing samples the same cumulative count as above samples
+      for (i in 1:nrow(calculated_index)){
+        if (calculated_index[i,"SAMPLENAME"] %in% samples_not_found){
+          calculated_index[i,"index"] = calculated_index[i-1,"index"]
+        }
+      }
+    }
     
   } else {
     stop("index_type must be one of \"count\", \"cumulative_count\"")
