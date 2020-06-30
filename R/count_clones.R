@@ -84,7 +84,7 @@ count_clones <- function(your_SE,
     # Summarize number of new barcodes and cumulative barcodes at each timepoint
     tidy_counts_filtered %>% 
       dplyr::group_by(group_by,plot_over,sample) %>% 
-      dplyr::summarise(new_count = n()) %>% 
+      dplyr::summarise(new_count = n(), .groups = 'drop') %>% 
       dplyr::group_by(group_by) %>% 
       dplyr::mutate(cumulative_count = cumsum(new_count)) -> summarized_data
     
