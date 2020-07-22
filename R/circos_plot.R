@@ -11,6 +11,7 @@
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
+#'@import dplyr
 #'
 #'@export
 #'
