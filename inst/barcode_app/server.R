@@ -1,5 +1,6 @@
 options(shiny.maxRequestSize=1000*1024^2)
 library(SummarizedExperiment)
+library(dplyr)
 
 shinyServer(
 
