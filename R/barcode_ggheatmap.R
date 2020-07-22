@@ -164,7 +164,7 @@ barcode_ggheatmap <- function(your_SE,
 
   if(row_order != 'emergence'){
     if(dendro){
-      g1_heatmap <- g1_heatmap + theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
+      g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
       g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
         ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
         ggplot2::scale_x_discrete(expand = c(.5/nrow(your_SE),0.01))+
@@ -184,7 +184,7 @@ barcode_ggheatmap <- function(your_SE,
       }
     }
     if(clusters > 0){
-      g1_heatmap <- g1_heatmap + theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
+      g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
       g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
