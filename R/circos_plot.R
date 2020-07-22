@@ -11,9 +11,6 @@
 #'
 #'@return Displays a circos plot in the current plot window.
 #'
-#'@importFrom dplyr group_by_all across %>%
-#'@importFrom plyr count
-#'@importFrom viridis viridis
 #'
 #'@export
 #'
@@ -51,7 +48,7 @@ temp_prop <- temp_prop[rowSums(temp_binary)>1,]
 temp_binary <- temp_binary[rowSums(temp_binary)>1,]
 
 # Count the number of occurences of the unique combinations
-unique_count <- as.data.frame(temp_binary) %>% dplyr::group_by(dplyr::across()) %>% plyr::count()
+unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
 # Sort decreasing
 unique_count <- unique_count[do.call(order,-unique_count),]
 
