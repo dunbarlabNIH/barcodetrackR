@@ -11,7 +11,6 @@ LazyData: TRUE
 Encoding: UTF-8
 Imports:
     circlize,
-    corrplot,
     dplyr,
     ggplot2,
     ggdendro,
