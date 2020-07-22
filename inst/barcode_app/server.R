@@ -195,7 +195,7 @@ shinyServer(
                                                plot_labels = NULL,
                                                n_clones = input$Heatmap_top_clones,
                                                cellnote_assay = input$Heatmap_cellnote_assay,
-                                               your_title = paste0("\n",input$Heatmap_title),
+                                               your_title = paste0(input$Heatmap_title),
                                                grid = input$Heatmap_grid,
                                                label_size = input$Heatmap_labels,
                                                dendro = input$Heatmap_dendrogram,
