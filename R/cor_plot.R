@@ -73,8 +73,8 @@ cor_plot = function(your_SE,
   if(no_negatives){
     plotting_data_longer %>%
       dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, p_value)) %>%
-      dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
-      dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
+   #   dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
+  #    dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
       dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
     color_limits <- c(0, 1)
     floor_limit <- ceiling(length(color_scale)/2)
@@ -102,7 +102,7 @@ cor_plot = function(your_SE,
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "circle"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(olor = ifelse(grid, "black", "white"), fill = "white") +
+      ggplot2::geom_tile(color = ifelse(grid, "black", "white"), fill = "white") +
       ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
       ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")

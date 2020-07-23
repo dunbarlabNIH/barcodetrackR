@@ -578,7 +578,7 @@ shinyServer(
         column(3,
                wellPanel(
                  selectInput("div_index", "Chooose Diversity Index",
-                             choices = c("count","shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
+                             choices = c("shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
                  selectInput("div_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
                  selectInput("div_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
                  textInput("div_your_title", "Title", value = ""),
