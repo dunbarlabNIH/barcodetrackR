@@ -143,7 +143,7 @@ cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
 ## `cor_plot`
-A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we view the Pearson correlation between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we visualize the Pearson correlation between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
