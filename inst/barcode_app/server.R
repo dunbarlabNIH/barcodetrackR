@@ -103,6 +103,8 @@ shinyServer(
                  uiOutput("Heatmap")),
         tabPanel("Correlation Plot",
                  uiOutput("CorPlot")),
+        tabPanel("Clone Count",
+                 uiOutput("CloneCount")),
         tabPanel("Clonal Diversity",
                  uiOutput("ClonalDiversity")),
         tabPanel("Clonal Contribution",
@@ -497,6 +499,54 @@ shinyServer(
       )
 
     })
+    
+    #======================================================================================================
+    # Clone Count TAB
+    output$CloneCount <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      CloneCountInput <- function(){
+        print(barcodetrackR::count_clones(your_SE = thresholded_data(),
+                           index_type = input$clone_index_type,
+                           group_by = input$clone_group_by,
+                           plot_over = input$clone_plot_over,
+                           line_size = input$clone_line_size,
+                           point_size = input$clone_point_size,
+                           text_size = input$clone_text_size,
+                           your_title = input$clone_your_title
+        ))
+      }
+      
+      
+      output$view_clone_plot <- renderPlot({
+        CloneCountInput()
+      })
+      
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectInput("clone_index_type", "Chooose Count Index",
+                             choices = c("count","cumulative_count"), selected = "count"),
+                 selectInput("clone_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 textInput("clone_your_title", "Title", value = ""),
+                 br(),
+                 numericInput("clone_line_size", "Line size", value = 2),
+                 numericInput("clone_point_size", "Point size", value = 5),
+                 numericInput("clone_text_size", "Text size", value = 16)
+               )
+        ),
+        
+        column(8,
+               plotOutput('view_clone_plot', height = 500)
+        )
+      )
+      
+    })
+    
     
 
     #======================================================================================================
