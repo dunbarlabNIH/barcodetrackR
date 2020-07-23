@@ -6,9 +6,9 @@ The R package and functions were created by Diego A. Espinoza, Ryland Mortlock, 
 
 ## Installation, Usage, and Documentation
 
-Please see examples and documentation at: http://diegoalexespi.github.io/barcodetrackR/
+Please see examples and documentation at: http://dunbarlabNIH.github.io/barcodetrackR/
 
 ## Issues
 
-Issues should be addressed at https://github.com/diegoalexespi/barcodetrackR/issues
+Issues should be addressed at https://github.com/dunbarlabNIH/barcodetrackR/issues
 
