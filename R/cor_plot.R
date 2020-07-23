@@ -98,17 +98,17 @@ cor_plot = function(your_SE,
 
   if(plot_type == "color"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "circle"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(color = "black", fill = "white") +
+      ggplot2::geom_tile(olor = ifelse(grid, "black", "white"), fill = "white") +
       ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
       ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "number") {
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")+
       ggplot2::geom_text(ggplot2::aes(label = round(correlation_value, digits = 2)), color = "black", size = number_size)
   } else {

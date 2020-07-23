@@ -172,7 +172,7 @@ shinyServer(
                  checkboxInput("stat_hist_y_log_axis", label = "Y log axis", value = FALSE),
                  numericInput("stat_hist_text_size", "Text size", value = 12),
                  numericInput("stat_hist_n_bins", "Number of bins", value = 10),
-                 numericInput("stat_hist_alpha", "Alpha", value = 0.5)
+                 numericInput("stat_hist_alpha", "Alpha", value = 0.5, min = 0, max = 1, step = 0.1)
                )
         ),
         column(8,
@@ -297,7 +297,7 @@ shinyServer(
                  # checkboxInput("Heatmap_log_transform", label = "Log-Transform", value = TRUE),
                  checkboxInput("Heatmap_dendrogram", label = "Display Dendrogram", value = FALSE),
                  selectInput("Heatmap_cellnote_assay", "Select Cell Display Option",
-                             choices = c("stars", "reads", "percentages"),
+                             choices = c("stars", "counts", "percentages"),
                              selected = "stars"),
                  numericInput("Heatmap_labels", "Set Column Label Size", value = 14),
                  numericInput("Heatmap_starsize", "Set Cell Label Size", value = 6),
@@ -404,7 +404,7 @@ shinyServer(
                  br(),
                  br(),
                  #numericInput("corplot_thresh", "2. Reads threshold", value = 0),
-                 selectInput("corplot_Method", "Chooose Correlation Method", choices = c("pearson", "kendall", "spearman", "manhattan"), selected = "pearson"),
+                 selectInput("corplot_Method", "Chooose Correlation Method", choices = c("pearson", "spearman", "kendall"), selected = "pearson"),
                  selectInput("corplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"), 
                  textInput("corplot_Title", "Title", value = ""),
                  strong("Options"),

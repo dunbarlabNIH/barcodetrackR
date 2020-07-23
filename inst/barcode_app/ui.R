@@ -2,7 +2,7 @@
 shinyUI(
   fluidPage(
     titlePanel("Barcode App"),
-    a(href="http://github.com/d93espinoza/barcodetrackR", "Link to GitHub repository (source code, sample data, etc.)"),
+    a(href="http://dunbarlabNIH.github.io/barcodetrackR", "Link to GitHub repository (source code, sample data, etc.)"),
     hr(),
     fluidRow(
       column(4,
