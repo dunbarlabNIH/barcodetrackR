@@ -18,23 +18,23 @@ output:
 # Introduction
 
 ## Motivation
-[barcodetrackR](http://github.com/d93espinoza/barcodetrackR) is an R package developed for the analysis and visualization of clonal tracking data from cellular barcoding experiments.
+[barcodetrackR](http://github.com/diegoalexespi/barcodetrackR) is an R package developed for the analysis and visualization of clonal tracking data from cellular barcoding experiments.
 
 ## Installation
-Currently, [barcodetrackR](http://github.com/d93espinoza/barcodetrackR) is available at Github and can be downloaded using the devtools package.
+Currently, [barcodetrackR](http://github.com/diegoalexespi/barcodetrackR) is available at Github and can be downloaded using the devtools package.
 ```{r installation, eval = FALSE}
-devtools::install_github("d93espinoza/barcodetrackR")
+devtools::install_github("diegoalexespi/barcodetrackR")
 ```
 
 ## Contributors
-The R package and functions were created by Diego A. Espinoza, Ryland Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/d93espinoza/barcodetrackR/issues.
+The R package and functions were created by Diego A. Espinoza, Ryland Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/diegoalexespi/barcodetrackR/issues.
 
 
 # Loading data
 
 ## Loading required packages
 
-The [barcodetrackR](http://github.com/d93espinoza/barcodetrackR) package operates on [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) objects from the Bioconductor repository. It stores associated colData for each sample in this object as well as any metadata. We load the `barcodetrackR` and `SummarizedExperiment` packages here for our analyses, as well as the `magrittr` package in order to improve legibility of code through using the pipe `%>%` operator.
+The [barcodetrackR](http://github.com/diegoalexespi/barcodetrackR) package operates on [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) objects from the Bioconductor repository. It stores associated colData for each sample in this object as well as any metadata. We load the `barcodetrackR` and `SummarizedExperiment` packages here for our analyses, as well as the `magrittr` package in order to improve legibility of code through using the pipe `%>%` operator.
 
 ```{r load packages required, eval = TRUE, warning=FALSE, message=FALSE}
 
@@ -287,7 +287,7 @@ clonal_contribution(your_SE = wu_SE,
                     graph_type = "line",
                     plot_over = "months",
                     filter_by = "celltype",
-                    filter_selection = "NK_CD56n_CD16p",
+                    filter_selection = "NK_16",
                     plot_non_selected = FALSE)
 ```
 
