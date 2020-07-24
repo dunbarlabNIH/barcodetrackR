@@ -112,7 +112,9 @@ shinyServer(
         tabPanel("Chord Diagram",
                  uiOutput("ChordDiagram")),
         tabPanel("Ridge Plot",
-                 uiOutput("RidgePlot"))
+                 uiOutput("RidgePlot")),
+        tabPanel("Binary Heatmap",
+                 uiOutput("BinaryHeatmap"))
 
         # tabPanel("Scatter Plot",
         #          uiOutput("ScatterPlot")),
@@ -704,6 +706,67 @@ shinyServer(
     })
     
   
+    #======================================================================================================
+    #BINARY HEATMAP TAB
+    
+    output$BinaryHeatmap <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      BinaryHeatmapInput <- function(){
+        print(barcodetrackR::barcode_binary_heatmap(your_SE = BinaryHeatmap_data(),
+                                     plot_labels = NULL,
+                                     threshold =  input$BinaryHeatmap_threshold,
+                                     your_title = paste0(input$BinaryHeatmap_title),
+                                     label_size = input$BinaryHeatmap_labels
+                                     
+        ))}
+      
+      
+      output$viewBinaryHeatmap <- renderPlot({
+        BinaryHeatmapInput()
+      })
+      
+      BinaryHeatmap_data <- reactive({
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$BinaryHeatmap_samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$BinaryHeatmap_samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
+        
+      })
+      
+      
+      BinaryHeatmap_uploaded_samples <- reactive({
+        samples <- as.vector(t(read.delim(input$BinaryHeatmap_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
+        return(samples)
+      })
+      
+      observeEvent(input$BinaryHeatmap_uploaded_samples, {updateSelectizeInput(session, inputId = 'BinaryHeatmap_samples', selected = BinaryHeatmap_uploaded_samples())})
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 div(style="display:inline-block; height:85px;",fileInput("BinaryHeatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
+                 selectizeInput("BinaryHeatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 # downloadButton("Heatmap_download_samples", "Download This Sample List"),
+                 # strong("Clones with a proportion below this threshold will be set to 0."),
+                 numericInput("BinaryHeatmap_threshold", "Threshold (clones with a proportion below this threshold will be set to 0)", value = 0, min = 0, max = 1, step = 0.001),
+                 # strong("Options"),
+                 numericInput("BinaryHeatmap_labels", "Set Column Label Size", value = 14),
+                 textInput("BinaryHeatmap_title", "Title for Heatmap", value = "")
+                 
+               )
+        ),
+        column(8,
+               plotOutput('viewBinaryHeatmap', height = 800),
+               #   dataTableOutput('heatmap_datatable')
+        )
+      )
+    })
+    
+    
     
     # #======================================================================================================
     # #SCATTER PLOT TAB
