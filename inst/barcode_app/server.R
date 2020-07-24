@@ -103,12 +103,14 @@ shinyServer(
                  uiOutput("Heatmap")),
         tabPanel("Correlation Plot",
                  uiOutput("CorPlot")),
+        tabPanel("Dissimilarity Plot",
+                 uiOutput("mdsPlot")),
+        tabPanel("Clonal Contribution",
+                 uiOutput("ClonalContribution")),
         tabPanel("Clone Count",
                  uiOutput("CloneCount")),
         tabPanel("Clonal Diversity",
                  uiOutput("ClonalDiversity")),
-        tabPanel("Clonal Contribution",
-                 uiOutput("ClonalContribution")),
         tabPanel("Chord Diagram",
                  uiOutput("ChordDiagram")),
         tabPanel("Ridge Plot",
@@ -431,6 +433,72 @@ shinyServer(
     })
     
 
+    #======================================================================================================
+    #DISSIMILARITY PLOT TAB
+    
+    output$mdsPlot <- renderUI({
+      
+      if (is.null(thresholded_data()))
+        return()
+      
+      mdsInput <- function(){
+        print(barcodetrackR::mds_plot(your_SE = mds_data(),
+                       group_by = input$mds_group,
+                       method_dist = input$mds_method,
+                       assay = input$mds_assay,
+                       your_title = paste0(input$mds_title),
+                       point_size = input$mds_point_size,
+                       text_size = input$mds_text_size
+                       
+        ))}
+      
+      
+      output$view_mdsPlot <- renderPlot({
+        mdsInput()
+      })
+      
+      mds_data <- reactive({
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$mds_samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$mds_samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
+        
+      })
+      
+      
+      mds_uploaded_samples <- reactive({
+        samples <- as.vector(t(read.delim(input$mds_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
+        return(samples)
+      })
+      
+      observeEvent(input$mds_uploaded_samples, {updateSelectizeInput(session, inputId = 'mds_samples', selected = mds_uploaded_samples())})
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 div(style="display:inline-block; height:85px;",fileInput("mds_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
+                 selectizeInput("mds_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"), 
+                 selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"), 
+                 selectInput("mds_assay", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE, selected = "percentages"),
+                 strong("Options"),
+                 textInput("mds_title", "Title for plot", value = ""),
+                 numericInput("mds_point_size", "Point size", value = 5, min = 1, step = 1),
+                 numericInput("mds_text_size", "Text size", value = 16, min = 1, step = 1)
+                 
+               )
+        ),
+        column(8,
+               plotOutput('view_mdsPlot', height = 800),
+               #   dataTableOutput('heatmap_datatable')
+        )
+      )
+    })
+    
+    
+    
+    
     #======================================================================================================
     # Clonal Contribution TAB
     output$ClonalContribution <- renderUI({
