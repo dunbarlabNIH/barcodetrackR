@@ -513,7 +513,7 @@ shinyServer(
                                                  filter_selection = input$cc_filter_selection,
                                                  SAMPLENAME_choice = input$cc_samplename_choice,
                                                  plot_over = input$cc_plot_over,
-                                                 # plot_over_display_choices = input$cc_plot_over_choices,
+                                                 plot_over_display_choices = input$cc_plot_over_choices,
                                                  n_clones = input$cc_n_clones,
                                                  keep_numeric = input$cc_keep_numeric,
                                                  plot_non_selected = input$cc_plot_non_selected,
@@ -539,10 +539,11 @@ shinyServer(
                                                              inputId = 'cc_filter_selection',
                                                              choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$cc_filter_by]))})
       
-      # observeEvent(input$cc_plot_over, {updateSelectizeInput(session,
-      #                                                        inputId = 'cc_plot_over_choices',
-      #                                                        choices = unique(colData(thresholded_data())[,input$cc_plot_over]))})
+      observeEvent(input$cc_plot_over, {updateSelectizeInput(session,
+                                                             inputId = 'cc_plot_over_choices',
+                                                             choices = sort(unique(colData(thresholded_data())[,input$cc_plot_over]), decreasing = F))})
 
+      
       fluidRow(
         column(3,
                wellPanel(
@@ -551,15 +552,15 @@ shinyServer(
                  selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE), 
                  selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
                  selectInput("cc_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                # selectizeInput("cc_plot_over_choices", label = "Choose values to plot over", choices = c(""), multiple = TRUE), 
+                 selectInput("cc_plot_over_choices", label = "Include: (defaults to all values of Plot Over", choices = c(""), multiple = TRUE), 
                  numericInput("cc_n_clones", "Number of clones to color", value = 10),
                  textInput("cc_your_title", "Title", value = ""),
                  strong("Options"),
-                 checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = TRUE),
+                 checkboxInput("cc_keep_numeric", "Keep x-axis numeric", value = FALSE),
                  checkboxInput("cc_plot_non_selected", "Plot non-selected", value = FALSE),
                  numericInput("cc_linesize", "Line size", value = 0.2),
                  numericInput("cc_text_size", "Text size", value = 16),
-                 numericInput("cc_y_limit", "Manually set y limit", value = NULL)
+                 numericInput("cc_y_limit", "Manually set y limit", min = 0, max = 1, value = NULL, step = 0.05)
                )
         ),
         
@@ -581,7 +582,9 @@ shinyServer(
         print(barcodetrackR::count_clones(your_SE = thresholded_data(),
                            index_type = input$clone_index_type,
                            group_by = input$clone_group_by,
+                           group_by_choices = input$clone_group_by_choices,
                            plot_over = input$clone_plot_over,
+                           plot_over_display_choices = input$clone_plot_over_choices,
                            line_size = input$clone_line_size,
                            point_size = input$clone_point_size,
                            text_size = input$clone_text_size,
@@ -595,13 +598,25 @@ shinyServer(
       })
       
       
+      # Helper function to get unique values of the plot_over parameter
+      observeEvent(input$clone_plot_over, {updateSelectizeInput(session,
+                                                                    inputId = 'clone_plot_over_choices',
+                                                                    choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), decreasing = F))})
+
+      observeEvent(input$clone_group_by, {updateSelectizeInput(session,
+                                                                inputId = 'clone_group_by_choices',
+                                                                choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_group_by]))})
+      
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("clone_index_type", "Chooose Count Index",
                              choices = c("count","cumulative_count"), selected = "count"),
                  selectInput("clone_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("clone_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE), 
                  selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("clone_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE), 
+                #  selectInput("clone_plot_over_choices", label = "Include:", choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), multiple = TRUE, selected = unique(SummarizedExperiment::colData(thresholded_data())[,input$plot_over])),
                  textInput("clone_your_title", "Title", value = ""),
                  br(),
                  numericInput("clone_line_size", "Line size", value = 2),
@@ -630,7 +645,9 @@ shinyServer(
         print(barcodetrackR::clonal_diversity(your_SE = thresholded_data(),
                                               index_type = input$div_index,
                                               group_by = input$div_group_by,
+                                              group_by_choices = input$div_group_by_choices,
                                               plot_over = input$div_plot_over,
+                                              plot_over_display_choices = input$div_plot_over_choices,
                                               line_size = input$div_line_size,
                                               point_size = input$div_point_size,
                                               text_size = input$div_text_size,
@@ -643,6 +660,14 @@ shinyServer(
         ClonalDiversityInput()
       })
       
+      # Helper function to get unique values of the plot_over parameter
+      observeEvent(input$div_plot_over, {updateSelectizeInput(session,
+                                                                inputId = 'div_plot_over_choices',
+                                                                choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$div_plot_over]), decreasing = F))})
+      
+      observeEvent(input$div_group_by, {updateSelectizeInput(session,
+                                                               inputId = 'div_group_by_choices',
+                                                               choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$div_group_by]))})
       
       fluidRow(
         column(3,
@@ -650,7 +675,9 @@ shinyServer(
                  selectInput("div_index", "Chooose Diversity Index",
                              choices = c("shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
                  selectInput("div_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("div_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE), 
                  selectInput("div_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("div_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE), 
                  textInput("div_your_title", "Title", value = ""),
                  br(),
                  numericInput("div_line_size", "Line size", value = 2),
@@ -680,6 +707,7 @@ shinyServer(
                                         bias_1 = input$ridge_bias1,
                                         bias_2 = input$ridge_bias2,
                                         split_bias_over = input$ridge_split_bias_over,
+                                        bias_over = input$ridge_bias_over_select,
                                         remove_unique = input$ridge_rem_unique,
                                         weighted = input$ridge_weighted,
                                         text_size = input$ridge_text_size,
@@ -701,6 +729,10 @@ shinyServer(
                                                              inputId = 'ridge_bias2',
                                                              choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_on]))})
       
+      observeEvent(input$ridge_split_bias_over, {updateSelectizeInput(session,
+                                                              inputId = 'ridge_bias_over_select',
+                                                              choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_over]), decreasing = F))})
+      
       
       fluidRow(
         column(3,
@@ -709,6 +741,7 @@ shinyServer(
                  selectInput("ridge_bias1", label = "Selection 1", choices = c(""), multiple = FALSE), 
                  selectInput("ridge_bias2", label = "Selection 2", choices = c(""), multiple = FALSE), 
                  selectInput("ridge_split_bias_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
+                 selectInput("ridge_bias_over_select", label = "Include:", choices = c(""), multiple = TRUE), 
                  strong("Options"),
                  checkboxInput("ridge_weighted", "Weighted", value = FALSE),
                  checkboxInput("ridge_rem_unique", "Remove unique barcodes", value = FALSE),
@@ -834,6 +867,8 @@ shinyServer(
       )
     })
     
+    
+
     
     
     # #======================================================================================================

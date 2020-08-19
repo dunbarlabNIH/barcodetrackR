@@ -4,6 +4,7 @@
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param group_by The column of metadata you want to group by e.g. cell_type
+#'@param group_by_choices Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. timepoint
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.
 #'@param index_type Character. One of "count" or "cumulative_count". 
@@ -26,7 +27,8 @@ count_clones <- function(your_SE,
                          plot_over,
                          plot_over_display_choices = NULL,
                          group_by,
-                         index_type = "shannon",
+                         group_by_choices = NULL,
+                         index_type = "count",
                          point_size = 3,
                          line_size = 2,
                          text_size = 12,
@@ -34,20 +36,34 @@ count_clones <- function(your_SE,
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
+  
   if(!(plot_over %in% coldata_names)){
     stop("plot_over must match a column name in colData(your_SE)")
   }
   if(!(group_by %in% coldata_names)){
     stop("group_by must match a column name in colData(your_SE)")
   }
+  
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
   }
-
+  
+  group_by_choices <- group_by_choices %||% levels(SummarizedExperiment::colData(your_SE)[[group_by]])
+  
+  # More error handling
+  if(!all(plot_over_display_choices %in% SummarizedExperiment::colData(your_SE)[,plot_over])){
+    stop("All elements of plot_over_display_choices must match cvalues in plot_over column")
+  }
+  if(!all(group_by_choices %in% SummarizedExperiment::colData(your_SE)[,group_by])){
+    stop("All elements of group_by_choices must match values in group_by column")
+  }
+  
   # extract metadata
   temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
+  # Keep only the data included in group_by_choices
+  temp_subset <- temp_subset[,(temp_subset[[group_by]] %in% group_by_choices)]
   temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% tibble::as_tibble()
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]

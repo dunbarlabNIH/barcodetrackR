@@ -69,7 +69,8 @@ clonal_contribution <- function(your_SE,
   #select those samples which to plot_over and to filter_by
   temp_subset <- your_SE[,your_SE[[filter_by]] == filter_selection]
   if(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]])){
-    plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(temp_subset)[[plot_over]]))
+    plot_over_display_choices <- plot_over_display_choices  %||% sort(unique(SummarizedExperiment::colData(temp_subset)[[plot_over]]))
+    plot_over_display_choices <- as.numeric(as.character(plot_over_display_choices))
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(temp_subset)[[plot_over]])
   }
@@ -92,6 +93,7 @@ clonal_contribution <- function(your_SE,
     dplyr::left_join(temp_subset_coldata %>% dplyr::rename(sample_name = SAMPLENAME), by = "sample_name") %>%
     dplyr::mutate(sample_name = !!as.name(plot_over))
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
     plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(sample_name)))
   } else {
     plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
