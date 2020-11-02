@@ -9,7 +9,8 @@ count_clones(
   plot_over,
   plot_over_display_choices = NULL,
   group_by,
-  index_type = "shannon",
+  group_by_choices = NULL,
+  index_type = "count",
   point_size = 3,
   line_size = 2,
   text_size = 12,
@@ -24,6 +25,8 @@ count_clones(
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
 
 \item{group_by}{The column of metadata you want to group by e.g. cell_type}
+
+\item{group_by_choices}{Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.}
 
 \item{index_type}{Character. One of "count" or "cumulative_count".}
 

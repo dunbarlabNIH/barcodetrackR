@@ -16,7 +16,8 @@ stat_hist(
   text_size = 12,
   n_bins = 10,
   n_cols = 1,
-  alpha = 0.5
+  alpha = 0.5,
+  your_title = NULL
 )
 }
 \arguments{

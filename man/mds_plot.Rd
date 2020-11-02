@@ -6,7 +6,7 @@
 \usage{
 mds_plot(
   your_SE,
-  label_by = "SAMPLENAME",
+  group_by = "SAMPLENAME",
   method_dist = "bray",
   assay = "percentages",
   your_title = NULL,
@@ -17,7 +17,7 @@ mds_plot(
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
 
-\item{label_by}{Selection from colData used to label each point. Defaults to SAMPLENAME.}
+\item{group_by}{Selection from colData used to label each point. Defaults to SAMPLENAME.}
 
 \item{method_dist}{Dissimilarity index from vegan. One of "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", or "cao".}
 
@@ -36,5 +36,5 @@ Plots pairwise correlation plot for the samples in your_SE.
 Calculates a simmilarity/dissimlarity index or metrix for each sample-sample pair and reduces the resulting dist matrix into two dimensions
 }
 \examples{
-mds_plot(your_SE = wu_SE, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray", label_by = "celltype")
+mds_plot(your_SE = wu_SE, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray",group_by = "celltype")
 }
