@@ -2,7 +2,8 @@
 #'
 #' Carries out a specific instance of statistical testing relevant to clonal tracking experiments. For the provided SummarizedExperiment,
 #' compare the rank-abundance distribution which is described by the increase in cumulative abundance within that sample as barcode abundances are added, starting with the most abundant barcode.
-#' The two-sided Kolmogorov-Smirnov statistical test is carried out comparing each pair of samples using the R function ks.test.
+#' The two-sided Kolmogorov-Smirnov statistical test is carried out comparing each pair of samples using the R function ks.test:https://www.rdocumentation.org/packages/dgof/versions/1.2/topics/ks.test
+#' Note that this test compares rank-abundance distribution regardless of whether the samples share the same barcodes or lineage tracing elements. The test could be employed on two samples with no barcode sequence overlap, simply to compare whether the rank abundance distribution of barcodes is drawn from the same distribution.
 #' 
 #'
 #'@param your_SE  Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.

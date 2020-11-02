@@ -44,10 +44,10 @@ clonal_diversity <- function(your_SE,
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
-    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
+    plot_over_display_choices <- plot_over_display_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   }
   
-  group_by_choices <- group_by_choices %||% levels(SummarizedExperiment::colData(your_SE)[[group_by]])
+  group_by_choices <- group_by_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]]))
 
   # More error handling
   if(!all(plot_over_display_choices %in% SummarizedExperiment::colData(your_SE)[,plot_over])){

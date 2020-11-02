@@ -27,7 +27,7 @@ devtools::install_github("dunbarlabNIH/barcodetrackR")
 ```
 
 ## Contributors
-The R package and functions were created by Diego A. Espinoza, Ryland Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/dunbarlabNIH/barcodetrackR/issues.
+The R package and functions were created by Diego A. Espinoza, Ryland D. Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/dunbarlabNIH/barcodetrackR/issues.
 
 
 # Loading data
@@ -75,15 +75,18 @@ koelle_SE <- create_SE(your_data = koelle_dataframe,
                        meta_data = koelle_metadata,
                        threshold = 0)
 
-system.file("sample_data/BelderbosME_etal/mouse_UBC_C22.txt", package = "barcodetrackR") %>%
+system.file("sample_data/BelderbosME_etal/count_matrix_mouse_C21.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> belderbos_dataframe
 
-system.file("sample_data/BelderbosME_etal/mouse_UBC_C22_metadata.txt", package = "barcodetrackR") %>%
+system.file("sample_data/BelderbosME_etal/metadata_mouse_C21.txt", package = "barcodetrackR") %>%
   read.delim() -> belderbos_metadata
+
+belderbos_metadata$weeks <- factor(belderbos_metadata$weeks, levels = c("9", "14", "20", "22", "sac"))
 
 belderbos_SE <- create_SE(your_data = belderbos_dataframe,
                           meta_data = belderbos_metadata,
                           threshold = 0)
+
 
 
 system.file("sample_data/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
@@ -98,18 +101,6 @@ six_SE <- create_SE(your_data = six_dataframe,
 
 ```
 
-In addition to reads data, the Six et al. paper includes "estimated abundance" data for each of these timepoints. We load these into a new SE in order to compare our analyses downstream.
-
-```{r load custom counts, eval = TRUE}
-
-system.file("sample_data/SixE_etal/WAS5_estabundance.txt", package = "barcodetrackR") %>%
-  read.delim( row.names = 1) -> six_dataframe_2
-
-six_ea_SE <- create_SE(your_data = six_dataframe_2,
-                    meta_data = six_metadata,
-                    threshold = 0)
-
-```
 
 Our input dataframes to create the `SummarizedExperiment` (SE) objects are each an n x m `data.frame` where there are n rows of observations (typically cellular barcodes, insertion sites, or the like) and the m columns are the samples. The input metadata must have row order identical to the order of the colums in its corresponding dataframe. The metadata must also have a column titled `SAMPLENAME` that denotes the column of `your_data` it refers to.
 
@@ -125,6 +116,14 @@ Our input dataframes to create the `SummarizedExperiment` (SE) objects are each 
 
 ```{r list assays, eval = TRUE}
 assays(six_SE)
+```
+
+# Shiny app
+
+The [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) package includes a Shiny app for users without programming experience to analyze clonal tracking data and create high-quality visualizations. To launch the app, use the following line of code.
+
+```{r launch_app, eval=FALSE}
+barcodetrackR::launchApp()
 ```
 
 # Correlations
@@ -161,6 +160,7 @@ cor_plot(six_SE[,10:20],
 ```
 
 We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
+
 ```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
@@ -169,15 +169,16 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
 
-When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set.
+When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set. The U stands for unsorted.
 
 ```{r cor_plot 4, eval = TRUE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
-belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
          plot_type = "number",
          number_size = 3)
 ```
+
 
 # Clonal patterns
 
@@ -194,7 +195,7 @@ barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
                   cellnote_size = 4)
 ```
 
-We can also add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones within the Six dataset. First, we order the columns to group them by celltype. The dendrograms make it easily to visually categorize groups of similar clones.
+We can also add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones from each sample within the Six dataset. First, we order the columns to group them by celltype. The dendrograms make it easily to visually categorize groups of similar clones.
 
 ```{r barcode_ggheatmap six_SE, echo=TRUE, warning = FALSE, fig.width = 12, fig.height=10}
 six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS", "m55_TCELLS",
@@ -214,24 +215,23 @@ barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   distance_method = "euclidean")
 ```
 
-The Belderbos dataset generally contains less clones than either the Wu or Six datasets, likely because the data is from mice.  When possible, using the "percentages" option of the `cellnote_assay` argument provides maximal information.
+The Belderbos dataset generally contains less clones than either the Wu or Six datasets, so by using the "percentages" option of the `cellnote_assay` we can see the actual percentages of each sample.
 
 ```{r barcode_ggheatmap belderbos_SE, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
-belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   n_clones = 10,
                   label_size = 18,
-                  dendro = TRUE,
+                  dendro = FALSE,
                   cellnote_size = 4,
-                  cellnote_assay = "percentages",
-                  clusters = 4)
+                  cellnote_assay = "percentages")
 ```
 
 ## `barcode_ggheatmap_stat`
 
-In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells which the barcoding data approximates. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints, using a sample size of 5,000 barcoded cells per sample.
+In some cases, we may be interested in whether each barcode changed in proportion from one sample to another. The function barcode_ggheatmap_stat allows users to layer information from statistical tests onto the heat map. Note that this test requires an additional piece of information, which is the sample size of cells which the barcoding data approximates. In this case, we view the CD16+ NK cells from the Wu dataset at various timepoints. In this case, 40,000 barcoded cells were used for DNA extraction and high-throughput sequencing for each sample. The sample size does not have to be the same for each sample though. 
 
-The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. Users can view the p-value from the statistical test on the hatmap by changing the `cellnote_assay` parameter to `"p_val"`. Users can also compare each sample to a reference sample (such as the first timepoint) by changing the `stat_option` to `"reference"` and providing the desired sample name to the `reference_sample` parameter.
+The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. Users can view the p-value from the statistical test on the heatmap by changing the `cellnote_assay` parameter to `"p_val"`. Users can also compare each sample to a reference sample (such as the first timepoint) by changing the `stat_option` to `"reference"` and providing the desired sample name to the `reference_sample` parameter.
 
 ```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 10, fig.height=7}
 wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
@@ -240,7 +240,7 @@ wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
                       "ZJ31_17.5m_NK_CD56n_CD16p", "ZJ31_20m_NK_CD56n_CD16p")
 
 barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
-                       sample_size = rep(5000,length(wu_CD16_NK_order)),
+                       sample_size = rep(40000,length(wu_CD16_NK_order)),
                        stat_test = "chi-squared",
                        stat_option = "subsequent",
                        p_threshold = 0.05,
@@ -249,21 +249,20 @@ barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                        cellnote_size = 6)
 ```
 
-Users can also return the results from the statistical test using the `barcode_statistics` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample. It is important to set this parameter to avoid long computation times. 
+Users can also return the results from the statistical test using the `barcode_statistics` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample.  
 
-Here we make statistical comparisons on the CD16+ NK samples form the Wu dataset. 
+Here we make statistical comparisons on the CD16+ NK samples from the Wu dataset. 
 
 ```{r barcode_statistics wu_SE, eval = TRUE, echo=TRUE, warning = FALSE}
 
 wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
-                                            sample_size = rep(5000,length(wu_CD16_NK_order)),
+                                            sample_size = rep(40000,length(wu_CD16_NK_order)),
                                             stat_test = "chi-squared",
                                             stat_option = "subsequent",
                                             bc_threshold = 0.001)
 
 head(wu_CD16_NK_statistics$p_val[,4:5])
 ```
-
 
 ## `barcode_binary_heatmap`
 
@@ -294,13 +293,13 @@ clonal_contribution(your_SE = wu_SE,
 For data with fewer clones, a bar chart might be appropriate. We can view the peripheral blood samples from the belderbos dataset, previously shown as a heat map. By turning the `plot_non_selected` argument to True, we can see all clones as stacks on the bar but only color the top 10 clones from the chosen sample. We can also use categorical spacing on the x-axis rather than numeric by setting `keep_numeric` to false.
 
 ```{r clonal_contribution belderbos_SE, echo=TRUE, warning = FALSE, eval = TRUE}
-clonal_contribution(your_SE = belderbos_SE,
-                    SAMPLENAME_choice = "sac",
+clonal_contribution(your_SE = belderbos_SE[,1:6],
+                    SAMPLENAME_choice = "wk22_U",
                     n_clones = 10,
                     graph_type = "bar",
                     plot_over = "weeks",
-                    filter_by = "source",
-                    filter_selection = "PB",
+                    filter_by = "celltype",
+                    filter_selection = "bulk",
                     keep_numeric = FALSE,
                     plot_non_selected = TRUE)
 ```
@@ -308,7 +307,9 @@ clonal_contribution(your_SE = belderbos_SE,
 # Clonal bias
 
 ## `bias_histogram`
-The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
+The most straightforward way to view the bias between samples is using a histogram. We include the bias_histogram function which allows users to compare the frequency of shared barcode abundance between samples. The histogram shows the frequency of barcodes within different values of log bias (on the x-axis) with values close to 0 signifying similar abundance between the two samples. When the barcode abundance is 0 in one of the samples, it is lumped into the leftmost or right most bin of the histogram. By setting the `"remove_unique"` argument to TRUE, one can compare only the barcodes found in both samples being compared. 
+
+The function allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
 ```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 
@@ -353,7 +354,7 @@ ridge_plot(your_SE = wu_SE,
            add_dots = TRUE)
 ```
 
-We again view a comparison in the Wu dataset, this time comparing B cells to Granulocytes but turning the weighting OFF.
+We again view a comparison in the Wu dataset, this time comparing B cells to Granulocytes but turning the weighting OFF. In this visualization, the density statistics does not take into account eh abundance of the clones, so each clone is treated as equal. The fact that these ridge plots appear more biased than in the above visualization shows that many of the high-abundance clones are shared between samples, and the more biased clones tend to have lower overall abundance.
 
 ```{r ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
 ridge_plot(your_SE = wu_SE,
@@ -366,7 +367,7 @@ ridge_plot(your_SE = wu_SE,
 ```
 
 ## `bias_lineplot`
-In some cases, there may be enough data to observe more interesting longitudinal trends. In the Koelle dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; the clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages seem to have similar abundances in each lineage over time.
+In some cases, there may be enough data to observe more interesting longitudinal trends. In the Koelle dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; each line represents a single clone with shading weighted by its added proportion between both cell types. The clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages seem to have similar abundances in each lineage over time.
 
 ```{r bias_lineplot koelle_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 bias_lineplot(your_SE = koelle_SE,
@@ -383,9 +384,23 @@ bias_lineplot(your_SE = koelle_SE,
 ## `rank_abundance`
 A way to depict clone richness and evenness within a plot is by using a rank-abundance plot. Here, the cumulative abundance of every clone in a sample is plotted in descending rank from 1 to n (where there are n clones in the sample being plotted), or by scaling all ranks to the range [0,1].
 
-We plot all samples from the Belderbos dataset. Note that the week 10 and 14 samples appear to have the most _evenness_ across detected clones, while the other samples contain both large and small detected clones.
+Here, we plot the first 8 samples from the Belderbos dataset. Note that the week 9 samples appear to have the most _evenness_ across detected clones, while the other samples contain both large and small detected clones.
+
 ```{r belderbos rank_abundance, eval = TRUE}
-rank_abundance_plot(belderbos_SE, scale_rank = TRUE)
+rank_abundance_plot(belderbos_SE[,1:8],
+                    scale_rank = TRUE,
+                    point_size = 2)
+```
+
+In addition to visually comparing rank abundance plots, one might want to emply a statistical test to ask whether the rank-abundance profiles from different samples are drawn from the same distribution. We have implemented the two sample Kolmogorov-Smirnov test in the function `"rank_abundance_stat_test"` in order to compute pairwise p-values between each sample testing the null hypothesis that their rank abundance profile is drawn from the same distribution.
+
+Below, we illustrate this test on the same 8 samples from Belderbos et al shown above and print the p-values for all pairwise comparisons.
+
+```{r belderbos rank_abundance stat_test, eval = TRUE, warning = FALSE}
+
+stat_result <- rank_abundance_stat_test(belderbos_SE[,1:8])
+print(stat_result[["p_value"]])
+
 ```
 
 ## `clonal_diversity`
@@ -399,7 +414,10 @@ We also include `"count"` as an option for `index_type` in order to use the tota
 
 As an example, we can plot the shannon diversities for the 5 cell types within the Wu dataset over time.
 ```{r wu shannon, eval = TRUE}
-clonal_diversity(wu_SE[,1:20], plot_over = "months", group_by = "celltype", index_type = "shannon")
+clonal_diversity(wu_SE[,1:20],
+                 plot_over = "months",
+                 group_by = "celltype",
+                 index_type = "shannon")
 ```
 
 Here we show the simpson indices for the unsorted samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their shannon indices.
