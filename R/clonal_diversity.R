@@ -50,10 +50,10 @@ clonal_diversity <- function(your_SE,
   group_by_choices <- group_by_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]]))
 
   # More error handling
-  if(!all(plot_over_display_choices %in% SummarizedExperiment::colData(your_SE)[,plot_over])){
-    stop("All elements of plot_over_display_choices must match cvalues in plot_over column")
+  if(!all(plot_over_display_choices %in% levels(as.factor(SummarizedExperiment::colData(your_SE)[[plot_over]])))){
+    stop("All elements of plot_over_display_choices must match values in plot_over column")
   }
-  if(!all(group_by_choices %in% SummarizedExperiment::colData(your_SE)[,group_by])){
+  if(!all(group_by_choices %in% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]])))){
     stop("All elements of group_by_choices must match values in group_by column")
   }
   

@@ -420,16 +420,22 @@ clonal_diversity(wu_SE[,1:20],
                  index_type = "shannon")
 ```
 
-Here we show the simpson indices for the unsorted samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their shannon indices.
+Here we show the simpson indices for the Peripheral Blood samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their shannon indices.
 
 ```{r belderbos shannon, eval = TRUE}
-clonal_diversity(belderbos_SE, plot_over = "weeks", group_by = "cell.type", index_type = "shannon")
+clonal_diversity(belderbos_SE[,1:6],
+                 plot_over = "weeks",
+                 group_by = "celltype", 
+                 index_type = "shannon")
 ```
 
 Similar to the Wu dataset, the Six dataset contains clonal tracking information for the T, B, Gr, Monocyte, and NK lineages. We can plot these over time as well and utilize the simpson index as a measure of diversity. 
 
 ```{r six simpson, eval = TRUE}
-clonal_diversity(six_SE, plot_over = "months", group_by = "celltype", index_type = "simpson")
+clonal_diversity(six_SE,
+                 plot_over = "months",
+                 group_by = "celltype",
+                 index_type = "simpson")
 ```
 
 ## `mds_plot`
@@ -437,12 +443,12 @@ Measures of simmilarity or dissimilarity between samples are known as beta-diver
 
 One of the most commonly used beta-diversity indices is the [Bray-Curtis Dissimilarity](https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity). Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
 ```{r wu bray diversity, eval = TRUE}
-mds_plot(wu_SE, label_by = "celltype", method_dist = "bray", assay = "percentages")
+mds_plot(wu_SE, group_by = "celltype", method_dist = "bray", assay = "percentages")
 ```
 
 When using the Bray-Curtis dissimilarity index between all of the samples in the Six dataset, we find that similarly to the Wu dataset, NK cells appear dissimilar from the remainder of the celltypes, while Monocytes and Granulocytes appear most similar to one another.
 ```{r six bray diversity, eval = TRUE}
-mds_plot(six_SE, label_by = "celltype", method_dist = "bray", assay = "percentages")
+mds_plot(six_SE, group_by = "celltype", method_dist = "bray", assay = "percentages")
 ```
 
 
@@ -477,17 +483,18 @@ The plot is quite involved, but we can quickly draw a few high-level conclusions
 The regions of the circos plot need not be cell types. They could also be timepoints. Here, we show that example using the belderbos dataset from mouse studies showing only the first four timepoints of peripheral blood samples.
 
 ```{r circos_plot belderbos_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
-belderbos_wk_samples_PB <- c("wk10", "wk14", "wk20", "wk27", "wk33")
+belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 circos_plot(belderbos_SE[,belderbos_wk_samples_PB])
 ```
 
-From the circos plot, we can see that the wk10 and wk14 timepoints have fewer number of clones detected, as indicated by their smaller bars around the perimeter. There are some clones shared between all timepoints (*dark purple links*) but most of the clones appear to be present in the wk20, wk27, and wk33 samples but not the wk10 and wk14 (*green and yellow links*).
+From the circos plot, there are some clones shared between all timepoints (*dark purple links*) and some shared only between the wk14, wk20, and wk22 timepoints (*light green and yellow links*).
 
 ```{r circos_plot belderbos_SE 2, echo=TRUE, warning = FALSE, eval=TRUE}
-circos_plot(belderbos_SE[,belderbos_wk_samples_PB], weighted = TRUE)
+circos_plot(belderbos_SE[,belderbos_wk_samples_PB],
+            weighted = TRUE)
 ```
 
-When looking at the weighted heat map, one sees that the majority of hematopoiesis in timepoints past 10 weeks is accounted for by the group of clones (*turquoise color*) that are present at all timepoints except for the wk10 timepoint. There are some clones present at all timepoints (*dark purple*) and the green and yellow links mostly represent fraction of hematopoiesis in the later timepoints coming from clones first detected at wk14 or wk20. 
+When looking at the weighted heat map, one sees that the majority of hematopoiesis in timepoints past 9 weeks is accounted for by the group of clones (*dark purple color*) that are present at all timepoints.
 
 From this example, one can see that the two plots paint different but complementary pictures. With the regular circos plot, clones are treated as equal so the information on fractional contribution is lost. However, the number of detected clones is indicated by the length of each region around the perimeter of the circos. This information can be useful for some studies and it is lost in the weighted heat map since all compartments poportion adds to 100%. We recommend using the regular and circos plot in combination to obtain maximal information from any given dataset.
 
