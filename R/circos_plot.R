@@ -13,6 +13,7 @@
 #'
 #'@import viridis
 #'@import dplyr
+#'@importFrom plyr count
 #'
 #'@export
 #'
@@ -31,8 +32,11 @@ your_data <- SummarizedExperiment::assays(your_SE)$counts
 meta_data <- SummarizedExperiment::colData(your_SE)
 your_data <- as.matrix(your_data[rowSums(your_data) > 0,])
 
+# Error check
+if (!plot_label %in% colnames(meta_data)){
+  stop("Provided plot_label is not a column of the metadata.")
+}
 #get labels for heatmap
-# plot_label <- plot_label %||% 'SAMPLENAME'
 colnames(your_data) <- meta_data[,plot_label]
 
 # Create binary matrix of data
@@ -50,14 +54,15 @@ temp_prop <- temp_prop[rowSums(temp_binary)>1,]
 temp_binary <- temp_binary[rowSums(temp_binary)>1,]
 
 # Count the number of occurences of the unique combinations
-unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
+# unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
+unique_count <- plyr::count(as.data.frame(temp_binary))
 # Sort decreasing
 unique_count <- unique_count[do.call(order,-unique_count),]
 
 # Get the proportions of each barcode matching each unique combination
 unique_prop <- unique_count
-unique_prop$n <- NULL
-count_vec <- unique_count$n
+unique_prop$freq <- NULL
+count_vec <- unique_count$freq
 my_counter <- 1
 for (i in 1:nrow(unique_count)){
   my_start <- my_counter
@@ -67,7 +72,7 @@ for (i in 1:nrow(unique_count)){
   } else {
     unique_prop[i,] <- as.list(colSums(temp_prop[my_start:my_end,]))
   }
-  my_counter <- my_counter + as.numeric(unique_count$n[i])
+  my_counter <- my_counter + as.numeric(unique_count$freq[i])
 }
 
 # Generate counting index for each cell type
@@ -115,13 +120,13 @@ if (weighted == FALSE){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
-      circlize::circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + as.numeric(unique_count[i,"n"])),
-                            cell.2, c(count_index[cell.2],count_index[cell.2] + as.numeric(unique_count[i,"n"])),
+      circlize::circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + as.numeric(unique_count[i,"freq"])),
+                            cell.2, c(count_index[cell.2],count_index[cell.2] + as.numeric(unique_count[i,"freq"])),
                             col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
     for (k in 1:num_cells){
-      count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"n"])
+      count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"freq"])
     }
   }
   title(your_title, adj = 0)
