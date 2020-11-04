@@ -22,6 +22,7 @@
 #'@return Displays a heatmap in the current plot window.
 #'
 #'@importFrom rlang %||%
+#'@import ggplot2
 #'
 #'@export
 #'

@@ -7,9 +7,16 @@
 #'@param threshold Optional. A numeric indicating which reads to filter out (only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero) prior to creating the SE object.
 #'@param log_base A numeric indicating which base to use when logging the percentages.
 #'@param scale_factor A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode percentages on a per sample basis will be multiplied by 1 million before log+1 normalization.
+#'
+#'@return Returns a SummarizedExperiment holding your clonal tracking data and the associated metadata.
+#'
+#'@import SummarizedExperiment
+#'
 #'@examples
 #'create_SE(your_data = exp1_clonal_counts_data, meta_data = exp1_meta_data)
+#'
 #'@export
+#'
 create_SE <- function(your_data = NULL,
                       meta_data = NULL,
                       threshold = 0,

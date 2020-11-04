@@ -15,9 +15,11 @@
 #'@return Bias plot for two lineages over time.
 #'
 #'@importFrom rlang %||%
+#'@import ggridges
 #'
 #'@examples
-#'ridge_plot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+#'ridge_plot(your_se = SE, split_bias_on = "cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+#'
 #'@export
 ridge_plot <- function(your_SE,
                        split_bias_on,

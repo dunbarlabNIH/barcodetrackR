@@ -45,5 +45,6 @@ Bias plot for two lineages over time.
 Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
 }
 \examples{
-ridge_plot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+ridge_plot(your_se = SE, split_bias_on = "cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+
 }

@@ -1,6 +1,6 @@
 #' Barcode Circos plot
 #'
-#' Creates a circos plot showing each cell type as a region around a circle and shared clones between these cell types as links between the regions.
+#' Creates a chord diagram showing each cell type as a region around a circle and shared clones between these cell types as links between the regions.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param weighted weighted = F which is default will make links based on # of shared clones. Weighted = T will make links based on their proportion.
@@ -9,9 +9,9 @@
 #'@param your_title The title for the plot.
 #'@param text_size Size of region labels
 #'
-#'@return Displays a circos plot in the current plot window.
+#'@return Displays a chord diagram in the current plot window.
 #'
-#'@import dplyr
+#'@import viridis
 #'
 #'@export
 #'

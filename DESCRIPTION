@@ -19,7 +19,11 @@ Imports:
     proxy,
     scales,
     shiny,
-    vegan
+    vegan,
+    SummarizedExperiment,
+    tidyr,
+    rlang,
+    cowplot
 RoxygenNote: 7.1.0
 Suggests: 
     BiocStyle,

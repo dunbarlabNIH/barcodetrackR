@@ -27,10 +27,10 @@ circos_plot(
 \item{text_size}{Size of region labels}
 }
 \value{
-Displays a circos plot in the current plot window.
+Displays a chord diagram in the current plot window.
 }
 \description{
-Creates a circos plot showing each cell type as a region around a circle and shared clones between these cell types as links between the regions.
+Creates a chord diagram showing each cell type as a region around a circle and shared clones between these cell types as links between the regions.
 }
 \examples{
 circos_plot(your_SE = ZH33_SE,  plot_label = 'Cell_type')

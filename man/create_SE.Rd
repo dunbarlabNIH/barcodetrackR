@@ -23,9 +23,13 @@ create_SE(
 
 \item{scale_factor}{A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode percentages on a per sample basis will be multiplied by 1 million before log+1 normalization.}
 }
+\value{
+Returns a SummarizedExperiment holding your clonal tracking data and the associated metadata.
+}
 \description{
 Creates a SummarizedExperiment object from a data frame containing clonal tracking counts (`your_data`) with rows as observations and columns as samples, and the associated metadata (`meta_data`) with rows as samples and columns of information describing those samples.
 }
 \examples{
 create_SE(your_data = exp1_clonal_counts_data, meta_data = exp1_meta_data)
+
 }
