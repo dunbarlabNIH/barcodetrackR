@@ -392,7 +392,7 @@ rank_abundance_plot(belderbos_SE[,1:8],
                     point_size = 2)
 ```
 
-In addition to visually comparing rank abundance plots, one might want to emply a statistical test to ask whether the rank-abundance profiles from different samples are drawn from the same distribution. We have implemented the two sample Kolmogorov-Smirnov test in the function `"rank_abundance_stat_test"` in order to compute pairwise p-values between each sample testing the null hypothesis that their rank abundance profile is drawn from the same distribution.
+In addition to visually comparing rank abundance plots, one might want to emply a statistical test to ask whether the rank-abundance profiles from different samples are drawn from the same distribution. We have implemented the two sample Kolmogorov-Smirnov test in the function `"rank_abundance_stat_test"` in order to compute pairwise p-values between each samples testing the null hypothesis that their rank abundance profile is drawn from the same distribution. Note that this method is agnostic to whether the samples have actual shared barcode sequences - it simply compares the cumulative abundance distribution as barcodes are added from highest to lowest in abundance.
 
 Below, we illustrate this test on the same 8 samples from Belderbos et al shown above and print the p-values for all pairwise comparisons.
 
