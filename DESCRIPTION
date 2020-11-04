@@ -23,7 +23,8 @@ Imports:
     SummarizedExperiment,
     tidyr,
     rlang,
-    cowplot
+    cowplot,
+    ggridges
 RoxygenNote: 7.1.0
 Suggests: 
     BiocStyle,
