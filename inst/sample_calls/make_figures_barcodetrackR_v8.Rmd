@@ -239,7 +239,7 @@ dev.off()
 fig3_ptsz <- 1
 fig3_txsz <- 8
 
-six_cc <- count_clones(six_SE,
+six_cc <- clonal_count(six_SE,
                        plot_over = "months",
                        group_by = "celltype",
                        index_type = "count",
@@ -257,7 +257,7 @@ six_cd <- clonal_diversity(six_SE,
                            text_size = fig3_txsz)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
 
-bel_cc <- count_clones(belderbos_SE[,c(1:6, 13:16)],
+bel_cc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
                        plot_over = "weeks",
                        group_by = "celltype",
                        index_type = "count",
@@ -281,7 +281,7 @@ colData(esp_SE)$celltype <- gsub("Mono","Mo",colData(esp_SE)$celltype)
 # Name metadata days not day
 colnames(colData(esp_SE))[2] <- "days"
 
-esp_cc <- count_clones(esp_SE[,colData(esp_SE)$celltype != "EOS"],
+esp_cc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        plot_over = "days",
                        group_by = "celltype",
                        index_type = "count",
@@ -315,7 +315,7 @@ dev.off()
 
 ```{r figure S1, eval = TRUE}
 
-six_cumc <- count_clones(six_SE,
+six_cumc <- clonal_count(six_SE,
                        plot_over = "months",
                        group_by = "celltype",
                        index_type = "cumulative_count",
@@ -324,7 +324,7 @@ six_cumc <- count_clones(six_SE,
                        text_size = fig3_txsz)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
 
-bel_cumc <- count_clones(belderbos_SE[,c(1:6, 13:16)],
+bel_cumc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
                        plot_over = "weeks",
                        group_by = "celltype",
                        index_type = "cumulative_count",
@@ -333,7 +333,7 @@ bel_cumc <- count_clones(belderbos_SE[,c(1:6, 13:16)],
                        text_size = fig3_txsz)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
 
-esp_cumc <- count_clones(esp_SE[,colData(esp_SE)$celltype != "EOS"],
+esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        plot_over = "days",
                        group_by = "celltype",
                        index_type = "cumulative_count",
@@ -434,7 +434,7 @@ dev.off()
 fig5_txsz <- 8
 
 # Ridge plots
-six_ridge <- ridge_plot(your_SE = six_SE,
+six_ridge <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Gr",
                         bias_2 = "T",
@@ -443,7 +443,7 @@ six_ridge <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = fig5_txsz)
 
-ko_ridge <- ridge_plot(your_SE = koelle_SE,
+ko_ridge <- bias_ridge_plot(your_SE = koelle_SE,
                        split_bias_on = "celltype",
                        bias_1 = "Gr",
                        bias_2 = "T",
@@ -485,7 +485,7 @@ dev.off()
 figS2_txsz <- 8
 
 # Ridge plots
-six_ridge2 <- ridge_plot(your_SE = six_SE,
+six_ridge2 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Gr",
                         bias_2 = "Mo",
@@ -494,7 +494,7 @@ six_ridge2 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge3 <- ridge_plot(your_SE = six_SE,
+six_ridge3 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Gr",
                         bias_2 = "B",
@@ -503,7 +503,7 @@ six_ridge3 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge4 <- ridge_plot(your_SE = six_SE,
+six_ridge4 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Gr",
                         bias_2 = "NK",
@@ -512,7 +512,7 @@ six_ridge4 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge5 <- ridge_plot(your_SE = six_SE,
+six_ridge5 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Mo",
                         bias_2 = "T",
@@ -521,7 +521,7 @@ six_ridge5 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge6 <- ridge_plot(your_SE = six_SE,
+six_ridge6 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Mo",
                         bias_2 = "B",
@@ -530,7 +530,7 @@ six_ridge6 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge7 <- ridge_plot(your_SE = six_SE,
+six_ridge7 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "Mo",
                         bias_2 = "NK",
@@ -539,7 +539,7 @@ six_ridge7 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge8 <- ridge_plot(your_SE = six_SE,
+six_ridge8 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "T",
                         bias_2 = "B",
@@ -548,7 +548,7 @@ six_ridge8 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge9 <- ridge_plot(your_SE = six_SE,
+six_ridge9 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "T",
                         bias_2 = "NK",
@@ -557,7 +557,7 @@ six_ridge9 <- ridge_plot(your_SE = six_SE,
                         add_dots = TRUE,
                         text_size = figS2_txsz)
 
-six_ridge10 <- ridge_plot(your_SE = six_SE,
+six_ridge10 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
                         bias_1 = "B",
                         bias_2 = "NK",
@@ -603,7 +603,7 @@ dev.off()
 figS3_txsz <- 8
 
 # Ridge plots
-ko_ridge2 <- ridge_plot(your_SE = koelle_SE,
+ko_ridge2 <- bias_ridge_plot(your_SE = koelle_SE,
                        split_bias_on = "celltype",
                        bias_1 = "Gr",
                        bias_2 = "Mo",
@@ -613,7 +613,7 @@ ko_ridge2 <- ridge_plot(your_SE = koelle_SE,
                        add_dots = TRUE,
                        text_size = figS3_txsz)
 
-ko_ridge3 <- ridge_plot(your_SE = koelle_SE,
+ko_ridge3 <- bias_ridge_plot(your_SE = koelle_SE,
                        split_bias_on = "celltype",
                        bias_1 = "Mo",
                        bias_2 = "T",
@@ -638,7 +638,7 @@ dev.off()
 
 figS4_text_size <- 6 
 
-clarke_cc <- count_clones(clarke_SE,
+clarke_cc <- clonal_count(clarke_SE,
                               plot_over = "months",
                               group_by = "SAMPLENAME",
                               index_type = "count",

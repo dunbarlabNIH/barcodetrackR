@@ -1,6 +1,6 @@
-#' Barcode Statistics
+#' Barcode Statistical Test
 #'
-#' Carries out a specific instance of statistical testing relevant to clonal tracking experiments. For longitduinal observations (of barcode abundances) in the provided SE object, use a Chi-squared or Fisher exact test whether each barcode proportion has changed between samples. \cr Each column in the provided SE will be "tested" against the reference sample. If the `stat_option` argument is set to its default of "subsequent" then each sample will be compared to the sample before it. If this argument is set to "reference" the reference sample column name must be provided and each column will be tested against that reference sample. 
+#' Carries out a specific instance of statistical testing relevant to clonal tracking experiments. For longitudinal observations (of barcode abundances) in the provided SE object, use a Chi-squared or Fisher exact test whether each barcode proportion has changed between samples. \cr Each column in the provided SE will be "tested" against the reference sample. If the `stat_option` argument is set to its default of "subsequent" then each sample will be compared to the sample before it. If this argument is set to "reference" the reference sample column name must be provided and each column will be tested against that reference sample. 
 #'
 #'@param your_SE A Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
 #'@param sample_size A numeric vector providing the sample size of each column of the SummarizedExperiment passed to the function. This sample size describes the samples that the barcoding data is meant to approximate, for example the number of cells barcodes were extracted from.
@@ -15,9 +15,9 @@
 #'@export
 #'
 #'@examples
-#'barcode_statistics(your_SE = my_SE, sample_size = rep(5000,ncol(my__SE)), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
+#'barcode_stat_test(your_SE = my_SE, sample_size = rep(5000,ncol(my__SE)), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
 #'
-barcode_statistics <- function(your_SE,
+barcode_stat_test <- function(your_SE,
                                sample_size,
                                stat_test = "chi-squared",
                                stat_option = "subsequent",

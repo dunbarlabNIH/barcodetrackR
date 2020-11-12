@@ -3,25 +3,28 @@
 #'
 #'@title Clonal contribution plot
 #'
-#'@description Bar or line plot of percentage contribution from a selected choice or number of elements in the rows of the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
+#'@description Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param SAMPLENAME_choice The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.
-#'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.
-#'@param clones_sequences The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.
-#'@param graph_type Choice of "bar" or "line" for how to display the clonal contribution data
 #'@param filter_by Name of metadata column to filter by e.g. Lineage
 #'@param filter_selection The value of the filter column to display e.g. "T" (within Lineage)
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. Month
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.
+#'@param clones_sequences The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.
+#'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.
+#'@param graph_type Choice of "bar" or "line" for how to display the clonal contribution data
 #'@param keep_numeric If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.
 #'@param plot_non_selected Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice
 #'@param linesize Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
 #'@param y_limit Numeric. What the max value of the y scale should be for the "percentages" assay.
-#'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
+#'@param return_table Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.
+#'
+#'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
+#'
 #'@examples
-#'clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  SAMPLENAME_choice = "Gr_3m", plot_over = "Timepoint", n_clones = 20)
+#'clonal_contribution(your_data = your_barcoding_SE, graph_type = "bar",  SAMPLENAME_choice = "Granulocytes_3m", filter_by = "celltype", filter_selection = "Granulocytes", plot_over = "Timepoint_weeks", n_clones = 20)
 #'@export
 
 clonal_contribution <- function(your_SE,
@@ -38,7 +41,8 @@ clonal_contribution <- function(your_SE,
                                 linesize = 0.2,
                                 text_size = 15,
                                 your_title = "",
-                                y_limit = NULL){
+                                y_limit = NULL,
+                                return_table = FALSE){
 
 
   # Some basic error checking before running the function
@@ -112,6 +116,10 @@ clonal_contribution <- function(your_SE,
     plotting_data <- dplyr::filter(plotting_data, sequence %in% selected_sequences)
     plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences)))
     color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences))), selected_sequences)
+  }
+  
+  if (return_table){
+    return(plotting_data[,1:3])
   }
 
   if (graph_type == "bar"){

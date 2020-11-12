@@ -6,6 +6,7 @@
 \usage{
 cor_plot(
   your_SE,
+  assay = "percentages",
   plot_labels = colnames(your_SE),
   method_corr = "pearson",
   your_title = "",
@@ -22,15 +23,17 @@ cor_plot(
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
 
+\item{assay}{The choice of assay to use for the correlation calculation. Set to "percentages" by default.}
+
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{method_corr}{Character. One of "pearson", "spearman", or "kendall".}
 
-\item{your_title}{The title for the plot.}
+\item{your_title}{Character. The title for the plot.}
 
 \item{grid}{Logical. Include a grid or not in the correlation plot}
 
-\item{label_size}{The size of the column labels.}
+\item{label_size}{Numeric. The size of the column labels.}
 
 \item{plot_type}{Character. One of "color", "circle", or "number".}
 
@@ -40,15 +43,15 @@ cor_plot(
 
 \item{color_scale}{Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.}
 
-\item{number_size}{Size of the text label when plot_type is "number".}
+\item{number_size}{SNumeric. ize of the text label when plot_type is "number".}
 
-\item{point_scale}{The size of the largest point if the plot_type is "circle"}
+\item{point_scale}{Numeric. The size of the largest point if the plot_type is "circle"}
 }
 \value{
 Plots pairwise correlation plot for the samples in your_SE.
 }
 \description{
-Gives the pairwise correlation between each sample-sample pair in the data frame.
+Plots the pairwise correlation between the specified assay of each sample-sample pair in the provided SummarizedExperiment.
 }
 \examples{
 cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")

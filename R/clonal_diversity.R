@@ -1,8 +1,8 @@
 #' Clonal diversity plot
 #'
-#' A line plot that tracks a diversity measure from a selected choice or number of elements in the rows of the SummarizedExperiment object.
+#' A line plot that tracks a diversity measure from selected samples of the SummarizedExperiment object plotted over a specified variable.
 #'
-#'@param your_SE A Summarized Experiment object.
+#'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
 #'@param group_by The column of metadata you want to group by e.g. cell_type
 #'@param group_by_choices Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. timepoint
@@ -11,9 +11,10 @@
 #'@param point_size Numeric. Size of points.
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
-#'@param your_title The title for the plot.
+#'@param your_title Character. The title for the plot.
+#'@param return_table Logical. IF set to TRUE, rather than returning the plot of clonal diversity, the function will return a dataframe containing the diversity index values for each specified sample.
 #'
-#'@return Outputs plot of a diversity measure tracked for groups over a factor.
+#'@return Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to true, a dataframe will be returned instead.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
@@ -31,7 +32,8 @@ clonal_diversity <- function(your_SE,
                            point_size = 3,
                            line_size = 2,
                            text_size = 12,
-                           your_title = NULL) {
+                           your_title = NULL,
+                           return_table = FALSE) {
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -85,9 +87,14 @@ clonal_diversity <- function(your_SE,
     dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
 
   plotting_data[[plot_over]] <- factor(plotting_data[[plot_over]], levels = plot_over_display_choices)
+  
+  if (return_table){
+    return(plotting_data)
+  }
+  
   plotting_data$x_value <- plotting_data[[plot_over]]
   plotting_data$group_by <- plotting_data[[group_by]]
-
+  
   # Create ggplot
   ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
     ggplot2::geom_line(size = line_size)+

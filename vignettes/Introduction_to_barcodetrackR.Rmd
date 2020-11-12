@@ -150,16 +150,7 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          plot_type = "color")
 ```
 
-A number of options are included; here we plot the Koelle dataset for all included samples and observe the high pairwise correlation of Monocyte and Granulocyte samples.
-```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5, warning=FALSE, message=FALSE}
-cor_plot(six_SE[,10:20],
-         method_corr = "pearson",
-         plot_type = "circle",
-         label_size = 12,
-         point_scale = 8)
-```
-
-We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above.
+We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization.
 
 ```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
@@ -169,7 +160,7 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
 
-When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the belberdos sample data set. The U stands for unsorted.
+When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the Belderbos et al sample data set. The U stands for unsorted.
 
 ```{r cor_plot 4, eval = TRUE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
@@ -249,17 +240,17 @@ barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                        cellnote_size = 6)
 ```
 
-Users can also return the results from the statistical test using the `barcode_statistics` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample.  
+Users can also return the results from the statistical test using the `barcode_stat_test` function which outputs a list containing the FC, log_FC, and p-value of each barcode for each sample. The inputs are similar to the `barcode_ggheatmap_stat function`. The function only performs statistical testing on the barcodes which have a proportion greater than `bc_threshold` in at least one sample.  
 
 Here we make statistical comparisons on the CD16+ NK samples from the Wu dataset. 
 
-```{r barcode_statistics wu_SE, eval = TRUE, echo=TRUE, warning = FALSE}
+```{r barcode_stat_test wu_SE, eval = TRUE, echo=TRUE, warning = FALSE}
 
-wu_CD16_NK_statistics <- barcode_statistics(your_SE = wu_SE[,wu_CD16_NK_order],
-                                            sample_size = rep(40000,length(wu_CD16_NK_order)),
-                                            stat_test = "chi-squared",
-                                            stat_option = "subsequent",
-                                            bc_threshold = 0.001)
+wu_CD16_NK_statistics <- barcode_stat_test(your_SE = wu_SE[,wu_CD16_NK_order],
+                                           sample_size = rep(40000,length(wu_CD16_NK_order)),
+                                           stat_test = "chi-squared",
+                                           stat_option = "subsequent",
+                                           bc_threshold = 0.001)
 
 head(wu_CD16_NK_statistics$p_val[,4:5])
 ```
@@ -335,7 +326,7 @@ bias_histogram(your_SE = six_SE,
                ncols = 2)
 ```
 
-## `ridge_plot`
+## `bias_ridge_plot`
 An alternative to the histogram is a ridge plot which shows clonal bias between cell types through a density estimation of the number of clones at each value of the log bias. Since the ridge plot treats clonal bias as a continuous variable, it can reveal trends that are masked by grouping into bins with a histogram. 
 
 It is important to note that in order to handle clones which have a count of zero in one of the samples, log+1 normalization is used within the ridge plot function. This differs from the histogram where these clones can be grouped into the farthest bins on either side. The log bias formula for the ridge plot function is given by:
@@ -344,26 +335,26 @@ $logbias=log(\frac{normalized_1+1}{normalized_2+1})$
 
 Here, we view a ridge plot showing clonal bias between B cells and Granulocytes from the Wu dataset. We calculate the density statistic using the cumulative sum of the normalized values for each log2 comparison. We also visualize each clone as a dot on the plot, proportionate to the cumulative sum of the normalized values.
 
-```{r ridge_plot wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
-ridge_plot(your_SE = wu_SE,
-           split_bias_on = "celltype",
-           bias_1 = "B",
-           bias_2 = "Gr",
-           split_bias_over = "months",
-           weighted = TRUE,
-           add_dots = TRUE)
+```{r bias_ridge_plot wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
+bias_ridge_plot(your_SE = wu_SE,
+                split_bias_on = "celltype",
+                bias_1 = "B",
+                bias_2 = "Gr",
+                split_bias_over = "months",
+                weighted = TRUE,
+                add_dots = TRUE)
 ```
 
 We again view a comparison in the Wu dataset, this time comparing B cells to Granulocytes but turning the weighting OFF. In this visualization, the density statistics does not take into account eh abundance of the clones, so each clone is treated as equal. The fact that these ridge plots appear more biased than in the above visualization shows that many of the high-abundance clones are shared between samples, and the more biased clones tend to have lower overall abundance.
 
-```{r ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
-ridge_plot(your_SE = wu_SE,
-           split_bias_on = "celltype",
-           bias_1 = "B",
-           bias_2 = "Gr",
-           split_bias_over = "months",
-           weighted = FALSE,
-           add_dots = TRUE)
+```{r bias_ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
+bias_ridge_plot(your_SE = wu_SE,
+                split_bias_on = "celltype",
+                bias_1 = "B",
+                bias_2 = "Gr",
+                split_bias_over = "months",
+                weighted = FALSE,
+                add_dots = TRUE)
 ```
 
 ## `bias_lineplot`

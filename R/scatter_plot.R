@@ -3,14 +3,15 @@
 #' Plots a scatter plot of two samples in the Summarized Experiment object
 #'
 #'@param your_SE A Summarized Experiment object of two samples.
-#'@param assay The choice of assay to plot on the scatter plot
+#'@param assay The choice of assay to plot on the scatter plot. Set to "percentages" by default.
 #'@param plot_labels The labels for the X and Y axis of the plot
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.
 #'@param display_corr Logical. Whether to display the computer correlation or not.
-#'@param point_size The size of the points being plotted.
-#'@param your_title The title for the plot.
+#'@param point_size Numeric. The size of the points being plotted.
+#'@param your_title Logical. The title for the plot.
 #'@param text_size Numeric. Size of text in plot.
-#'@return Plots scatter plot for the samples in your_SE.
+#'
+#'@return Displays a scatter plot of the specified assay for the specified samples in your_SE with correlation value optionally displayed.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
@@ -31,7 +32,13 @@ scatter_plot = function(your_SE,
                         text_size = 12) {
 
   #extracts assay from your_SE
+  if (assay %in% names(SummarizedExperiment::assays(your_SE)) == FALSE){
+    stop("The specified assay is not found in your_SE.")
+  }
+  
   plotting_data <- SummarizedExperiment::assays(your_SE)[[assay]]
+  
+  
   if(ncol(plotting_data) != 2){
     stop("your_SE must only contain 2 samples (columns)")
   }

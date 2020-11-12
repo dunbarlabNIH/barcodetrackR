@@ -16,7 +16,8 @@ bias_histogram(
   text_size = 10,
   linesize = 0.4,
   ncols = 1,
-  scale_all_y = TRUE
+  scale_all_y = TRUE,
+  return_table = FALSE
 )
 }
 \arguments{
@@ -24,9 +25,9 @@ bias_histogram(
 
 \item{split_bias_on}{The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen}
 
-\item{bias_1}{The factor you wish to plot on the right side of the plots.}
+\item{bias_1}{The first cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the RIGHT side of the histogram.}
 
-\item{bias_2}{The factor you wish to plot on the left side of the plots.}
+\item{bias_2}{The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LEFT side of the ridge plot}
 
 \item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on.}
 
@@ -43,12 +44,14 @@ bias_histogram(
 \item{ncols}{Numeric. Number of columns to plot on using plot_grid from cowplot.}
 
 \item{scale_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
+
+\item{return_table}{Logical. If set to TRUE, instead of a plot, tbe function will return a list containing a dataframe for each sample-sample log bias combination containing each barcode sequence and its bias between the samples.}
 }
 \value{
-Histogram of log bias for two factors over another set of factors.
+Histogram of log bias for two factors faceted over another set of factors. Or, if return_table is set to TRUE, a list of dataframes containing the log bias data for each bias comparison passed to the function.
 }
 \description{
-Given a summarized experiment, gives histogram of log biases for 2 cell types
+Given a summarized experiment, gives histogram of log biases for 2 cell types. Each stacked bar in the histogram represents a clone binned by log bias defined as the log2 of the percentage abundance in the sample specified in "bias_1" divided by the percentage abundance in "bias_2."
 }
 \examples{
 bias_histogram(your_SE = SE, split_bias_on = "Lineage", bias_1 = "B", bias_2 = "T", split_bias_over = "Month", bias_over = c(1,2,4.5,12))

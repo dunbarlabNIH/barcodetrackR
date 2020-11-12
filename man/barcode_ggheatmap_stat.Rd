@@ -28,7 +28,8 @@ barcode_ggheatmap_stat(
   row_order = "hierarchical",
   clusters = 0,
   percent_scale = c(0, 2.5e-05, 0.001, 0.01, 0.1, 1),
-  color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
+  color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4"),
+  return_table = FALSE
 )
 }
 \arguments{
@@ -78,10 +79,12 @@ barcode_ggheatmap_stat(
 
 \item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
 
+\item{return_table}{Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote (* indicating statistical signficant change, for example) for each sample instead of displaying a plot. Note, for more in-depth statistical analysis, use the `"barcode_stat_test` function.}
+
 \item{show_all_signficant}{Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.}
 }
 \value{
-Displays a heatmap in the current plot window.
+Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnote for each sample.
 }
 \description{
 Creates a heatmap from the columns of data in the Summarized Experiment object, with the option to label based on statistical analysis. Uses ggplot2.

@@ -19,7 +19,8 @@ clonal_contribution(
   linesize = 0.2,
   text_size = 15,
   your_title = "",
-  y_limit = NULL
+  y_limit = NULL,
+  return_table = FALSE
 )
 }
 \arguments{
@@ -49,14 +50,16 @@ clonal_contribution(
 
 \item{y_limit}{Numeric. What the max value of the y scale should be for the "percentages" assay.}
 
+\item{return_table}{Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.}
+
 \item{clones_sequences}{The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.}
 }
 \value{
-Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones.
+Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 }
 \description{
-Bar or line plot of percentage contribution from a selected choice or number of elements in the rows of the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
+Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
-clonal_contribution(your_data = ZG66_simple_data, graph_type = "bar",  SAMPLENAME_choice = "Gr_3m", plot_over = "Timepoint", n_clones = 20)
+clonal_contribution(your_data = your_barcoding_SE, graph_type = "bar",  SAMPLENAME_choice = "Granulocytes_3m", filter_by = "celltype", filter_selection = "Granulocytes", plot_over = "Timepoint_weeks", n_clones = 20)
 }

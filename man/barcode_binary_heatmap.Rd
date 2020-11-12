@@ -9,7 +9,8 @@ barcode_binary_heatmap(
   plot_labels = NULL,
   threshold = 0,
   your_title = NULL,
-  label_size = 12
+  label_size = 12,
+  return_table = FALSE
 )
 }
 \arguments{
@@ -22,12 +23,14 @@ barcode_binary_heatmap(
 \item{your_title}{The title for the plot.}
 
 \item{label_size}{The size of the column labels.}
+
+\item{return_table}{Logical. Whether or not to return table of barcode sequences with their presence or absence in each sample indicated as a 1 or 0 resepctively in the value column column.}
 }
 \value{
-Displays a binary heat map in the current plot window.
+Displays a binary heat map in the current plot window. Or if return_table is set to TRUE, returns a dataframe indicating the presence or absence of each barcode in each sample.
 }
 \description{
-Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
+Creates a binary heatmap showing the absence or presence of new clones in samples ordered from L to R in the SummarizedExperiment.
 }
 \examples{
 barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])

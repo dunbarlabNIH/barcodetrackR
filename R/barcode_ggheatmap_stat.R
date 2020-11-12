@@ -26,8 +26,9 @@
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
 #'@param percent_scale A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.
 #'@param color_scale A character vector which indicates the colors of the color scale. Must be same length as percent_scale.
+#'@param return_table Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote (* indicating statistical signficant change, for example) for each sample instead of displaying a plot. Note, for more in-depth statistical analysis, use the `"barcode_stat_test` function.
 #'
-#'@return Displays a heatmap in the current plot window.
+#'@return Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnote for each sample.
 #'
 #'@importFrom rlang %||%
 #'
@@ -59,7 +60,8 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    row_order = "hierarchical",
                                    clusters = 0,
                                    percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
-                                   color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
+                                   color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4"),
+                                   return_table = FALSE) {
 
   # Apply bc_threshold
   bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$percentages, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
@@ -307,6 +309,10 @@ barcode_ggheatmap_stat <- function(your_SE,
   invisible_label <- plot_labels[which(max(nchar(as.character(plot_labels))) == nchar(as.character(plot_labels)))[1]]
 
 
+  if(return_table){
+    return(plotting_data)
+  }
+  
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
     ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+

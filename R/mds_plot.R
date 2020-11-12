@@ -2,14 +2,15 @@
 #'
 #' Calculates a simmilarity/dissimlarity index or metrix for each sample-sample pair and reduces the resulting dist matrix into two dimensions
 #'
-#'@param your_SE A Summarized Experiment object.
-#'@param group_by Selection from colData used to label each point. Defaults to SAMPLENAME.
+#'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
 #'@param method_dist Dissimilarity index from vegan. One of "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", or "cao".
 #'@param assay The assay to calculate the index on
-#'@param your_title The title for the plot.
-#'@param point_size The size of the points.
+#'@param your_title Character. The title for the plot.
+#'@param point_size Numeric. The size of the points.
 #'@param text_size Numeric. Size of text in plot.
-#'@return Plots pairwise correlation plot for the samples in your_SE.
+#'@param return_table Logical. If set to true, the function will return a dataframe containing each samples reduced measure of dissimilarity coordinates. 
+#'
+#'@return Plots dissimilarity indices between samples in your_SE. Or if return table is set to TRUE, returns a dataframe of each sample's reduced measures of dissimilarity coordinates.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
@@ -26,7 +27,8 @@ mds_plot = function(your_SE,
                     assay = "percentages",
                     your_title = NULL,
                     point_size = 3,
-                    text_size = 12) {
+                    text_size = 12,
+                    return_table = FALSE) {
 
   SummarizedExperiment::colData(your_SE) %>%
     tibble::as_tibble() %>%
@@ -44,6 +46,10 @@ mds_plot = function(your_SE,
   # if(is.null(your_title)){
   #   your_title <- paste0("PCoA on pairwise ", method_dist, " values")
   # }
+  
+  if (return_table){
+    return(plotting_data)
+  }
 
   ggplot2::ggplot(plotting_data, ggplot2::aes_string(x = "MDS_1", y = "MDS_2", color = group_by)) +
     ggplot2::geom_point(size = point_size)+

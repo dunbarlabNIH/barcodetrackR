@@ -10,24 +10,27 @@ rank_abundance_plot(
   point_size = 3,
   your_title = NULL,
   text_size = 12,
-  plot_labels = NULL
+  plot_labels = NULL,
+  return_table = FALSE
 )
 }
 \arguments{
 \item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
-\item{scale_rank}{Whether or not to scale all ranks from 0 to 1 or keep barcode ranks as their actual integer values. When `scale_rank` is set to FALSE, all samples will not necessarily have the same x maximum.}
+\item{scale_rank}{Logical. Whether or not to scale all ranks from 0 to 1 or keep barcode ranks as their actual integer values. When `scale_rank` is set to FALSE, all samples will not necessarily have the same x maximum.}
 
 \item{point_size}{Numeric. Size of the points for the plot.}
 
-\item{your_title}{Specify a title for the plot.}
+\item{your_title}{Character. Specify a title for the plot.}
 
 \item{text_size}{Numeric. Size of text in plot.}
 
 \item{plot_labels}{Vector of labels for each sample. If not specified, the colnames(your_SE) will be used.}
+
+\item{return_table}{Logical. If set to TRUE, rather than a plot, the function will return a dataframe containing for each sample, each barcode in rank order with its abundance in that sample, its scaled rank (0 to 1), and the cumulative sum of abundance for all barcodes with rank <= the rank of that barcode.}
 }
 \value{
-Displays a rank-abundance plot (made by ggplot2) of the samples chosen. \cr Each point represents a single barcode with the x-value describing its rank in abundance with 1 being the most abundant barcode \cr The y-value representing the cumulative abundance of all barcodes with rank less than or equal to the x-axis value.
+Displays a rank-abundance plot (made by ggplot2) of the samples chosen. \cr Each point represents a single barcode with the x-value describing its rank in abundance with 1 being the most abundant barcode \cr The y-value representing the cumulative abundance of all barcodes with rank less than or equal to the x-axis value. \cr If the return_table is set to TRUE, instead of a plot, a datframe with the rank abundance data will be returned.
 }
 \description{
 Create a rank abundance plot of the barcodes in the chosen samples provided in `your_SE`.
