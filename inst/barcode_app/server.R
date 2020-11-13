@@ -217,6 +217,9 @@ shinyServer(
                                                # log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
                                                ))}
 
+      
+
+      
       # HeatmapREADMEtable <- function(){
       #   your_table <- readme_data()
       #   your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
@@ -232,21 +235,7 @@ shinyServer(
       #                                             options = list(paging = FALSE, searching = FALSE))
       # 
       # 
-      # output$downloadHeatmapkey <- downloadHandler(
-      #   filename = function() {paste(input$file1, "_heatmapkey.txt", sep = "")},
-      #   content = function(file){
-      #     write.table(barcodetrackR::barcode_ggheatmap(your_SE = Heatmap_data(),
-      #                                                  plot_labels = NULL,
-      #                                                  n_clones = input$Heatmap_top_clones,
-      #                                                  log_transform = input$Heatmap_log_transform,
-      #                                                  printtable = TRUE,
-      #                                                  table_option = input$Heatmap_table_option,
-      #                                                  log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10),
-      #                                                  distance_method = input$Heatmap_distance,
-      #                                                  minkowski_power = input$Heatmap_mink_distance,
-      #                                                  hclust_linkage = input$Heatmap_hclust_linkage), file, sep = '\t', quote = FALSE)
-      #   }
-      # )
+
       # 
       # output$downloadHeatmapSTATS <- downloadHandler(
       #   filename = function() {paste(input$file1, "_heatmapSTATS.txt", sep = "")},
@@ -277,12 +266,37 @@ shinyServer(
 
       })
 
-      # output$Heatmap_download_samples <- downloadHandler(
-      #   filename = function() {paste("_samplelist.txt", sep = "\t")},
-      #   content = function(file){
-      #     write.table(input$Heatmap_samples, file, sep = '\t', quote = FALSE, row.names = FALSE, col.names = FALSE)
-      #   }
-      # )
+      output$downloadHeatmapData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "heatmap_data.txt", sep = "_")},
+        content = function(file){
+         write.table(barcodetrackR::barcode_ggheatmap(your_SE = Heatmap_data(),
+                                           plot_labels = NULL,
+                                           n_clones = input$Heatmap_top_clones,
+                                           cellnote_assay = input$Heatmap_cellnote_assay,
+                                           your_title = paste0(input$Heatmap_title),
+                                           grid = input$Heatmap_grid,
+                                           label_size = input$Heatmap_labels,
+                                           dendro = input$Heatmap_dendrogram,
+                                           cellnote_size = input$Heatmap_starsize,
+                                           distance_method = input$Heatmap_distance,
+                                           minkowski_power = input$Heatmap_mink_distance,
+                                           hclust_linkage = input$Heatmap_hclust_linkage,
+                                           row_order = input$Heatmap_row_order,
+                                           clusters = input$Heatmap_clusters,
+                                           percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
+                                           color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4"),
+                                           return_table = TRUE),
+                     file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
+      
+      
+      output$Heatmap_download_samples <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "samplelist.txt", sep = "_")},
+        content = function(file){
+          write.table(input$Heatmap_samples, file, sep = '\t', quote = FALSE, row.names = FALSE, col.names = FALSE)
+        }
+      )
 
       Heatmap_uploaded_samples <- reactive({
         samples <- as.vector(t(read.delim(input$Heatmap_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
@@ -296,7 +310,8 @@ shinyServer(
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
                  selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
-                 # downloadButton("Heatmap_download_samples", "Download This Sample List"),
+                 downloadButton("Heatmap_download_samples", "Download This Sample List"),
+                 br(),
                  numericInput("Heatmap_top_clones", "Number of top clones", value = 10),
                  strong("Options"),
                  checkboxInput("Heatmap_grid", label = "Grid", value = TRUE),
@@ -323,9 +338,9 @@ shinyServer(
                  # selectInput("Heatmap_table_option", "14. Select Format for Key (below)",
                  #             choices = c("logs", "reads", "percents", "ranks"),
                  #             selected = "percents"),
-                 # strong("15. Press button to download Heatmap Key."),
-                 # br(),
-                 # downloadButton('downloadHeatmapkey', 'Heatmap_key'),
+                 strong("Press button to download Heatmap data."),
+                 br(),
+                 downloadButton('downloadHeatmapData', 'Heatmap_data'),
                  # br(),
                  # strong("16. Press button to download Heatmap Stats."),
                  # br(),
@@ -365,30 +380,49 @@ shinyServer(
                                 point_scale = input$corplot_point_scale)
       }
 
-      output$downloadcorplotzip <- downloadHandler(
-        filename = function() {"corplot_files.zip"},
-        content = function(file){
-          tmpdir <- tempdir()
-          setwd(tmpdir)
-          listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(),
-                                                 # thresh = input$corplot_thresh, 
-                                                 your_title = input$corplot_Title,
-                                                 method_corr = input$corplot_Method,
-                                                 label_size = input$corplot_Labels,
-                                                 plot_type = input$corplot_Type,
-                                                 return_table = TRUE)
-          for(i in seq_along(listoffiles)){
-            write.table(listoffiles[[i]], file = paste0(names(listoffiles)[i], ".txt"), quote = FALSE, sep = '\t')
-          }
-          zip(zipfile = file, files = c("cortable.txt","cortable_pval.txt", "cortable_ci_hi.txt","cortable_ci_lo.txt"))
-          if(file.exists(file)) {file.rename(paste0(file), file)}
-        },
-        contentType = "application/zip"
-      )
-
+      # output$downloadcorplotzip <- downloadHandler(
+      #   filename = function() {"corplot_files.zip"},
+      #   content = function(file){
+      #     tmpdir <- tempdir()
+      #     setwd(tmpdir)
+      #     listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(),
+      #                                            # thresh = input$corplot_thresh, 
+      #                                            your_title = input$corplot_Title,
+      #                                            method_corr = input$corplot_Method,
+      #                                            label_size = input$corplot_Labels,
+      #                                            plot_type = input$corplot_Type,
+      #                                            return_table = TRUE)
+      #     for(i in seq_along(listoffiles)){
+      #       write.table(listoffiles[[i]], file = paste0(names(listoffiles)[i], ".txt"), quote = FALSE, sep = '\t')
+      #     }
+      #     zip(zipfile = file, files = c("cortable.txt","cortable_pval.txt", "cortable_ci_hi.txt","cortable_ci_lo.txt"))
+      #     if(file.exists(file)) {file.rename(paste0(file), file)}
+      #   },
+      #   contentType = "application/zip"
+      # )
+      # 
       output$viewcorplot <- renderPlot({
         corplotInput()
       })
+      
+      output$downloadCorData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "corplot_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::cor_plot(your_SE = corplot_data(),
+                                              # thresh = input$corplot_thresh,
+                                              your_title = input$corplot_Title,
+                                              method_corr = input$corplot_Method,
+                                              label_size = input$corplot_Labels,
+                                              plot_type = input$corplot_Type,
+                                              no_negatives = input$corplot_excludeneg,
+                                              grid = input$corplot_Grid,
+                                              # color_scale = input$corplot_Colors,
+                                              number_size = input$corplot_number_size,
+                                              point_scale = input$corplot_point_scale,
+                                              return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
 
       corplot_data <- reactive({
         se <- thresholded_data()
@@ -416,13 +450,16 @@ shinyServer(
                  strong("Options"),
                  checkboxInput("corplot_excludeneg", "Exclude negatives", value = FALSE),
                  checkboxInput("corplot_Grid", "Grid", value = TRUE),
-                # selectInput("corplot_Colors", "Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
+                 # selectInput("corplot_Colors", "Choose Color Scale", choices = c("default", "rainbow", "white_heat"), selected = "default"),
                  numericInput("corplot_Labels", "Set Label Size", value = 12),
                  numericInput("corplot_number_size", "Set Number Size", value = 4),
                  numericInput("corplot_point_scale", "Set Point Scale", value = 4),
-                 strong("Press button to downlaod CorPlot Files as .zip"),
+                 strong("Press button to download Correlation data."),
                  br(),
-                 downloadButton('downloadcorplotzip', 'corr_plot.zip')
+                 downloadButton('downloadCorData', 'Cor_data')
+                 # strong("Press button to downlaod CorPlot Files as .zip"),
+                 # br(),
+                 # downloadButton('downloadcorplotzip', 'corr_plot.zip')
                )
         ),
 
@@ -457,6 +494,21 @@ shinyServer(
         mdsInput()
       })
       
+      output$downloadMdsData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "mds_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::mds_plot(your_SE = mds_data(),
+                                              group_by = input$mds_group,
+                                              method_dist = input$mds_method,
+                                              assay = input$mds_assay,
+                                              your_title = paste0(input$mds_title),
+                                              point_size = input$mds_point_size,
+                                              text_size = input$mds_text_size,
+                                              return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
+      
       mds_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$mds_samples] # subset samples
@@ -485,8 +537,10 @@ shinyServer(
                  strong("Options"),
                  textInput("mds_title", "Title for plot", value = ""),
                  numericInput("mds_point_size", "Point size", value = 5, min = 1, step = 1),
-                 numericInput("mds_text_size", "Text size", value = 16, min = 1, step = 1)
-                 
+                 numericInput("mds_text_size", "Text size", value = 16, min = 1, step = 1),
+                 strong("Press button to download MDS data."),
+                 br(),
+                 downloadButton('downloadMdsData', 'MDS_data')
                )
         ),
         column(8,
@@ -529,6 +583,27 @@ shinyServer(
         ClonalContributionInput()
       })
       
+      output$downloadClonalContribData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "clonal_contribution_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
+                                                         graph_type = input$cc_graph_type,
+                                                         filter_by = input$cc_filter_by,
+                                                         filter_selection = input$cc_filter_selection,
+                                                         SAMPLENAME_choice = input$cc_samplename_choice,
+                                                         plot_over = input$cc_plot_over,
+                                                         plot_over_display_choices = input$cc_plot_over_choices,
+                                                         n_clones = input$cc_n_clones,
+                                                         keep_numeric = input$cc_keep_numeric,
+                                                         plot_non_selected = input$cc_plot_non_selected,
+                                                         linesize = input$cc_linesize,
+                                                         text_size = input$cc_text_size,
+                                                         your_title = input$cc_your_title,
+                                                         y_limit = input$cc_y_limit,
+                                                         return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
       
       # Helper function
       # filter_data_available <- reactive({
@@ -560,7 +635,10 @@ shinyServer(
                  checkboxInput("cc_plot_non_selected", "Plot non-selected", value = FALSE),
                  numericInput("cc_linesize", "Line size", value = 0.2),
                  numericInput("cc_text_size", "Text size", value = 16),
-                 numericInput("cc_y_limit", "Manually set y limit", min = 0, max = 1, value = NULL, step = 0.05)
+                 numericInput("cc_y_limit", "Manually set y limit", min = 0, max = 1, value = NULL, step = 0.05),
+                 strong("Press button to download clonal contribution data."),
+                 br(),
+                 downloadButton('downloadClonalContribData', 'Download_data')
                )
         ),
         
@@ -579,7 +657,7 @@ shinyServer(
         return()
       
       CloneCountInput <- function(){
-        print(barcodetrackR::count_clones(your_SE = thresholded_data(),
+        print(barcodetrackR::clonal_count(your_SE = thresholded_data(),
                            index_type = input$clone_index_type,
                            group_by = input$clone_group_by,
                            group_by_choices = input$clone_group_by_choices,
@@ -597,6 +675,23 @@ shinyServer(
         CloneCountInput()
       })
       
+      output$downloadClonalCountData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "clonal_count_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::clonal_count(your_SE = thresholded_data(),
+                                                  index_type = input$clone_index_type,
+                                                  group_by = input$clone_group_by,
+                                                  group_by_choices = input$clone_group_by_choices,
+                                                  plot_over = input$clone_plot_over,
+                                                  plot_over_display_choices = input$clone_plot_over_choices,
+                                                  line_size = input$clone_line_size,
+                                                  point_size = input$clone_point_size,
+                                                  text_size = input$clone_text_size,
+                                                  your_title = input$clone_your_title,
+                                                  return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
       
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$clone_plot_over, {updateSelectizeInput(session,
@@ -616,12 +711,15 @@ shinyServer(
                  selectInput("clone_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE), 
                  selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
                  selectInput("clone_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE), 
-                #  selectInput("clone_plot_over_choices", label = "Include:", choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), multiple = TRUE, selected = unique(SummarizedExperiment::colData(thresholded_data())[,input$plot_over])),
+                 #  selectInput("clone_plot_over_choices", label = "Include:", choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), multiple = TRUE, selected = unique(SummarizedExperiment::colData(thresholded_data())[,input$plot_over])),
                  textInput("clone_your_title", "Title", value = ""),
                  br(),
                  numericInput("clone_line_size", "Line size", value = 2),
                  numericInput("clone_point_size", "Point size", value = 5),
-                 numericInput("clone_text_size", "Text size", value = 16)
+                 numericInput("clone_text_size", "Text size", value = 16),
+                 strong("Press button to download clonal count data."),
+                 br(),
+                 downloadButton('downloadClonalCountData', 'Download_data')
                )
         ),
         
@@ -660,6 +758,24 @@ shinyServer(
         ClonalDiversityInput()
       })
       
+      output$downloadClonalDivData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "clonal_diversity_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::clonal_diversity(your_SE = thresholded_data(),
+                                                      index_type = input$div_index,
+                                                      group_by = input$div_group_by,
+                                                      group_by_choices = input$div_group_by_choices,
+                                                      plot_over = input$div_plot_over,
+                                                      plot_over_display_choices = input$div_plot_over_choices,
+                                                      line_size = input$div_line_size,
+                                                      point_size = input$div_point_size,
+                                                      text_size = input$div_text_size,
+                                                      your_title = input$div_your_title,
+                                                  return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
+      
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$div_plot_over, {updateSelectizeInput(session,
                                                                 inputId = 'div_plot_over_choices',
@@ -682,7 +798,10 @@ shinyServer(
                  br(),
                  numericInput("div_line_size", "Line size", value = 2),
                  numericInput("div_point_size", "Point size", value = 5),
-                 numericInput("div_text_size", "Text size", value = 16)
+                 numericInput("div_text_size", "Text size", value = 16),
+                 strong("Press button to download clonal diversity data."),
+                 br(),
+                 downloadButton('downloadClonalDivData', 'Download_data')
                )
         ),
         
@@ -702,7 +821,7 @@ shinyServer(
         return()
       
       RidgePlotInput <- function(){
-        print(barcodetrackR::ridge_plot(your_SE = thresholded_data(),
+        print(barcodetrackR::bias_ridge_plot(your_SE = thresholded_data(),
                                         split_bias_on = input$ridge_split_bias_on,
                                         bias_1 = input$ridge_bias1,
                                         bias_2 = input$ridge_bias2,
@@ -719,6 +838,24 @@ shinyServer(
       output$view_ridge_plot <- renderPlot({
         RidgePlotInput()
       })
+      
+      output$downloadRidgeData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "bias_ridge_plot_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::bias_ridge_plot(your_SE = thresholded_data(),
+                                                     split_bias_on = input$ridge_split_bias_on,
+                                                     bias_1 = input$ridge_bias1,
+                                                     bias_2 = input$ridge_bias2,
+                                                     split_bias_over = input$ridge_split_bias_over,
+                                                     bias_over = input$ridge_bias_over_select,
+                                                     remove_unique = input$ridge_rem_unique,
+                                                     weighted = input$ridge_weighted,
+                                                     text_size = input$ridge_text_size,
+                                                     add_dots = input$ridge_add_dots,
+                                                      return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
       
       # Helper function to get unique values of the split_bias_on parameter
       observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
@@ -746,7 +883,10 @@ shinyServer(
                  checkboxInput("ridge_weighted", "Weighted", value = FALSE),
                  checkboxInput("ridge_rem_unique", "Remove unique barcodes", value = FALSE),
                  checkboxInput("ridge_add_dots", "Add dots", value = TRUE),
-                 numericInput("ridge_text_size", "Text size", value = 16)
+                 numericInput("ridge_text_size", "Text size", value = 16),
+                 strong("Press button to download clonal ridge plot data."),
+                 br(),
+                 downloadButton('downloadRidgeData', 'Download_data')
                )
         ),
         
@@ -767,10 +907,10 @@ shinyServer(
         return()
       
       ChordDiagramInput <- function(){
-        print(barcodetrackR::circos_plot(your_SE = circos_data(),
+        print(barcodetrackR::chord_diagram(your_SE = circos_data(),
                                          weighted = input$circos_weighted,
                                          your_title = input$circos_title,
-                                         plot_label = input$circos_plot_label,
+                                         plot_label = input$chord_diagram_label,
                                          alpha = input$circos_alpha
         ))
       }
@@ -783,9 +923,22 @@ shinyServer(
         return(se)
       })
       
-      output$view_circos_plot <- renderPlot({
+      output$view_chord_diagram <- renderPlot({
         ChordDiagramInput()
       })
+      
+      output$downloadChordData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "chord_diagram_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::chord_diagram(your_SE = circos_data(),
+                                                   weighted = input$circos_weighted,
+                                                   your_title = input$circos_title,
+                                                   plot_label = input$chord_diagram_label,
+                                                   alpha = input$circos_alpha,
+                                                   return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
       
       fluidRow(
         column(3,
@@ -793,14 +946,17 @@ shinyServer(
                  selectizeInput("circos_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
                  strong("Options"),
                  checkboxInput("circos_weighted", "Weighted", value = FALSE),
-                 selectInput("circos_plot_label", "Plot labels",choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("chord_diagram_label", "Plot labels",choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
                  textInput("circos_title", "Title", value = ""),
-                 numericInput("circos_alpha", "Alpha", value = 1)
+                 numericInput("circos_alpha", "Alpha", value = 1),
+                 strong("Press button to download chord diagram data."),
+                 br(),
+                 downloadButton('downloadChordData', 'Download_data')
                )
         ),
         
         column(8,
-               plotOutput('view_circos_plot', height = 400)
+               plotOutput('view_chord_diagram', height = 400)
         )
       )
       
@@ -829,6 +985,20 @@ shinyServer(
         BinaryHeatmapInput()
       })
       
+      
+      output$downloadBinaryHeatmapData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "binary_heatmap_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::barcode_binary_heatmap(your_SE = BinaryHeatmap_data(),
+                                                            plot_labels = NULL,
+                                                            threshold =  input$BinaryHeatmap_threshold,
+                                                            your_title = paste0(input$BinaryHeatmap_title),
+                                                            label_size = input$BinaryHeatmap_labels,
+                                                            return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
+      
       BinaryHeatmap_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$BinaryHeatmap_samples] # subset samples
@@ -856,8 +1026,10 @@ shinyServer(
                  numericInput("BinaryHeatmap_threshold", "Threshold (clones with a proportion below this threshold will be set to 0)", value = 0, min = 0, max = 1, step = 0.001),
                  # strong("Options"),
                  numericInput("BinaryHeatmap_labels", "Set Column Label Size", value = 14),
-                 textInput("BinaryHeatmap_title", "Title for Heatmap", value = "")
-                 
+                 textInput("BinaryHeatmap_title", "Title for Heatmap", value = ""),
+                 strong("Press button to download Binary Heatmap data."),
+                 br(),
+                 downloadButton('downloadBinaryHeatmapData', 'Heatmap_data')
                )
         ),
         column(8,
