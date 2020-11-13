@@ -18,6 +18,7 @@
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
+#'@import tibble
 #'
 #'@examples
 #'diversity_plot(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)

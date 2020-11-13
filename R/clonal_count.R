@@ -12,13 +12,14 @@
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
 #'@param your_title The title for the plot.
-#'@param return_table 
+#'@param return_table Logical. If set to true, rather than returning a plot, the function will return the clonal count or cumulative count of each sample in a dataframe.
 #'
-#'@return Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to TRUE, a dataframe of the number of clones for each sample.
+#'@return Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to TRUE, a dataframe of the number of clones (or cumulative clones) for each sample.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
 #'@importFrom tidyr pivot_longer
+#'@import tibble
 #'
 #'@examples
 #'clonal_count(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
@@ -49,10 +50,10 @@ clonal_count <- function(your_SE,
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
-    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
+    plot_over_display_choices <- plot_over_display_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   }
   
-  group_by_choices <- group_by_choices %||% levels(SummarizedExperiment::colData(your_SE)[[group_by]])
+  group_by_choices <- group_by_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]]))
   
   # More error handling
   if(!all(plot_over_display_choices %in% SummarizedExperiment::colData(your_SE)[,plot_over])){

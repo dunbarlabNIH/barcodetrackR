@@ -453,25 +453,25 @@ ko_ridge <- bias_ridge_plot(your_SE = koelle_SE,
                        add_dots = TRUE,
                        text_size = fig5_txsz)
 
-# Circos plots
+# Chord diagrams
 
 # Make koelle naming consistent with six
 colData(koelle_SE)$celltype <- gsub("Mono",  "Mo", colData(koelle_SE)$celltype)
 
-# When saving circos plots to variables, I have to use this hacky way of doing it :/
-ko_circos_selection <- c("ZH33_38m_Gr_Ficoll","ZH33_38m_T","ZH33_38m_Mono")
-ko_circos <- function() circos_plot(koelle_SE[,ko_circos_selection],
+# When saving chord diagrams to variables, I have to use this hacky way of doing it :/
+ko_chord_selection <- c("ZH33_38m_Gr_Ficoll","ZH33_38m_T","ZH33_38m_Mono")
+ko_chord <- function() chord_diagram(koelle_SE[,ko_chord_selection],
                                     weighted = TRUE,
                                     plot_label = "celltype",
                                     text_size = fig5_txsz)
-six_circos_selection <- c("m55_GRANULOCYTES","m55_TCELLS","m55_MONOCYTES")
-six_circos <- function() circos_plot(six_SE[,six_circos_selection],
+six_chord_selection <- c("m55_GRANULOCYTES","m55_TCELLS","m55_MONOCYTES")
+six_chord <- function() chord_diagram(six_SE[,six_chord_selection],
                                      weighted = TRUE,
                                      plot_label = "celltype",
                                      text_size = fig5_txsz)
 
 pdf(file = file.path(results_dir, "Figure_5.pdf"), width = 8, height = 8)
-cowplot::plot_grid(six_ridge, six_circos, ko_ridge, ko_circos,
+cowplot::plot_grid(six_ridge, six_chord, ko_ridge, ko_chord,
                    ncol = 2, nrow = 2, align = "h",
                    labels = c("A", "B", "C", "D"))
 dev.off()
@@ -567,28 +567,28 @@ six_ridge10 <- bias_ridge_plot(your_SE = six_SE,
                         text_size = figS2_txsz)
 
 # Chord diagrams
-six_circos_selection2 <- c("m55_GRANULOCYTES","m55_BCELLS","m55_MONOCYTES")
-six_circos2 <- function() circos_plot(six_SE[,six_circos_selection2],
+six_chord_selection2 <- c("m55_GRANULOCYTES","m55_BCELLS","m55_MONOCYTES")
+six_chord2 <- function() chord_diagram(six_SE[,six_chord_selection2],
                                      weighted = TRUE,
                                      plot_label = "celltype",
                                      text_size = figS2_txsz)
 
-six_circos_selection3 <- c("m55_GRANULOCYTES","m55_NKCELLS","m55_MONOCYTES")
-six_circos3 <- function() circos_plot(six_SE[,six_circos_selection3],
+six_chord_selection3 <- c("m55_GRANULOCYTES","m55_NKCELLS","m55_MONOCYTES")
+six_chord3 <- function() chord_diagram(six_SE[,six_chord_selection3],
                                      weighted = TRUE,
                                      plot_label = "celltype",
                                      text_size = figS2_txsz)
 
-six_circos_selection4 <- c("m55_TCELLS","m55_BCELLS","m55_NKCELLS")
-six_circos4 <- function() circos_plot(six_SE[,six_circos_selection4],
+six_chord_selection4 <- c("m55_TCELLS","m55_BCELLS","m55_NKCELLS")
+six_chord4 <- function() chord_diagram(six_SE[,six_chord_selection4],
                                      weighted = TRUE,
                                      plot_label = "celltype",
                                      text_size = figS2_txsz)
 
 pdf(file = file.path(results_dir, "Figure_S2.pdf"), width = 11, height = 8)
-cowplot::plot_grid(six_ridge2, six_ridge3, six_ridge4, six_circos2,
-                   six_ridge5, six_ridge6, six_ridge7, six_circos3,
-                   six_ridge8, six_ridge9, six_ridge10, six_circos4,
+cowplot::plot_grid(six_ridge2, six_ridge3, six_ridge4, six_chord2,
+                   six_ridge5, six_ridge6, six_ridge7, six_chord3,
+                   six_ridge8, six_ridge9, six_ridge10, six_chord4,
                    ncol = 4, nrow = 3, align = "h",
                    labels = LETTERS[1:12])
 dev.off()

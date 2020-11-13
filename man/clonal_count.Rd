@@ -39,10 +39,10 @@ clonal_count(
 
 \item{your_title}{The title for the plot.}
 
-\item{return_table}{}
+\item{return_table}{Logical. If set to true, rather than returning a plot, the function will return the clonal count or cumulative count of each sample in a dataframe.}
 }
 \value{
-Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to TRUE, a dataframe of the number of clones for each sample.
+Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to TRUE, a dataframe of the number of clones (or cumulative clones) for each sample.
 }
 \description{
 A line plot that tracks the total number of clones or the cumulative number of clones from selected samples of the SummarizedExperiment object plotted over a specified variable.

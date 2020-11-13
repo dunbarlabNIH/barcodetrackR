@@ -11,26 +11,27 @@ mds_plot(
   assay = "percentages",
   your_title = NULL,
   point_size = 3,
-  text_size = 12
+  text_size = 12,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{your_SE}{A Summarized Experiment object.}
-
-\item{group_by}{Selection from colData used to label each point. Defaults to SAMPLENAME.}
+\item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
 \item{method_dist}{Dissimilarity index from vegan. One of "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", or "cao".}
 
 \item{assay}{The assay to calculate the index on}
 
-\item{your_title}{The title for the plot.}
+\item{your_title}{Character. The title for the plot.}
 
-\item{point_size}{The size of the points.}
+\item{point_size}{Numeric. The size of the points.}
 
 \item{text_size}{Numeric. Size of text in plot.}
+
+\item{return_table}{Logical. If set to true, the function will return a dataframe containing each samples reduced measure of dissimilarity coordinates.}
 }
 \value{
-Plots pairwise correlation plot for the samples in your_SE.
+Plots dissimilarity indices between samples in your_SE. Or if return table is set to TRUE, returns a dataframe of each sample's reduced measures of dissimilarity coordinates.
 }
 \description{
 Calculates a simmilarity/dissimlarity index or metrix for each sample-sample pair and reduces the resulting dist matrix into two dimensions

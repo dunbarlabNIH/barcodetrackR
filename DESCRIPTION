@@ -25,7 +25,8 @@ Imports:
     rlang,
     cowplot,
     ggridges,
-    viridis
+    viridis,
+    tibble
 RoxygenNote: 7.1.0
 Suggests: 
     BiocStyle,

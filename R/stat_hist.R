@@ -15,6 +15,7 @@
 #'@param n_cols Number of columns for faceted histograms.
 #'@param text_size Size of text.
 #'@param alpha The transparency of the histograms if group_by is provided. Lower = more transparent. 1 = opaque
+#'
 #'@return Histogram of chosen statistics
 #'
 #'@importFrom rlang %||%
@@ -34,8 +35,6 @@ stat_hist <- function(your_SE,
                       n_cols = 1,
                       alpha = 0.5,
                       your_title = NULL){
-  
-  
   
   if (data_choice == "barcode_stats"){
     

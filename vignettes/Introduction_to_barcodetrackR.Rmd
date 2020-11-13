@@ -443,45 +443,45 @@ mds_plot(six_SE, group_by = "celltype", method_dist = "bray", assay = "percentag
 ```
 
 
-# Circos plot
+# Chord diagram
 
-The circos plot is a fun way to view relationships between variables. We make use of the [circlize package](https://jokergoo.github.io/circlize_book/book/graphics.html) to show shared clones between compartments as links between regions around a circle. Here, we will start by subetting our data to a single timepoint and comparing just three cell types: T cells, B cells, and Granulocytes. 
+The chord diagram provides an informative way to view relationships between variables. We make use of the [circlize package](https://jokergoo.github.io/circlize_book/book/graphics.html) to show shared clones between compartments as links between regions around a circle. Here, we will start by subetting our data to a single timepoint and comparing just three cell types: T cells, B cells, and Granulocytes. 
 
-```{r circos_plot wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
+```{r chord_diagram wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_circos_selection <- c("ZJ31_12m_T","ZJ31_12m_B","ZJ31_12m_Gr")
-circos_plot(wu_SE[,wu_circos_selection], plot_label = "celltype")
+chord_diagram(wu_SE[,wu_circos_selection], plot_label = "celltype")
 ```
 
 Here, we can see that most clones are present in all three cell types (*purple link*). There are also clones shared between each pair-wise combination of cell types. Based on the width of the links, you can ascertain that more clones are shared between Granulocytes and B cells (*yellow link*), followed by B cells and T cells (*blue link*), then T cells and Granulocytes (*green link*). The portion of each cell type without a link (*empty space*) represents the number of clones which are unique to that cell type.
 
 We can also create a weighted circos plot. The difference is that in the previous plot, the width of the links between cell types are proportional to the *number of clones* shared between those cell types. In the weighted heat map, the width of the links between two cell types is proportional to the *proportion of contribution* of the shared clones to the overall hematopoiesis in that cell type.
 
-```{r circos_plot wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
-circos_plot(wu_SE[,wu_circos_selection], plot_label = "celltype", weighted = TRUE)
+```{r chord_diagram wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
+chord_diagram(wu_SE[,wu_circos_selection], plot_label = "celltype", weighted = TRUE)
 ```
 
 In this example, the circos plots look very similar. But you can see the subtle difference when you look at the blue link showing clones shared between B and T cells. The link is wider when connecting to T cells because the shared Bcell-Tcell clones represent a larger fraction of detected hematopoiesis in the T cell compartment than the B cell compartment. 
 
 The circos plot can handle any number of inputs but keep in mind that the number of unique combinations rises exponentially with the number of compartments. Here, we use the alpha parameter to control the transparency of the links. And we plot four cell types rather than three.
 
-```{r circos_plot wu_SE 3, echo=TRUE, warning = FALSE, eval = TRUE}
+```{r chord_diagram wu_SE 3, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_circos_selection2 <- c("ZJ31_12m_T","ZJ31_12m_B","ZJ31_12m_Gr","ZJ31_12m_NK_CD56n_CD16p")
-circos_plot(wu_SE[,wu_circos_selection2], plot_label = "celltype", alpha = 0.9)
+chord_diagram(wu_SE[,wu_circos_selection2], plot_label = "celltype", alpha = 0.9)
 ```
 
 The plot is quite involved, but we can quickly draw a few high-level conclusions. A large chunk of clones are shared between all four cell types (*darkest purple color*). Another large chunk of clones is shared between B cells, T cells, and Grans but not NK cells (*lighter purple*). Note that each unique color signifies a unique combination of the four cell types. 
 
 The regions of the circos plot need not be cell types. They could also be timepoints. Here, we show that example using the belderbos dataset from mouse studies showing only the first four timepoints of peripheral blood samples.
 
-```{r circos_plot belderbos_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
+```{r chord_diagram belderbos_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
-circos_plot(belderbos_SE[,belderbos_wk_samples_PB])
+chord_diagram(belderbos_SE[,belderbos_wk_samples_PB])
 ```
 
-From the circos plot, there are some clones shared between all timepoints (*dark purple links*) and some shared only between the wk14, wk20, and wk22 timepoints (*light green and yellow links*).
+From the chord diagram, there are some clones shared between all timepoints (*dark purple links*) and some shared only between the wk14, wk20, and wk22 timepoints (*light green and yellow links*).
 
-```{r circos_plot belderbos_SE 2, echo=TRUE, warning = FALSE, eval=TRUE}
-circos_plot(belderbos_SE[,belderbos_wk_samples_PB],
+```{r chord_diagram belderbos_SE 2, echo=TRUE, warning = FALSE, eval=TRUE}
+chord_diagram(belderbos_SE[,belderbos_wk_samples_PB],
             weighted = TRUE)
 ```
 

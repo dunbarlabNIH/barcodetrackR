@@ -1,8 +1,8 @@
 #' Autocorrelation Plot
 #'
-#' Gives the pairwise correlation between each sample-sample pair in the data frame.
+#' Gives the pairwise correlation between each sample-sample pair in the data frame. Considers all samples matching the provided "filter_selection" within the "filter_by" column of your metadata. For each unique value of the "plot_over" argument, plots the correlation of that sample with all other samples as a line plot.
 #'
-#'@param your_SE A Summarized Experiment object.
+#'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall".
 #'@param filter_by Name of metadata column to filter by e.g. Lineage
 #'@param filter_selection The value of the filter column to display e.g. "T" (within Lineage)
@@ -14,7 +14,9 @@
 #'@param point_size Numeric. Size of the points.
 #'@param line_size Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
-#'@return Plots pairwise correlation plot for the samples in your_SE.
+#'@param return_table Logical. If set to true, insetad of returning a plot, the function will return a dataframe containing the pairwise correlation values between samples.
+#'
+#'@return Plots pairwise correlation plot for the samples in your_SE. Or, a dataframe of the pairwise correlation values if return_table is set to TRUE.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
@@ -36,7 +38,8 @@ autocor_plot = function(your_SE,
                         no_negatives = FALSE,
                         point_size = 1,
                         line_size = 1,
-                        text_size = 15) {
+                        text_size = 15,
+                        return_table = FALSE) {
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -104,6 +107,10 @@ autocor_plot = function(your_SE,
       dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
   }
 
+  if (return_table){
+    return(plotting_data_longer)
+  }
+  
   gg_autocorplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = target_sample, y = correlation_value, group = grouping_sample, color = grouping_sample)) +
     ggplot2::geom_line(size=line_size)+
     ggplot2::geom_point(size=point_size)+

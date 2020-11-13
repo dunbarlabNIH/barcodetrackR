@@ -16,11 +16,12 @@ autocor_plot(
   no_negatives = FALSE,
   point_size = 1,
   line_size = 1,
-  text_size = 15
+  text_size = 15,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{your_SE}{A Summarized Experiment object.}
+\item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
 \item{method_corr}{Character. One of "pearson", "spearman", or "kendall".}
 
@@ -43,12 +44,14 @@ autocor_plot(
 \item{line_size}{Numeric. Thickness of the lines.}
 
 \item{text_size}{Numeric. Size of text in plot.}
+
+\item{return_table}{Logical. If set to true, insetad of returning a plot, the function will return a dataframe containing the pairwise correlation values between samples.}
 }
 \value{
-Plots pairwise correlation plot for the samples in your_SE.
+Plots pairwise correlation plot for the samples in your_SE. Or, a dataframe of the pairwise correlation values if return_table is set to TRUE.
 }
 \description{
-Gives the pairwise correlation between each sample-sample pair in the data frame.
+Gives the pairwise correlation between each sample-sample pair in the data frame. Considers all samples matching the provided "filter_selection" within the "filter_by" column of your metadata. For each unique value of the "plot_over" argument, plots the correlation of that sample with all other samples as a line plot.
 }
 \examples{
 autocor_plot(six_SE, plot_over = "months", filter_by = "celltype", filter_selection = "Gr", no_negatives = TRUE, keep_numeric = TRUE)
