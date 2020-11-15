@@ -485,8 +485,10 @@ shinyServer(
                        assay = input$mds_assay,
                        your_title = paste0(input$mds_title),
                        point_size = input$mds_point_size,
-                       text_size = input$mds_text_size
-                       
+                       text_size = input$mds_text_size,
+                       kmeans_cluster = input$kmeans_cluster,
+                       k.param = input$k.param,
+                       draw_ellipses = input$draw_ellipses
         ))}
       
       
@@ -504,6 +506,9 @@ shinyServer(
                                               your_title = paste0(input$mds_title),
                                               point_size = input$mds_point_size,
                                               text_size = input$mds_text_size,
+                                              kmeans_cluster = input$kmeans_cluster,
+                                              k.param = input$k.param,
+                                              draw_ellipses = input$draw_ellipses,
                                               return_table = TRUE),
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
@@ -534,6 +539,9 @@ shinyServer(
                  selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"), 
                  selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"), 
                  selectInput("mds_assay", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE, selected = "percentages"),
+                 checkboxInput("kmeans_cluster", label = "Compute k means clusters", value = FALSE),
+                 numericInput("k.param", "k (number of kmeans clusters)", value = 3, min = 1, step = 1),
+                 checkboxInput("draw_ellipses", label = "Draw ellipses for k means clusters", value = FALSE),
                  strong("Options"),
                  textInput("mds_title", "Title for plot", value = ""),
                  numericInput("mds_point_size", "Point size", value = 5, min = 1, step = 1),

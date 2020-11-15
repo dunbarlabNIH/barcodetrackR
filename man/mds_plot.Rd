@@ -12,7 +12,10 @@ mds_plot(
   your_title = NULL,
   point_size = 3,
   text_size = 12,
-  return_table = FALSE
+  return_table = FALSE,
+  kmeans_cluster = FALSE,
+  k.param = 3,
+  draw_ellipses = FALSE
 )
 }
 \arguments{
@@ -29,6 +32,12 @@ mds_plot(
 \item{text_size}{Numeric. Size of text in plot.}
 
 \item{return_table}{Logical. If set to true, the function will return a dataframe containing each samples reduced measure of dissimilarity coordinates.}
+
+\item{kmeans_cluster}{Logical. If set to true, each sample will be assigned a cluster computed by kmeans on the reduced dimensional space computed on the measures of dissimilarity between samples.}
+
+\item{k.param}{Numeric. If kmeans_cluster is TRUE, provide the number of kmeans clusters to identify.}
+
+\item{draw_ellipses}{Logical. If kmeans_cluster is TRUE, draw ellipses around the different kmeans clusters.}
 }
 \value{
 Plots dissimilarity indices between samples in your_SE. Or if return table is set to TRUE, returns a dataframe of each sample's reduced measures of dissimilarity coordinates.
