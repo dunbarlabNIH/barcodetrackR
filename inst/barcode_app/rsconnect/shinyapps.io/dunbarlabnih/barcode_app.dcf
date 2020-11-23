@@ -1,0 +1,10 @@
+name: barcode_app
+title:
+username:
+account: dunbarlabnih
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3290350
+bundleId: 3897051
+url: https://dunbarlabnih.shinyapps.io/barcode_app/
+when: 1606169533.1195
