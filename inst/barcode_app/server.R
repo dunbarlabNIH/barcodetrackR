@@ -7,20 +7,56 @@ shinyServer(
 
     #=========================================================================================================
 
+    my_data <- reactiveVal()
+    observeEvent(input$file1, {
+      tmp1 <- read.delim(input$file1$datapath,  row.names =1)
+      my_data(tmp1)
+    })
+    observeEvent(input$loadSampleData, {
+      tmp1 <- read.delim(system.file("sample_data/app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
+      my_data(tmp1)
+      output$SampleDataText <- renderText({ 
+        "Data loaded."
+      })
+    })
+    
+    my_metadata <- reactiveVal()
+    observeEvent(input$file2, {
+      tmp2 <- read.delim(input$file2$datapath)
+      my_metadata(tmp2)
+    })
+    observeEvent(input$loadSampleMetadata, {
+      tmp2 <- read.delim(system.file("sample_data/app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR"))
+      my_metadata(tmp2)
+      output$SampleMetadataText <- renderText({ 
+        "Metadata loaded."
+      })
+    })
+    
     output$thresholdPanel <- renderUI({
-      if (is.null(input$file1) | is.null(input$file2)) #| is.null(input$file3))
+      # if (is.null(input$file1) | is.null(input$file2)) #| is.null(input$file3))
+      if (is.null(my_data()) | is.null(my_metadata())) 
         return()
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
-
-
     })
 
+    # input$file1 <- eventReactive(input$loadSampleData, {
+    #   system.file("sample_data/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
+    #     read.delim(row.names = 1)
+    # })
+    # 
+    # input$file1 <- eventReactive(input$loadSampleMetadata, {
+    #   system.file("sample_data/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
+    #     read.delim(row.names = 1)
+    # })
+    
     thresholded_data <- eventReactive(input$threshybutton, {
       withProgress(message = "Loading files and applying threshold", value = 0, {
-        # your_data <- barcodetrackR::threshold(read.delim(input$file1$datapath, row.names = 1), input$thresholdvalue)
-        your_data <- read.delim(input$file1$datapath,  row.names =1)
-        metadata <- read.delim(input$file2$datapath)
+        # your_data <- read.delim(input$file1$datapath,  row.names =1)
+        # metadata <- read.delim(input$file2$datapath)
 
+        your_data <- my_data()
+        metadata <- my_metadata()
         # incProgress(0.5, detail = "Loading metadata/readme and applying Threshold")
         # t_your_data <- t(your_data)
         # metadata <- read.delim(input$file2$datapath, stringsAsFactors = FALSE)
@@ -166,9 +202,9 @@ shinyServer(
                  selectInput("stat_hist_data_choice", "Select Histogram Display Option",
                              choices = c("barcode_stats", "aggregate_stats"),
                              selected = "barcode_stats"),
-                 selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1], multiple = TRUE),
                  selectInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE),
-                 numericInput("stat_hist_n_cols", "Number of columns", value = 2),
+                 numericInput("stat_hist_n_cols", "Number of columns", value = 1, min = 1),
                  # br(),
                  selectizeInput("stat_hist_metadata_stat", label = "Choose Metadata", choices = colnames(SummarizedExperiment::colData(thresholded_data()))[unlist(lapply(SummarizedExperiment::colData(thresholded_data()), is.numeric))], multiple = FALSE),
                  selectInput("stat_hist_group_by", label = "Group by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = FALSE, selectize = FALSE, size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
