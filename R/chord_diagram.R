@@ -13,7 +13,8 @@
 #'@return Displays a chord diagram in the current plot window depicting shared clonality between samples (regions) as chords or links between the regions. Or,
 #'
 #'@import viridis
-#'@import dplyr
+# #'@import dplyr
+#'@rawNamespace import(dplyr, except = count)
 #'@importFrom plyr count
 #'
 #'@export
