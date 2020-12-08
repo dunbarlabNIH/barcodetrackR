@@ -1,13 +1,14 @@
 #' Barcode Binary Heatmap
 #'
-#' Creates a binary heatmap showing the presence of new clones from L to R in the dataset.
+#' Creates a binary heatmap showing the absence or presence of new clones in samples ordered from L to R in the SummarizedExperiment.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param threshold Clones with a proportion below this threshold will be set to 0.
 #'@param your_title The title for the plot.
 #'@param label_size The size of the column labels.
-#'@return Displays a binary heat map in the current plot window.
+#'@param return_table  Logical. Whether or not to return table of barcode sequences with their presence or absence in each sample indicated as a 1 or 0 resepctively in the value column column.
+#'@return Displays a binary heat map in the current plot window. Or if return_table is set to TRUE, returns a dataframe indicating the presence or absence of each barcode in each sample. 
 #'
 #'@export
 #'
@@ -18,7 +19,8 @@ barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
                                    threshold = 0,
                                    your_title = NULL,
-                                   label_size = 12) {
+                                   label_size = 12,
+                                   return_table = FALSE) {
 
   #get labels for heatmap
   plot_labels <- plot_labels %||% colnames(your_SE)
@@ -40,8 +42,13 @@ barcode_binary_heatmap <- function(your_SE,
   plotting_data$value <- factor(plotting_data$value, levels = c(0,1))
   plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
   x_column <- plyr::mapvalues(plotting_data$sample_name, from = colnames(your_SE), to = plot_labels)
-  plotting_data$x_labels <- factor(x_column, levels = plot_labels)
+  
 
+  if(return_table){
+    return(plotting_data)
+  }
+  
+  plotting_data$x_labels <- factor(x_column, levels = plot_labels)
 
   ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_labels, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value))+

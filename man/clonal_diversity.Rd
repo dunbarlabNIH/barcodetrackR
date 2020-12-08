@@ -9,21 +9,25 @@ clonal_diversity(
   plot_over,
   plot_over_display_choices = NULL,
   group_by,
+  group_by_choices = NULL,
   index_type = "shannon",
   point_size = 3,
   line_size = 2,
   text_size = 12,
-  your_title = NULL
+  your_title = NULL,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{your_SE}{A Summarized Experiment object.}
+\item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
 \item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. timepoint}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
 
 \item{group_by}{The column of metadata you want to group by e.g. cell_type}
+
+\item{group_by_choices}{Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.}
 
 \item{index_type}{Character. One of "shannon", "shannon_count", "simpson", or "invsimpson.}
 
@@ -33,13 +37,15 @@ clonal_diversity(
 
 \item{text_size}{Numeric. Size of text in plot.}
 
-\item{your_title}{The title for the plot.}
+\item{your_title}{Character. The title for the plot.}
+
+\item{return_table}{Logical. IF set to TRUE, rather than returning the plot of clonal diversity, the function will return a dataframe containing the diversity index values for each specified sample.}
 }
 \value{
-Outputs plot of a diversity measure tracked for groups over a factor.
+Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to true, a dataframe will be returned instead.
 }
 \description{
-A line plot that tracks a diversity measure from a selected choice or number of elements in the rows of the SummarizedExperiment object.
+A line plot that tracks a diversity measure from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
 diversity_plot(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)

@@ -13,33 +13,36 @@ bias_lineplot(
   bias_over = NULL,
   remove_unique = FALSE,
   text_size = 16,
-  keep_numeric = TRUE
+  keep_numeric = TRUE,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{your_SE}{Your SummarizedExperiment of barcode data and associated metadata}
+\item{your_SE}{SummarizedExperiment of barcode data and associated metadata}
 
-\item{split_bias_on}{The column of metadata corresponding to cell types}
+\item{split_bias_on}{The column of metadata corresponding to cell types (or other factor to be compared.)}
 
-\item{bias_1}{The first cell type to be compared. Will be on the UPPER side of the line plot}
+\item{bias_1}{The first cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the UPPER side of the line plot}
 
-\item{bias_2}{The second cell type to be compared. Will be on the LOWER side of the line plot}
+\item{bias_2}{The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LOWER side of the line plot}
 
 \item{split_bias_over}{The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.}
 
 \item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
-\item{remove_unique}{If set to true, only clones present in both samples will be considered.}
+\item{remove_unique}{Logical. If set to true, only clones present in both samples will be considered.}
 
-\item{text_size}{The size of the text in the plot.}
+\item{text_size}{Numeric. The size of the text in the plot.}
 
-\item{keep_numeric}{Whether to keep the numeric spacing within split_bias_over or switch to discrete x scale}
+\item{keep_numeric}{Logical. Whether to keep the numeric spacing within split_bias_over or switch to discrete x scale.}
+
+\item{return_table}{Logical. If set to TRUE, rather than returnign a plot, the function will return a dataframe containing for each barcode sequence and each point of comparison: the bias value, the added proportion between the two factors at that point (cumul_sum), and the maximum cumul_sum (peak_abundance) of that barcode sequence at any point of comparison.}
 }
 \value{
-Bias line plot for two lineages over time.
+Bias line plot for two lineages over time. Or if return_table is set to TRUE, a dataframe containing the bias values for each barcode sequence between the two samples at all points of comparison.
 }
 \description{
-Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
+Given a summarized experiment and a specified factor to compare bias between "split_bias_on", shows the value of that bias plotted against another specified factor "split_bias_over" where each clone is represented by a line shaded by its overall abundance in the two samples being compared.
 }
 \examples{
 bias_lineplot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")

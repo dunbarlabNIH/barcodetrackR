@@ -1,9 +1,10 @@
 #' Clonal count plot
 #'
-#' A line plot that tracks a diversity measure from a selected choice or number of elements in the rows of the SummarizedExperiment object.
+#' A line plot that tracks the total number of clones or the cumulative number of clones from selected samples of the SummarizedExperiment object plotted over a specified variable.
 #'
-#'@param your_SE A Summarized Experiment object.
-#'@param group_by The column of metadata you want to group by e.g. cell_type
+#'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
+#'@param group_by The column of metadata you want to group by e.g. cell_type.
+#'@param group_by_choices Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. timepoint
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.
 #'@param index_type Character. One of "count" or "cumulative_count". 
@@ -11,43 +12,61 @@
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
 #'@param your_title The title for the plot.
+#'@param return_table Logical. If set to true, rather than returning a plot, the function will return the clonal count or cumulative count of each sample in a dataframe.
 #'
-#'@return Outputs plot of a diversity measure tracked for groups over a factor.
+#'@return Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to TRUE, a dataframe of the number of clones (or cumulative clones) for each sample.
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
 #'@importFrom tidyr pivot_longer
+#'@import tibble
 #'
 #'@examples
-#'count_clones(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
+#'clonal_count(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
 #'
 #'@export
-count_clones <- function(your_SE,
+clonal_count <- function(your_SE,
                          plot_over,
                          plot_over_display_choices = NULL,
                          group_by,
-                         index_type = "shannon",
+                         group_by_choices = NULL,
+                         index_type = "count",
                          point_size = 3,
                          line_size = 2,
                          text_size = 12,
-                         your_title = NULL) {
+                         your_title = NULL,
+                         return_table = FALSE) {
 
   # Some basic error checking before running the function
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
+  
   if(!(plot_over %in% coldata_names)){
     stop("plot_over must match a column name in colData(your_SE)")
   }
   if(!(group_by %in% coldata_names)){
     stop("group_by must match a column name in colData(your_SE)")
   }
+  
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
-    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
+    plot_over_display_choices <- plot_over_display_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   }
-
+  
+  group_by_choices <- group_by_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]]))
+  
+  # More error handling
+  if(!all(plot_over_display_choices %in% SummarizedExperiment::colData(your_SE)[,plot_over])){
+    stop("All elements of plot_over_display_choices must match cvalues in plot_over column")
+  }
+  if(!all(group_by_choices %in% SummarizedExperiment::colData(your_SE)[,group_by])){
+    stop("All elements of group_by_choices must match values in group_by column")
+  }
+  
   # extract metadata
   temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
+  # Keep only the data included in group_by_choices
+  temp_subset <- temp_subset[,(temp_subset[[group_by]] %in% group_by_choices)]
   temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% tibble::as_tibble()
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]
@@ -92,7 +111,8 @@ count_clones <- function(your_SE,
     as.data.frame(summarized_data) %>% 
       dplyr::select(sample,cumulative_count) %>% 
       dplyr::rename(SAMPLENAME = sample, index = cumulative_count) %>% 
-      dplyr::mutate(index_type = index_type) -> calculated_index
+      dplyr::mutate(index_type = index_type) %>%
+      dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) -> calculated_index
     
     # Fix the fact that certain samples will be dropped if they have 0 new clones
     # Hacky way to do it. Need to go back and make it better later.
@@ -103,7 +123,7 @@ count_clones <- function(your_SE,
                                                              index_type = rep(index_type, length(samples_not_found))))
       # Reorder
       calculated_index %>%
-        dplyr::arrange(factor(SAMPLENAME), levels = unique(tidy_counts_ordered$sample)) -> calculated_index
+        dplyr::arrange(factor(SAMPLENAME), levels = unique(tidy_counts_ordered$sample))  -> calculated_index
       
       # Give the missing samples the same cumulative count as above samples
       for (i in 1:nrow(calculated_index)){
@@ -123,6 +143,11 @@ count_clones <- function(your_SE,
     dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
 
   plotting_data[[plot_over]] <- factor(plotting_data[[plot_over]], levels = plot_over_display_choices)
+  
+  if (return_table){
+    return(calculated_index)
+  }
+  
   plotting_data$x_value <- plotting_data[[plot_over]]
   plotting_data$group_by <- plotting_data[[group_by]]
 

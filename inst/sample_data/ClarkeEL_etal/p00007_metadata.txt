@@ -1,5 +1,6 @@
 SAMPLENAME	months
-1	6_months	6
-2	12_months	12
-3	18_months	18
-4	24_months	24
+timepoint_4_months	4
+timepoint_6_months	6
+timepoint_12_months	12
+timepoint_18_months	18
+timepoint_24_months	24

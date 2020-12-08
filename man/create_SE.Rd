@@ -7,23 +7,29 @@
 create_SE(
   your_data = NULL,
   meta_data = NULL,
-  threshold = 5e-04,
+  threshold = 0,
   log_base = exp(1),
   scale_factor = 1e+06
 )
 }
 \arguments{
-\item{your_data}{A data frame. For cellular barcoding data, this will usually be individual barcodes in rows and samples in columns.}
+\item{your_data}{A data frame. For clonal tracking data, this will be individual barcodes or lineage tracing elements in rows and samples in columns.}
 
-\item{meta_data}{A data frame containing all meta-data. Must, at the very least, include a column called "SAMPLENAME" that contains all the colnames within the data frame passed as  `your_data` and only those colnames.}
+\item{meta_data}{A data frame containing all meta-data. Must, at the very least, include a column called "SAMPLENAME" that contains all of the colnames within the data frame passed as  `your_data` and only those colnames.}
 
-\item{threshold}{Optional. A numeric indicating which reads to filter out (only those matrix entries that compose higher than `threshold` percentage of reads within a sample will be kept as non-zero) prior to creating the SE object.}
+\item{threshold}{Optional. A numeric indicating which reads to filter out (only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero) prior to creating the SE object.}
 
 \item{log_base}{A numeric indicating which base to use when logging the percentages.}
+
+\item{scale_factor}{A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode percentages on a per sample basis will be multiplied by 1 million before log+1 normalization.}
+}
+\value{
+Returns a SummarizedExperiment holding your clonal tracking data and the associated metadata.
 }
 \description{
-Creates a SummarizedExperiment object from a data frame and associated meta-data.
+Creates a SummarizedExperiment object from a data frame containing clonal tracking counts (`your_data`) with rows as observations and columns as samples, and the associated metadata (`meta_data`) with rows as samples and columns of information describing those samples.
 }
 \examples{
-create_SE(your_data = ZH33_file, meta_data = ZH33_meta_data)
+create_SE(your_data = exp1_clonal_counts_data, meta_data = exp1_meta_data)
+
 }

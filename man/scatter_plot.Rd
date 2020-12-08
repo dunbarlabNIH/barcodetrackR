@@ -18,7 +18,7 @@ scatter_plot(
 \arguments{
 \item{your_SE}{A Summarized Experiment object of two samples.}
 
-\item{assay}{The choice of assay to plot on the scatter plot}
+\item{assay}{The choice of assay to plot on the scatter plot. Set to "percentages" by default.}
 
 \item{plot_labels}{The labels for the X and Y axis of the plot}
 
@@ -26,14 +26,14 @@ scatter_plot(
 
 \item{display_corr}{Logical. Whether to display the computer correlation or not.}
 
-\item{point_size}{The size of the points being plotted.}
+\item{point_size}{Numeric. The size of the points being plotted.}
 
-\item{your_title}{The title for the plot.}
+\item{your_title}{Logical. The title for the plot.}
 
 \item{text_size}{Numeric. Size of text in plot.}
 }
 \value{
-Plots scatter plot for the samples in your_SE.
+Displays a scatter plot of the specified assay for the specified samples in your_SE with correlation value optionally displayed.
 }
 \description{
 Plots a scatter plot of two samples in the Summarized Experiment object

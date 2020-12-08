@@ -15,6 +15,7 @@
 #'@param n_cols Number of columns for faceted histograms.
 #'@param text_size Size of text.
 #'@param alpha The transparency of the histograms if group_by is provided. Lower = more transparent. 1 = opaque
+#'
 #'@return Histogram of chosen statistics
 #'
 #'@importFrom rlang %||%
@@ -32,9 +33,8 @@ stat_hist <- function(your_SE,
                       text_size = 12,
                       n_bins = 10,
                       n_cols = 1,
-                      alpha = 0.5){
-  
-  
+                      alpha = 0.5,
+                      your_title = NULL){
   
   if (data_choice == "barcode_stats"){
     
@@ -47,7 +47,11 @@ stat_hist <- function(your_SE,
     your_data <- SummarizedExperiment::assays(your_SE)[[assay_choice]]
     
     # sample selection
-    sample_select <- sample_select %||% colnames(your_SE)[1]
+    if (is.null(sample_select)){
+      # sample_select <- colnames(your_SE)[1]
+      sample_select <- colnames(your_SE)
+    }
+
     
     # Error handling
     if (any(sample_select %in% colnames(your_SE) == FALSE)){
@@ -86,7 +90,7 @@ stat_hist <- function(your_SE,
   # Choice for y and x axis
   y_axis_choice <-"identity"
   if(y_log_axis){
-    y_axis_choice <- "pseudo_log"
+    y_axis_choice <- "log10"
   }
 
   
@@ -94,12 +98,17 @@ stat_hist <- function(your_SE,
   if (data_choice == "barcode_stats"){
     
     plot_list <- lapply(1:length(sample_select), function(i){
-    
+      
+      if (is.null(your_title)){
+        your_title <- sample_select[i]
+      }
+      
       g <- suppressMessages(
         ggplot2::ggplot(your_data, ggplot2::aes(x = your_data[,i]))+
         ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
         ggplot2::theme_classic()+
-        ggplot2::labs(x = paste0("barcode ",assay_choice), title = sample_select[i])+
+        ggplot2::labs(x = paste0("barcode ",assay_choice))+
+        ggplot2::ggtitle(your_title)+
         ggplot2::theme(text = ggplot2::element_text(size = text_size))+
         ggplot2::scale_y_continuous(trans = y_axis_choice)
       )
@@ -125,7 +134,8 @@ stat_hist <- function(your_SE,
         ggplot2::ggplot(meta_data, ggplot2::aes(x = meta_data[,metadata_stat], color = meta_data[,group_by], fill = meta_data[,group_by]))+
         ggplot2::geom_histogram(bins = n_bins, alpha = alpha, position = "identity")+
         ggplot2::theme_classic()+
-        ggplot2::labs(x = paste0("metadata: ",metadata_stat), fill = group_by, title = "Aggregate Statistics") +
+        ggplot2::labs(x = paste0("metadata: ",metadata_stat), fill = group_by) +
+        ggplot2::ggtitle(your_title)+
         ggplot2::guides(color = FALSE)+
         ggplot2::theme(text = ggplot2::element_text(size = text_size))+
         ggplot2::scale_y_continuous(trans = y_axis_choice)
@@ -136,7 +146,9 @@ stat_hist <- function(your_SE,
         ggplot2::ggplot(meta_data, ggplot2::aes(x = meta_data[,metadata_stat]))+
           ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
           ggplot2::theme_classic()+
-          ggplot2::labs(x = paste0("metadata: ",metadata_stat), title = "Aggregate Statistics")+
+          ggplot2::ggtitle(your_title)+
+          ggplot2::labs(x = paste0("metadata: ",metadata_stat))+
+          ggplot2::ggtitle(your_title)+
           ggplot2::theme(text = ggplot2::element_text(size = text_size))+
           ggplot2::scale_y_continuous(trans = y_axis_choice)
       )

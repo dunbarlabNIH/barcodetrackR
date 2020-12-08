@@ -2,37 +2,40 @@
 % Please edit documentation in R/rank_abundance_plot.R
 \name{rank_abundance_plot}
 \alias{rank_abundance_plot}
-\title{Rank abundance plot}
+\title{Rank Abundance Plot}
 \usage{
 rank_abundance_plot(
   your_SE,
-  sample_labels = colnames(your_SE),
+  scale_rank = FALSE,
   point_size = 3,
   your_title = NULL,
-  scale_rank = FALSE,
   text_size = 12,
-  plot_labels = NULL
+  plot_labels = NULL,
+  return_table = FALSE
 )
 }
 \arguments{
-\item{sample_labels}{Vector of legend labels. Defaults to colnames(your_SE).}
+\item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
-\item{point_size}{Numeric. Size of the points.}
+\item{scale_rank}{Logical. Whether or not to scale all ranks from 0 to 1 or keep barcode ranks as their actual integer values. When `scale_rank` is set to FALSE, all samples will not necessarily have the same x maximum.}
 
-\item{your_title}{The title for the plot.}
+\item{point_size}{Numeric. Size of the points for the plot.}
 
-\item{scale_rank}{Whether or not to scale all ranks to 1 to 100 or keep numerical integer ranks.}
+\item{your_title}{Character. Specify a title for the plot.}
 
 \item{text_size}{Numeric. Size of text in plot.}
 
-\item{your_data}{A data frame. Usually individual barcodes in rows and samples in columns.}
+\item{plot_labels}{Vector of labels for each sample. If not specified, the colnames(your_SE) will be used.}
+
+\item{return_table}{Logical. If set to TRUE, rather than a plot, the function will return a dataframe containing for each sample, each barcode in rank order with its abundance in that sample, its scaled rank (0 to 1), and the cumulative sum of abundance for all barcodes with rank <= the rank of that barcode.}
 }
 \value{
-Displays a rank-abundance plot (made by ggplot2) of the samples chosen.
+Displays a rank-abundance plot (made by ggplot2) of the samples chosen. \cr Each point represents a single barcode with the x-value describing its rank in abundance with 1 being the most abundant barcode \cr The y-value representing the cumulative abundance of all barcodes with rank less than or equal to the x-axis value. \cr If the return_table is set to TRUE, instead of a plot, a datframe with the rank abundance data will be returned.
 }
 \description{
-Rank abundance Plot of the Barcodes for each sample chosen. Uses the cumulative sum so that all
-samples eventually reach 100%.
+Create a rank abundance plot of the barcodes in the chosen samples provided in `your_SE`.
+Use this function to visualize the distribution of barcode abundances within sample(s).
+Note: If comparing the visualization to the statistical testing results from `rank_abundance_stat_test` function in barcodetrackR, please set the `scale_rank` to TRUE. The K-S test is agnostic to number of samples so it is directly comparable to the visualization produced when the barcode ranks are scaled between 0 and 1.
 }
 \examples{
 rank_abundance_plot(your_data = wu_SE, point_size = 4)

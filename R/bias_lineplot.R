@@ -1,17 +1,19 @@
 #' Bias line plot
 #'
-#' Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
+#' Given a summarized experiment and a specified factor to compare bias between "split_bias_on", shows the value of that bias plotted against another specified factor "split_bias_over" where each clone is represented by a line shaded by its overall abundance in the two samples being compared.
 # '
-#'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
-#'@param split_bias_on The column of metadata corresponding to cell types
-#'@param bias_1 The first cell type to be compared. Will be on the UPPER side of the line plot
-#'@param bias_2 The second cell type to be compared. Will be on the LOWER side of the line plot
+#'@param your_SE SummarizedExperiment of barcode data and associated metadata
+#'@param split_bias_on The column of metadata corresponding to cell types (or other factor to be compared.)
+#'@param bias_1 The first cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the UPPER side of the line plot
+#'@param bias_2 The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LOWER side of the line plot
 #'@param split_bias_over The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
-#'@param remove_unique If set to true, only clones present in both samples will be considered.
-#'@param text_size The size of the text in the plot.
-#'@param keep_numeric Whether to keep the numeric spacing within split_bias_over or switch to discrete x scale
-#'@return Bias line plot for two lineages over time.
+#'@param remove_unique Logical. If set to true, only clones present in both samples will be considered.
+#'@param text_size Numeric. The size of the text in the plot.
+#'@param keep_numeric Logical. Whether to keep the numeric spacing within split_bias_over or switch to discrete x scale.
+#'@param return_table Logical. If set to TRUE, rather than returnign a plot, the function will return a dataframe containing for each barcode sequence and each point of comparison: the bias value, the added proportion between the two factors at that point (cumul_sum), and the maximum cumul_sum (peak_abundance) of that barcode sequence at any point of comparison.
+#'
+#'@return Bias line plot for two lineages over time. Or if return_table is set to TRUE, a dataframe containing the bias values for each barcode sequence between the two samples at all points of comparison.
 #'
 #'@importFrom rlang %||%
 #'
@@ -19,14 +21,15 @@
 #'bias_lineplot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
 #'@export
 bias_lineplot <- function(your_SE,
-                       split_bias_on,
-                       bias_1,
-                       bias_2,
-                       split_bias_over,
-                       bias_over = NULL,
-                       remove_unique = FALSE,
-                       text_size = 16,
-                       keep_numeric = TRUE){
+                          split_bias_on,
+                          bias_1,
+                          bias_2,
+                          split_bias_over,
+                          bias_over = NULL,
+                          remove_unique = FALSE,
+                          text_size = 16,
+                          keep_numeric = TRUE,
+                          return_table = FALSE){
 
   # Basic error handling
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -94,6 +97,10 @@ bias_lineplot <- function(your_SE,
     plotting_data$plot_over <- factor(plotting_data$plot_over, levels = bias_over)
   }
 
+  if (return_table){
+    return(plotting_data)
+  }  
+  
   g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = plot_over, y = bias, color = cumul_sum, group = barcode)) +
     ggplot2::geom_line()+
     ggplot2::geom_point()+

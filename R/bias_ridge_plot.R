@@ -1,25 +1,29 @@
-#' Ridge plot
+#' Bias Ridge plot
 #'
-#' Given a summarized experiment, gives ridge plots showing percent total contribution to both lineages.
+#' Given a summarized experiment and a specified factor to compare bias between, gives ridge plots which show the density of clones at each value of log bias where log bias is calculated as log((percentage abundance in sample 1 + 1)/(percentage abundance in sample 2 + 1)). If the weighted option is set to TRUE, the density estimator will weight the estimation by the added proportion of the clone between the two samples.
 # '
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata
-#'@param split_bias_on The column of metadata corresponding to cell types
-#'@param bias_1 The first cell type to be compared. Will be on the RIGHT side of the ridge plot
-#'@param bias_2 The second cell type to be compared. Will be on the LEFT side of the ridge plot
+#'@param split_bias_on The column of metadata corresponding to cell types (or whatever factors you want to compare the bias between).
+#'@param bias_1 The first cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the RIGHT side of the ridge plot
+#'@param bias_2 The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LEFT side of the ridge plot
 #'@param split_bias_over The column of metadata to plot by. If numeric, y axis will be in increasing order. If categorical, it will follow order of metadata.
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
 #'@param remove_unique If set to true, only clones present in both samples will be considered.
-#'@param weighted If true, the density estimation will be weighted by the overall contribution of each barcode
-#'@param text_size The size of the text in the plot.
-#'@param add_dots Whether or not to add dots underneath the density plots.
-#'@return Bias plot for two lineages over time.
+#'@param weighted If true, the density estimation will be weighted by the overall contribution of each barcode to the two samples being compared.
+#'@param text_size Numeric. The size of the text in the plot.
+#'@param add_dots Logical. Whether or not to add dots underneath the density plots. Dot size is proportion to the added proportion of the clone in the two samples.
+#'@param return_table Logical. If true, rather than returning a plot, the function will return a dataframe containing the calculated bias and cumul_sum which contains the added proportion between the two samples, for each barcode sequence across each sample considered.
+#'
+#'@return Bias plot for two lineages over time. Or a dataframe containing the bias value and added proportion of each barcode if return_table is set to TRUE.
 #'
 #'@importFrom rlang %||%
+#'@import ggridges
 #'
 #'@examples
-#'ridge_plot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+#'bias_ridge_plot(your_se = SE, split_bias_on = "cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+#'
 #'@export
-ridge_plot <- function(your_SE,
+bias_ridge_plot <- function(your_SE,
                        split_bias_on,
                        bias_1,
                        bias_2,
@@ -28,7 +32,8 @@ ridge_plot <- function(your_SE,
                        remove_unique = FALSE,
                        weighted = FALSE,
                        text_size = 16,
-                       add_dots = FALSE){
+                       add_dots = FALSE,
+                       return_table = FALSE){
 
   # Basic error handling
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
@@ -88,6 +93,10 @@ ridge_plot <- function(your_SE,
     do.call(rbind, .) %>%
     dplyr::mutate(plot_over = factor(plot_over, levels = bias_over)) -> plotting_data
 
+  if (return_table){
+    return(plotting_data)
+  }
+  
   # Weighted ridge plot
   if (weighted){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., weight = cumul_sum, fill = plot_over))

@@ -1,37 +1,45 @@
-#' Barcode Circos plot
+#' Barcode Chord Diagram
 #'
-#' Creates a circos plot showing each cell type as a region around a circle and shared clones between these cell types as links between the regions.
+#' Creates a chord diagram showing each cell type (or other factor) as a region around a circle and shared clones between these cell types as links between the regions. The space around the regions which is not connected to a chord indicates clones unique to that sample, not shared with other samples. 
 #'
-#'@param your_SE A Summarized Experiment object.
-#'@param weighted weighted = F which is default will make links based on # of shared clones. Weighted = T will make links based on their proportion.
-#'@param plot_label Name of colData variable to use as labels for regions. Defaults to SAMPLENAME
-#'@param alpha Transparency of links. Default = 1 is opaque. 0 is completely transluscent
-#'@param your_title The title for the plot.
-#'@param text_size Size of region labels
+#'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
+#'@param weighted Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = T will make the link width based on the clone's proportion in the samples.
+#'@param plot_label Character. Name of colData variable to use as labels for regions. Defaults to SAMPLENAME
+#'@param alpha Numeric. Transparency of links. Default = 1 is opaque. 0 is completely transluscent
+#'@param your_title Character. The title for the plot.
+#'@param text_size Numeric. Size of region labels
+#'@param return_table Logical. If set to TRUE, in addition to plotting a chord diagram in the plot window, the function will return a dataframe of the shared clonality used to make the chord diagram. If Weighted is FALSE, the dataframe will contain a row for each set of clones and values of 1 or 0 indicating the samples which share that set of clones, and a freq column which is the number of clones in that set. If weighted is set to TRUE, each row will contain a set of clones and the data will show the proportion that set of clones comprises in each sample. The proportions of 0 indicate which samples do not share that set of clones.
 #'
-#'@return Displays a circos plot in the current plot window.
+#'@return Displays a chord diagram in the current plot window depicting shared clonality between samples (regions) as chords or links between the regions. Or,
 #'
-#'@import dplyr
+#'@import viridis
+# #'@import dplyr
+#'@rawNamespace import(dplyr, except = count)
+#'@importFrom plyr count
 #'
 #'@export
 #'
 #'@examples
-#'circos_plot(your_SE = ZH33_SE,  plot_label = 'Cell_type')
+#'chord_diagram(your_SE = my_SE,  plot_label = 'Cell_type')
 #'
-circos_plot <- function(your_SE,
+chord_diagram <- function(your_SE,
                         weighted = FALSE,
                         plot_label = "SAMPLENAME",
                         alpha = 1,
                         your_title = NULL,
-                        text_size = 12) {
+                        text_size = 12,
+                        return_table = FALSE) {
 
 # Load data, remove data that is zero in all timepoints
 your_data <- SummarizedExperiment::assays(your_SE)$counts
 meta_data <- SummarizedExperiment::colData(your_SE)
 your_data <- as.matrix(your_data[rowSums(your_data) > 0,])
 
+# Error check
+if (!plot_label %in% colnames(meta_data)){
+  stop("Provided plot_label is not a column of the metadata.")
+}
 #get labels for heatmap
-# plot_label <- plot_label %||% 'SAMPLENAME'
 colnames(your_data) <- meta_data[,plot_label]
 
 # Create binary matrix of data
@@ -49,14 +57,15 @@ temp_prop <- temp_prop[rowSums(temp_binary)>1,]
 temp_binary <- temp_binary[rowSums(temp_binary)>1,]
 
 # Count the number of occurences of the unique combinations
-unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
+# unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
+unique_count <- plyr::count(as.data.frame(temp_binary))
 # Sort decreasing
 unique_count <- unique_count[do.call(order,-unique_count),]
 
 # Get the proportions of each barcode matching each unique combination
 unique_prop <- unique_count
-unique_prop$n <- NULL
-count_vec <- unique_count$n
+unique_prop$freq <- NULL
+count_vec <- unique_count$freq
 my_counter <- 1
 for (i in 1:nrow(unique_count)){
   my_start <- my_counter
@@ -66,7 +75,7 @@ for (i in 1:nrow(unique_count)){
   } else {
     unique_prop[i,] <- as.list(colSums(temp_prop[my_start:my_end,]))
   }
-  my_counter <- my_counter + as.numeric(unique_count$n[i])
+  my_counter <- my_counter + as.numeric(unique_count$freq[i])
 }
 
 # Generate counting index for each cell type
@@ -81,6 +90,11 @@ my_cols = viridis::viridis(nrow(unique_count))
 
 
 if (weighted == FALSE){
+  
+  if (return_table){
+    return(unique_count)
+  }
+  
   # Initialize circos plot
   par(mar = c(0.5, 0.5, 1, 0.5))
   circlize::circos.par(points.overflow.warning = FALSE)
@@ -114,13 +128,13 @@ if (weighted == FALSE){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
-      circlize::circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + as.numeric(unique_count[i,"n"])),
-                            cell.2, c(count_index[cell.2],count_index[cell.2] + as.numeric(unique_count[i,"n"])),
+      circlize::circos.link(cell.1, c(count_index[cell.1],count_index[cell.1] + as.numeric(unique_count[i,"freq"])),
+                            cell.2, c(count_index[cell.2],count_index[cell.2] + as.numeric(unique_count[i,"freq"])),
                             col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
     for (k in 1:num_cells){
-      count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"n"])
+      count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"freq"])
     }
   }
   title(your_title, adj = 0)
@@ -128,6 +142,11 @@ if (weighted == FALSE){
 }
 
 else if (weighted == TRUE){
+  
+  if (return_table){
+    return(unique_prop)
+  }
+  
   # Initialize circos plot
   par(mar = c(0.5, 0.5, 1, 0.5))
   circlize::circos.par(points.overflow.warning = FALSE)

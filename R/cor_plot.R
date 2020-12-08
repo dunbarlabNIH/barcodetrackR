@@ -1,19 +1,21 @@
 #' Correlation Plot
 #'
-#' Gives the pairwise correlation between each sample-sample pair in the data frame.
+#' Plots the pairwise correlation between the specified assay of each sample-sample pair in the provided SummarizedExperiment.
 #'
 #'@param your_SE A Summarized Experiment object.
+#'@param assay The choice of assay to use for the correlation calculation. Set to "percentages" by default.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall".
-#'@param your_title The title for the plot.
+#'@param your_title Character. The title for the plot.
 #'@param grid Logical. Include a grid or not in the correlation plot
-#'@param label_size The size of the column labels.
+#'@param label_size Numeric. The size of the column labels.
 #'@param plot_type Character. One of "color", "circle", or "number".
 #'@param no_negatives Logical. Whether to make negative correlations = 0.
 #'@param return_table Logical. Whether or not to return table of p-values, confidence intervals, and R values instead of displaying a plot.
 #'@param color_scale Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.
-#'@param number_size Size of the text label when plot_type is "number".
-#'@param point_scale The size of the largest point if the plot_type is "circle"
+#'@param number_size SNumeric. ize of the text label when plot_type is "number".
+#'@param point_scale Numeric. The size of the largest point if the plot_type is "circle"
+#'
 #'@return Plots pairwise correlation plot for the samples in your_SE.
 #'
 #'@importFrom rlang %||%
@@ -26,6 +28,7 @@
 #"
 
 cor_plot = function(your_SE,
+                    assay = "percentages",
                     plot_labels = colnames(your_SE),
                     method_corr ="pearson",
                     your_title = "",
@@ -38,9 +41,18 @@ cor_plot = function(your_SE,
                     number_size = 3,
                     point_scale = 1) {
 
-  #extracts percentages assay from your_SE
-  plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
-
+  
+  #extracts assay from your_SE
+  if (assay %in% names(SummarizedExperiment::assays(your_SE)) == FALSE){
+    stop("The specified assay is not found in your_SE.")
+  }
+  
+  plotting_data <- SummarizedExperiment::assays(your_SE)[[assay]]
+  
+  if(ncol(plotting_data) < 2){
+    stop("your_SE must contain at least 2 samples (columns).")
+  }
+  
   plotting_data_columns <- colnames(plotting_data)
 
   plotting_data_longer <- lapply(1:length(plotting_data_columns), function(i){
@@ -73,8 +85,8 @@ cor_plot = function(your_SE,
   if(no_negatives){
     plotting_data_longer %>%
       dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, p_value)) %>%
-      dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
-      dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
+   #   dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
+  #    dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
       dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
     color_limits <- c(0, 1)
     floor_limit <- ceiling(length(color_scale)/2)
@@ -98,17 +110,17 @@ cor_plot = function(your_SE,
 
   if(plot_type == "color"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "circle"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(color = "black", fill = "white") +
+      ggplot2::geom_tile(color = ifelse(grid, "black", "white"), fill = "white") +
       ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
       ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "number") {
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = ifelse(grid, "black", NULL)) +
+      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")+
       ggplot2::geom_text(ggplot2::aes(label = round(correlation_value, digits = 2)), color = "black", size = number_size)
   } else {

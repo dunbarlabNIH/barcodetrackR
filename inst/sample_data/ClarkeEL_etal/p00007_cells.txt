@@ -1,4 +1,4 @@
-4_months	6_months	12_months	18_months	24_months
+	timepoint_4_months	timepoint_6_months	timepoint_12_months	timepoint_18_months	timepoint_24_months
 chr1.10512610.-	14	1	0	0	0
 chr1.109081437.-	1	0	0	0	0
 chr1.109791610.-	55	18	0	0	0

@@ -1,16 +1,16 @@
-#' Barcode Top Clone Heatmap
+#' barcode_ggheatmap
 #'
-#' Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
+#' Creates a heatmap displaying the log abundance of the top 'n' clones from each sample in the Summarized Experiment object, using ggplot2. Clones are on the y-axis and samples are on the x-axis. The ordering and clustering of clones on the y-axis as well as all aesthetics of the plot can be controlled through the arguments described below.
 #'
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "reads", or "percentages"
+#'@param cellnote_assay Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0. 
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
 #'@param dendro Logical. Whether or not to show row dendrogram when hierarchical clustering.
-#'@param cellnote_size The numerical size of the cell note labels.
+#'@param cellnote_size The numerical size of the cell note labels. To have no cellnote, set cellnote_size to 0. 
 #'@param distance_method Character. Use summary(proxy::pr_DB) to see all possible options for distance metrics in clustering.
 #'@param minkowski_power The power of the Minkowski distance (if minkowski is the distance method used).
 #'@param hclust_linkage Character. One of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
@@ -18,10 +18,12 @@
 #'@param clusters How many clusters to cut hierarchical tree into for display when row_order is "hierarchical".
 #'@param percent_scale A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.
 #'@param color_scale A character vector which indicates the colors of the color scale. Must be same length as percent_scale.
+#'@param return_table Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote for each sample instead of displaying a plot.
 #'
-#'@return Displays a heatmap in the current plot window.
+#'@return Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnotes for each sample. 
 #'
 #'@importFrom rlang %||%
+#'@import ggplot2
 #'
 #'@export
 #'
@@ -43,7 +45,8 @@ barcode_ggheatmap <- function(your_SE,
                               row_order = "hierarchical",
                               clusters = 0,
                               percent_scale = c(0, 0.000025, 0.001, 0.01, 0.1, 1),
-                              color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")) {
+                              color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4"),
+                              return_table = FALSE) {
 
   #eliminate new lines from title
   if(!is.null(your_title)){
@@ -130,6 +133,9 @@ barcode_ggheatmap <- function(your_SE,
   }
 
 
+  if(return_table){
+    return(plotting_data)
+  }
 
   if(grid) grid_color = "black" else grid_color = NA
 

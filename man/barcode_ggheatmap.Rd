@@ -2,7 +2,7 @@
 % Please edit documentation in R/barcode_ggheatmap.R
 \name{barcode_ggheatmap}
 \alias{barcode_ggheatmap}
-\title{Barcode Top Clone Heatmap}
+\title{barcode_ggheatmap}
 \usage{
 barcode_ggheatmap(
   your_SE,
@@ -20,7 +20,8 @@ barcode_ggheatmap(
   row_order = "hierarchical",
   clusters = 0,
   percent_scale = c(0, 2.5e-05, 0.001, 0.01, 0.1, 1),
-  color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4")
+  color_scale = c("#4575B4", "#4575B4", "lightblue", "#fefeb9", "#D73027", "red4"),
+  return_table = FALSE
 )
 }
 \arguments{
@@ -30,7 +31,7 @@ barcode_ggheatmap(
 
 \item{n_clones}{The top 'n' clones to plot.}
 
-\item{cellnote_assay}{Character. One of "stars", "reads", or "percentages"}
+\item{cellnote_assay}{Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0.}
 
 \item{your_title}{The title for the plot.}
 
@@ -40,7 +41,7 @@ barcode_ggheatmap(
 
 \item{dendro}{Logical. Whether or not to show row dendrogram when hierarchical clustering.}
 
-\item{cellnote_size}{The numerical size of the cell note labels.}
+\item{cellnote_size}{The numerical size of the cell note labels. To have no cellnote, set cellnote_size to 0.}
 
 \item{distance_method}{Character. Use summary(proxy::pr_DB) to see all possible options for distance metrics in clustering.}
 
@@ -55,12 +56,14 @@ barcode_ggheatmap(
 \item{percent_scale}{A numeric vector through which to spread the color scale (values inclusive from 0 to 1). Must be same length as color_scale.}
 
 \item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
+
+\item{return_table}{Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote for each sample instead of displaying a plot.}
 }
 \value{
-Displays a heatmap in the current plot window.
+Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnotes for each sample.
 }
 \description{
-Creates a heatmap using the top 'n' rows from each column in the Summarized Experiment object, using ggplot2.
+Creates a heatmap displaying the log abundance of the top 'n' clones from each sample in the Summarized Experiment object, using ggplot2. Clones are on the y-axis and samples are on the x-axis. The ordering and clustering of clones on the y-axis as well as all aesthetics of the plot can be controlled through the arguments described below.
 }
 \examples{
 barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)

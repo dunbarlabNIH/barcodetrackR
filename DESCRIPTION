@@ -19,10 +19,20 @@ Imports:
     proxy,
     scales,
     shiny,
+    vegan,
+    SummarizedExperiment,
+    tidyr,
+    rlang,
+    cowplot,
+    ggridges,
+    viridis,
+    tibble,
     vegan
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     BiocStyle,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
+biocViews:

@@ -6,35 +6,45 @@
 \usage{
 mds_plot(
   your_SE,
-  label_by = "SAMPLENAME",
+  group_by = "SAMPLENAME",
   method_dist = "bray",
   assay = "percentages",
   your_title = NULL,
   point_size = 3,
-  text_size = 12
+  text_size = 12,
+  return_table = FALSE,
+  kmeans_cluster = FALSE,
+  k.param = 3,
+  draw_ellipses = FALSE
 )
 }
 \arguments{
-\item{your_SE}{A Summarized Experiment object.}
-
-\item{label_by}{Selection from colData used to label each point. Defaults to SAMPLENAME.}
+\item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
 \item{method_dist}{Dissimilarity index from vegan. One of "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", or "cao".}
 
 \item{assay}{The assay to calculate the index on}
 
-\item{your_title}{The title for the plot.}
+\item{your_title}{Character. The title for the plot.}
 
-\item{point_size}{The size of the points.}
+\item{point_size}{Numeric. The size of the points.}
 
 \item{text_size}{Numeric. Size of text in plot.}
+
+\item{return_table}{Logical. If set to true, the function will return a dataframe containing each samples reduced measure of dissimilarity coordinates.}
+
+\item{kmeans_cluster}{Logical. If set to true, each sample will be assigned a cluster computed by kmeans on the reduced dimensional space computed on the measures of dissimilarity between samples.}
+
+\item{k.param}{Numeric. If kmeans_cluster is TRUE, provide the number of kmeans clusters to identify.}
+
+\item{draw_ellipses}{Logical. If kmeans_cluster is TRUE, draw ellipses around the different kmeans clusters.}
 }
 \value{
-Plots pairwise correlation plot for the samples in your_SE.
+Plots dissimilarity indices between samples in your_SE. Or if return table is set to TRUE, returns a dataframe of each sample's reduced measures of dissimilarity coordinates.
 }
 \description{
 Calculates a simmilarity/dissimlarity index or metrix for each sample-sample pair and reduces the resulting dist matrix into two dimensions
 }
 \examples{
-mds_plot(your_SE = wu_SE, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray", label_by = "celltype")
+mds_plot(your_SE = wu_SE, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray",group_by = "celltype")
 }
