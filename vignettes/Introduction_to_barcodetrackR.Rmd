@@ -126,48 +126,75 @@ The [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) package includ
 barcodetrackR::launchApp()
 ```
 
-# Correlations
+# Sample correlations, distances, and similarities
 
 ## `scatter_plot`
 A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a `scatter_plot` function as part of the package.
 
-Here, we view the correlation of barcode counts between different cell types at the 20 month timepoint of the Wu et al study. We compare granulocytes (Gr) to B and T cells.
+Here, we view the correlation of barcode _"percentages"_ between different cell types at the 20 month timepoint of the Wu et al study. We compare granulocytes (Gr) to B and T cells.
 
 ```{r scatter_plot, eval = TRUE, fig.width = 7, fig.height=4}
 Gr_B_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_B")
 Gr_T_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_T")
-wu_scatterplot_1 <- scatter_plot(wu_SE[,Gr_B_20], your_title = "Gr vs B")
-wu_scatterplot_2 <- scatter_plot(wu_SE[,Gr_T_20], your_title = "Gr vs T")
+wu_scatterplot_1 <- scatter_plot(wu_SE[,Gr_B_20], your_title = "Gr vs B", assay = "percentages")
+wu_scatterplot_2 <- scatter_plot(wu_SE[,Gr_T_20], your_title = "Gr vs T", assay = "percentages")
 cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
 ## `cor_plot`
-A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we visualize the Pearson correlation between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we visualize the Pearson correlation of the barcode _"percentages"_ between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
-         plot_type = "color")
+         plot_type = "color",
+         assay = "percentages")
 ```
 
-We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization.
+If desired, we can also calculate and visualize the Pearson correlations for the _"logs"_ assay for the same samples above.
+```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5}
+wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
+cor_plot(wu_SE[,wu_cor_plot_sample_selection],
+         method_corr = "pearson",
+         plot_type = "color",
+         assay = "logs")
+```
+
+We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization. Here, we return the p-values and confidence intervals for the correlations calculated using the _"percentages"_ assay.
 
 ```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
+         assay = "percentages",
          return_table = TRUE) %>% head
 ```
 
-Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to eliminate negative correlations within the data, from which deriving biological meaning may be difficult.
+Above, we used two of the three available correlation visualizations (`"color"` and `"circle"`) using the standard color palette provided. A `no_negative` parameter is offered as well to set all negative correlations in the data to equal 0. This may be done to eliminate negative correlations from the data, from which deriving biological meaning may be difficult.
 
-When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example comparing the pearson correlation of clones within peripheral blood at subsequent timepoints from the Belderbos et al sample data set. The U stands for unsorted.
+When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example visualizing the Pearson correlations of peripheral blood samples at subsequent timepoints from the Belderbos et al sample data set. Note: within these samples, U stands for unsorted.
 
 ```{r cor_plot 4, eval = TRUE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
          plot_type = "number",
+         assay = "percentages",
          number_size = 3)
+```
+
+
+## `dist_plot`
+While correlation coefficients .
+```{r dist 1, eval = TRUE, fig.width = 6, fig.height = 5}
+wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
+dist_plot(wu_SE[,wu_cor_plot_sample_selection],
+          dist_method =  "euclidean",
+          plot_type = "color",
+          assay = "logs")
+dist_plot(wu_SE[,wu_cor_plot_sample_selection],
+          dist_method =  "cosine",
+          plot_type = "color",
+          assay = "logs")
 ```
 
 
