@@ -8,7 +8,7 @@ dist_plot(
   your_SE,
   assay = "percentages",
   plot_labels = colnames(your_SE),
-  dist_method = "Euclidean",
+  dist_method = "euclidean",
   cluster_tree = FALSE,
   your_title = "",
   grid = TRUE,
@@ -29,7 +29,7 @@ dist_plot(
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
-\item{dist_method}{Character. Distance OR similarity measure from the `proxy` package. Full list of distance and similarity measures can be found using `summary(proxy::pr_DB)`.
+\item{dist_method}{Character. Distance OR similarity measure from the `proxy` package. Full list of distance and similarity measures can be found using `summary(proxy::pr_DB)`. Default is "euclidean".
 Distances will be calculated for distance measures, while similarities will be calculated for similarity measures. Distance OR similarity measure will be calculated using the `assay`
 specified.}
 

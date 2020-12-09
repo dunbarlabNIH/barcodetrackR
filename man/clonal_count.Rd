@@ -6,11 +6,12 @@
 \usage{
 clonal_count(
   your_SE,
+  percent_threshold = 0,
   plot_over,
   plot_over_display_choices = NULL,
   group_by,
   group_by_choices = NULL,
-  index_type = "count",
+  cumulative = FALSE,
   point_size = 3,
   line_size = 2,
   text_size = 12,
@@ -21,6 +22,8 @@ clonal_count(
 \arguments{
 \item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
+\item{percent_threshold}{Numeric. The percent threshold for which to count barcodes as present or not present. Set to 0 by default.}
+
 \item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. timepoint}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
@@ -29,7 +32,7 @@ clonal_count(
 
 \item{group_by_choices}{Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.}
 
-\item{index_type}{Character. One of "count" or "cumulative_count".}
+\item{cumulative}{Logical. If TRUE, will plot cumulative counts over the `plot_over` argument rather than unique counts per sample (the default, which is FALSE).}
 
 \item{point_size}{Numeric. Size of points.}
 
@@ -48,6 +51,6 @@ Outputs plot of a diversity measure tracked for groups over a factor. Or if retu
 A line plot that tracks the total number of clones or the cumulative number of clones from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
-clonal_count(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
+clonal_count(your_data = wu_SE, cumulative = FALSE, plot_by = "timepoint", group_by = "cell_type")
 
 }

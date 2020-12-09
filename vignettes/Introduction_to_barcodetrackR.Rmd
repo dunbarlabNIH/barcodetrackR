@@ -198,13 +198,14 @@ dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           assay = "logs")
 ```
 
-Here is the same example, this time using the cosine similarity as the pairwise measure, and imposing a clustering on the resulting similarities (note, in the case of calculating hierarchical clustering on a similarity matrix, we use `proxy` to convert similarities to distances prior to clustering).
+Here is the same example, this time using the cosine similarity as the pairwise measure, and imposing a clustering on the resulting similarities (note, in the case of calculating hierarchical clustering on a similarity matrix, we use `proxy` to convert similarities to distances prior to clustering). We can also pick a number of color scales, here choosing "Greens".
 
-```{r dist plot 2, eval = TRUE, fig.width = 6, fig.height = 5}
+```{r dist plot 2, eval = TRUE, fig.width = 8, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "cosine",
           plot_type = "color",
           assay = "logs",
+          color_pal = "Greens",
           cluster_tree = TRUE)
 ```
 
@@ -396,7 +397,7 @@ bias_ridge_plot(your_SE = wu_SE,
 ```
 
 ## `bias_lineplot`
-In some cases, there may be enough data to observe more interesting longitudinal trends. In the Koelle dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; each line represents a single clone with shading weighted by its added proportion between both cell types. The clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages seem to have similar abundances in each lineage over time.
+In some cases, there may be enough data to observe more interesting longitudinal trends. In the Koelle dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; each line represents a single clone with shading weighted by its added proportion between both cell types. The clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages are relatively unbiased to lineage over time.
 
 ```{r bias_lineplot koelle_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 bias_lineplot(your_SE = koelle_SE,
@@ -407,6 +408,24 @@ bias_lineplot(your_SE = koelle_SE,
               remove_unique = TRUE)
 ```
 
+# Clone counts
+
+## `clonal_count`
+We may be interested in the number of clones detected per group across another variable (such as time). Here, we will use the function `clonal_count` to plot the number of unique clones detected in each lineage over time for the Koelle dataset. We see that at the initial 1-month time point, a large number of clones are detected in the Granulocyte lineage, while at the 38-month time point,the number of detected clones in the Granulocyte lineage is comparable to the number of detected clones of the Monocyte and T cell lineages.
+```{r clone counts 1, eval = TRUE}
+clonal_count(your_SE = koelle_SE,
+             plot_over = "months",
+             group_by = "celltype")
+```
+
+
+We can also set the argument `cumulative = TRUE` to plot the cumulative detection of clones in each lineage over time for the Koelle dataset. This plot can help us determine whether the clones being detected in each successive time point are newly detected or have previously been detected. Within this dataset, we find that out to 38-month time point, we see few new clones becoming detected in the Granulcyte and Monocyte lineages, while we continue to detect new clones at every time point within the T cell lineage.
+```{r clone counts cumulative, eval = TRUE}
+clonal_count(your_SE = koelle_SE,
+             plot_over = "months",
+             group_by = "celltype",
+             cumulative = TRUE)
+```
 
 # Diversity
 
