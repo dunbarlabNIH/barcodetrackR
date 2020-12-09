@@ -155,8 +155,8 @@ dist_plot = function(your_SE,
         axis.ticks = ggplot2::element_blank()
       )
     left_gg_dendogram <- gg_dendrogram + ggplot2::coord_flip()+
-      ggplot2::scale_x_reverse()+
-      ggplot2::scale_y_reverse()
+      ggplot2::scale_x_reverse(expand = c(0,0.6))+
+      ggplot2::scale_y_reverse(expand = c(0,0))
     gg_distplot <- cowplot::plot_grid(left_gg_dendogram, gg_distplot, rel_widths = c(1,7), align = "h", axis = "bt")
 
   }
