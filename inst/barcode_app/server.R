@@ -476,7 +476,8 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("corplot_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("corplot_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
                  actionButton("corplot_Copier", label = "Copy Samples from heatmap"),
                  br(),
                  br(),
@@ -572,7 +573,8 @@ shinyServer(
         column(3,
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("mds_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
-                 selectizeInput("mds_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("mds_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
                  selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"),
                  selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"),
                  selectInput("mds_assay", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE, selected = "percentages"),
@@ -988,7 +990,8 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 selectizeInput("circos_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("circos_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:3]),
                  strong("Options"),
                  checkboxInput("circos_weighted", "Weighted", value = FALSE),
                  selectInput("chord_diagram_label", "Plot labels",choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
@@ -1065,7 +1068,8 @@ shinyServer(
         column(3,
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("BinaryHeatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
-                 selectizeInput("BinaryHeatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("BinaryHeatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
                  # downloadButton("Heatmap_download_samples", "Download This Sample List"),
                  # strong("Clones with a proportion below this threshold will be set to 0."),
                  numericInput("BinaryHeatmap_threshold", "Threshold (clones with a proportion below this threshold will be set to 0)", value = 0, min = 0, max = 1, step = 0.001),
