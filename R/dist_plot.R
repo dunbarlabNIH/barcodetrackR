@@ -5,7 +5,7 @@
 #'@param your_SE A Summarized Experiment object.
 #'@param assay The choice of assay to use for the correlation calculation. Set to "percentages" by default.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
-#'@param dist_method Character. Distance OR similarity measure from the `proxy` package. Full list of distance and similarity measures can be found using `summary(proxy::pr_DB)`.
+#'@param dist_method Character. Distance OR similarity measure from the `proxy` package. Full list of distance and similarity measures can be found using `summary(proxy::pr_DB)`. Default is "euclidean".
 #'Distances will be calculated for distance measures, while similarities will be calculated for similarity measures. Distance OR similarity measure will be calculated using the `assay`
 #'specified.
 #'@param cluster_tree Logical. Whether to cluster samples and plot a hierarchical tree calculated from the distance or similarity measure used. Default is FALSE.
@@ -34,7 +34,7 @@
 dist_plot = function(your_SE,
                     assay = "percentages",
                     plot_labels = colnames(your_SE),
-                    dist_method = "Euclidean",
+                    dist_method = "euclidean",
                     cluster_tree = FALSE,
                     your_title = "",
                     grid = TRUE,
@@ -155,7 +155,7 @@ dist_plot = function(your_SE,
         axis.ticks = ggplot2::element_blank()
       )
     left_gg_dendogram <- gg_dendrogram + ggplot2::coord_flip()+
-      ggplot2::scale_x_reverse(expand = c(0,0.6))+
+      ggplot2::scale_x_reverse(expand = c(0,0.5))+
       ggplot2::scale_y_reverse(expand = c(0,0))
     gg_distplot <- cowplot::plot_grid(left_gg_dendogram, gg_distplot, rel_widths = c(1,7), align = "h", axis = "bt")
 
