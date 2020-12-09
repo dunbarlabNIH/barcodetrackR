@@ -546,3 +546,7 @@ When looking at the weighted heat map, one sees that the majority of hematopoies
 
 From this example, one can see that the two plots paint different but complementary pictures. With the regular circos plot, clones are treated as equal so the information on fractional contribution is lost. However, the number of detected clones is indicated by the length of each region around the perimeter of the circos. This information can be useful for some studies and it is lost in the weighted heat map since all compartments poportion adds to 100%. We recommend using the regular and circos plot in combination to obtain maximal information from any given dataset.
 
+# Session Info
+```{r session info, eval=TRUE}
+sessionInfo()
+```
