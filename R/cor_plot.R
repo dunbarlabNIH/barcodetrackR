@@ -13,7 +13,7 @@
 #'@param no_negatives Logical. Whether to make negative correlations = 0.
 #'@param return_table Logical. Whether or not to return table of p-values, confidence intervals, and R values instead of displaying a plot.
 #'@param color_scale Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.
-#'@param number_size SNumeric. ize of the text label when plot_type is "number".
+#'@param number_size Numeric. Size of the text label when plot_type is "number".
 #'@param point_scale Numeric. The size of the largest point if the plot_type is "circle"
 #'
 #'@return Plots pairwise correlation plot for the samples in your_SE.
@@ -41,18 +41,18 @@ cor_plot = function(your_SE,
                     number_size = 3,
                     point_scale = 1) {
 
-  
+
   #extracts assay from your_SE
   if (assay %in% names(SummarizedExperiment::assays(your_SE)) == FALSE){
     stop("The specified assay is not found in your_SE.")
   }
-  
+
   plotting_data <- SummarizedExperiment::assays(your_SE)[[assay]]
-  
+
   if(ncol(plotting_data) < 2){
     stop("your_SE must contain at least 2 samples (columns).")
   }
-  
+
   plotting_data_columns <- colnames(plotting_data)
 
   plotting_data_longer <- lapply(1:length(plotting_data_columns), function(i){

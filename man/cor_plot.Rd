@@ -43,7 +43,7 @@ cor_plot(
 
 \item{color_scale}{Character. Either "default" or an odd-numbered color scale where the lowest value will correspond to -1, the median value to 0, and the highest value to 1.}
 
-\item{number_size}{SNumeric. ize of the text label when plot_type is "number".}
+\item{number_size}{Numeric. Size of the text label when plot_type is "number".}
 
 \item{point_scale}{Numeric. The size of the largest point if the plot_type is "circle"}
 }
