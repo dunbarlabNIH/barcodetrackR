@@ -15,11 +15,11 @@ shinyServer(
     observeEvent(input$loadSampleData, {
       tmp1 <- read.delim(system.file("sample_data/app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
       my_data(tmp1)
-      output$SampleDataText <- renderText({ 
+      output$SampleDataText <- renderText({
         "Data loaded."
       })
     })
-    
+
     my_metadata <- reactiveVal()
     observeEvent(input$file2, {
       tmp2 <- read.delim(input$file2$datapath)
@@ -28,14 +28,14 @@ shinyServer(
     observeEvent(input$loadSampleMetadata, {
       tmp2 <- read.delim(system.file("sample_data/app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR"))
       my_metadata(tmp2)
-      output$SampleMetadataText <- renderText({ 
+      output$SampleMetadataText <- renderText({
         "Metadata loaded."
       })
     })
-    
+
     output$thresholdPanel <- renderUI({
       # if (is.null(input$file1) | is.null(input$file2)) #| is.null(input$file3))
-      if (is.null(my_data()) | is.null(my_metadata())) 
+      if (is.null(my_data()) | is.null(my_metadata()))
         return()
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
     })
@@ -44,12 +44,12 @@ shinyServer(
     #   system.file("sample_data/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
     #     read.delim(row.names = 1)
     # })
-    # 
+    #
     # input$file1 <- eventReactive(input$loadSampleMetadata, {
     #   system.file("sample_data/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
     #     read.delim(row.names = 1)
     # })
-    
+
     thresholded_data <- eventReactive(input$threshybutton, {
       withProgress(message = "Loading files and applying threshold", value = 0, {
         # your_data <- read.delim(input$file1$datapath,  row.names =1)
@@ -172,14 +172,14 @@ shinyServer(
 
     #DATASTATISTICS TAB
     output$DataStatistics <- renderUI({
-      
+
     if (is.null(thresholded_data()))
       return()
-    
+
       stat_histInput <- function(){
         print(barcodetrackR::stat_hist(your_SE = thresholded_data(),
-                                       data_choice = input$stat_hist_data_choice, 
-                                       assay_choice = input$stat_hist_assay_choice, 
+                                       data_choice = input$stat_hist_data_choice,
+                                       assay_choice = input$stat_hist_assay_choice,
                                        sample_select = input$stat_hist_sample_select,
                                        metadata_stat = input$stat_hist_metadata_stat,
                                        group_by = input$stat_hist_group_by,
@@ -190,11 +190,11 @@ shinyServer(
                                        n_cols = input$stat_hist_n_cols,
                                        alpha = input$stat_hist_alpha
         ))}
-      
+
       output$viewDataStatistics <- renderPlot({
         stat_histInput()
       })
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -221,9 +221,9 @@ shinyServer(
                plotOutput('viewDataStatistics', height = 600)
         )
       )
-    })                                
-                                       
-              
+    })
+
+
     #======================================================================================================
     #HEATMAP TAB
 
@@ -253,9 +253,9 @@ shinyServer(
                                                # log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
                                                ))}
 
-      
 
-      
+
+
       # HeatmapREADMEtable <- function(){
       #   your_table <- readme_data()
       #   your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
@@ -269,22 +269,22 @@ shinyServer(
 
       # output$heatmap_datatable <- renderDataTable({HeatmapREADMEtable()},
       #                                             options = list(paging = FALSE, searching = FALSE))
-      # 
-      # 
+      #
+      #
 
-      # 
+      #
       # output$downloadHeatmapSTATS <- downloadHandler(
       #   filename = function() {paste(input$file1, "_heatmapSTATS.txt", sep = "")},
       #   content = function(file){
       #     write.table(HeatmapREADMEtable(), file, sep = '\t', quote = FALSE)
       #   }
       # )
-      
-      
+
+
       output$viewHeatmap <- renderPlot({
         HeatmapInput()
       })
- 
+
       Heatmap_data <- reactive({
         # df <- thresholded_data()
         se <- thresholded_data()
@@ -325,8 +325,8 @@ shinyServer(
                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
-      
+
+
       output$Heatmap_download_samples <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "samplelist.txt", sep = "_")},
         content = function(file){
@@ -345,7 +345,8 @@ shinyServer(
         column(3,
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
-                 selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
+                 selectizeInput("Heatmap_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
                  downloadButton("Heatmap_download_samples", "Download This Sample List"),
                  br(),
                  numericInput("Heatmap_top_clones", "Number of top clones", value = 10),
@@ -390,7 +391,7 @@ shinyServer(
       )
     })
 
-    
+
     #======================================================================================================
     #CORPLOT TAB
 
@@ -400,7 +401,7 @@ shinyServer(
       if (is.null(thresholded_data()))
         return()
 
-     
+
 
       corplotInput <- function(){
         barcodetrackR::cor_plot(your_SE = corplot_data(),
@@ -422,7 +423,7 @@ shinyServer(
       #     tmpdir <- tempdir()
       #     setwd(tmpdir)
       #     listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(),
-      #                                            # thresh = input$corplot_thresh, 
+      #                                            # thresh = input$corplot_thresh,
       #                                            your_title = input$corplot_Title,
       #                                            method_corr = input$corplot_Method,
       #                                            label_size = input$corplot_Labels,
@@ -436,11 +437,11 @@ shinyServer(
       #   },
       #   contentType = "application/zip"
       # )
-      # 
+      #
       output$viewcorplot <- renderPlot({
         corplotInput()
       })
-      
+
       output$downloadCorData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "corplot_data.txt", sep = "_")},
         content = function(file){
@@ -470,7 +471,7 @@ shinyServer(
 
       #======================================================================================================
       observeEvent(input$corplot_Copier, {updateSelectizeInput(session, inputId = 'corplot_Samples', selected = input$Heatmap_samples)})
-      
+
 
       fluidRow(
         column(3,
@@ -481,7 +482,7 @@ shinyServer(
                  br(),
                  #numericInput("corplot_thresh", "2. Reads threshold", value = 0),
                  selectInput("corplot_Method", "Chooose Correlation Method", choices = c("pearson", "spearman", "kendall"), selected = "pearson"),
-                 selectInput("corplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"), 
+                 selectInput("corplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"),
                  textInput("corplot_Title", "Title", value = ""),
                  strong("Options"),
                  checkboxInput("corplot_excludeneg", "Exclude negatives", value = FALSE),
@@ -504,16 +505,16 @@ shinyServer(
         )
       )
     })
-    
+
 
     #======================================================================================================
     #DISSIMILARITY PLOT TAB
-    
+
     output$mdsPlot <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       mdsInput <- function(){
         print(barcodetrackR::mds_plot(your_SE = mds_data(),
                        group_by = input$mds_group,
@@ -526,12 +527,12 @@ shinyServer(
                        k.param = input$k.param,
                        draw_ellipses = input$draw_ellipses
         ))}
-      
-      
+
+
       output$view_mdsPlot <- renderPlot({
         mdsInput()
       })
-      
+
       output$downloadMdsData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "mds_data.txt", sep = "_")},
         content = function(file){
@@ -549,31 +550,31 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       mds_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$mds_samples] # subset samples
         se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$mds_samples)
         se <- se[,order(se$SAMPLENAME)]
         return(se)
-        
+
       })
-      
-      
+
+
       mds_uploaded_samples <- reactive({
         samples <- as.vector(t(read.delim(input$mds_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
         return(samples)
       })
-      
+
       observeEvent(input$mds_uploaded_samples, {updateSelectizeInput(session, inputId = 'mds_samples', selected = mds_uploaded_samples())})
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("mds_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
                  selectizeInput("mds_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE),
-                 selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"), 
-                 selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"), 
+                 selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"),
+                 selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"),
                  selectInput("mds_assay", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE, selected = "percentages"),
                  checkboxInput("kmeans_cluster", label = "Compute k means clusters", value = FALSE),
                  numericInput("k.param", "k (number of kmeans clusters)", value = 3, min = 1, step = 1),
@@ -593,17 +594,17 @@ shinyServer(
         )
       )
     })
-    
-    
-    
-    
+
+
+
+
     #======================================================================================================
     # Clonal Contribution TAB
     output$ClonalContribution <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       ClonalContributionInput <- function(){
         print(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
                                                  graph_type = input$cc_graph_type,
@@ -621,12 +622,12 @@ shinyServer(
                                                  y_limit = input$cc_y_limit
         ))
       }
-      
-      
+
+
       output$view_cc_plot <- renderPlot({
         ClonalContributionInput()
       })
-      
+
       output$downloadClonalContribData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "clonal_contribution_data.txt", sep = "_")},
         content = function(file){
@@ -648,30 +649,30 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       # Helper function
       # filter_data_available <- reactive({
       #   filter_data_available <- unique(colData(thresholded_data())[,input$cc_filter_by])
       # })
-      
+
       observeEvent(input$cc_filter_by, {updateSelectizeInput(session,
                                                              inputId = 'cc_filter_selection',
                                                              choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$cc_filter_by]))})
-      
+
       observeEvent(input$cc_plot_over, {updateSelectizeInput(session,
                                                              inputId = 'cc_plot_over_choices',
                                                              choices = sort(unique(colData(thresholded_data())[,input$cc_plot_over]), decreasing = F))})
 
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("cc_graph_type", "Chooose Graph Type", choices = c("bar", "line"), selected = "bar"),
-                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE), 
+                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE),
                  selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
-                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("cc_plot_over_choices", label = "Include: (defaults to all values of Plot Over", choices = c(""), multiple = TRUE), 
+                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("cc_plot_over_choices", label = "Include: (defaults to all values of Plot Over", choices = c(""), multiple = TRUE),
                  numericInput("cc_n_clones", "Number of clones to color", value = 10),
                  textInput("cc_your_title", "Title", value = ""),
                  strong("Options"),
@@ -685,21 +686,21 @@ shinyServer(
                  downloadButton('downloadClonalContribData', 'Download_data')
                )
         ),
-        
+
         column(8,
                plotOutput('view_cc_plot', height = 500)
         )
       )
 
     })
-    
+
     #======================================================================================================
     # Clone Count TAB
     output$CloneCount <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       CloneCountInput <- function(){
         print(barcodetrackR::clonal_count(your_SE = thresholded_data(),
                            index_type = input$clone_index_type,
@@ -713,12 +714,12 @@ shinyServer(
                            your_title = input$clone_your_title
         ))
       }
-      
-      
+
+
       output$view_clone_plot <- renderPlot({
         CloneCountInput()
       })
-      
+
       output$downloadClonalCountData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "clonal_count_data.txt", sep = "_")},
         content = function(file){
@@ -736,7 +737,7 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$clone_plot_over, {updateSelectizeInput(session,
                                                                     inputId = 'clone_plot_over_choices',
@@ -745,16 +746,16 @@ shinyServer(
       observeEvent(input$clone_group_by, {updateSelectizeInput(session,
                                                                 inputId = 'clone_group_by_choices',
                                                                 choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_group_by]))})
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("clone_index_type", "Chooose Count Index",
                              choices = c("count","cumulative_count"), selected = "count"),
-                 selectInput("clone_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("clone_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE), 
-                 selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("clone_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE), 
+                 selectInput("clone_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("clone_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE),
+                 selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("clone_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE),
                  #  selectInput("clone_plot_over_choices", label = "Include:", choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), multiple = TRUE, selected = unique(SummarizedExperiment::colData(thresholded_data())[,input$plot_over])),
                  textInput("clone_your_title", "Title", value = ""),
                  br(),
@@ -766,23 +767,23 @@ shinyServer(
                  downloadButton('downloadClonalCountData', 'Download_data')
                )
         ),
-        
+
         column(8,
                plotOutput('view_clone_plot', height = 500)
         )
       )
-      
+
     })
-    
-    
+
+
 
     #======================================================================================================
     # Clonal Diversity TAB
     output$ClonalDiversity <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       ClonalDiversityInput <- function(){
         print(barcodetrackR::clonal_diversity(your_SE = thresholded_data(),
                                               index_type = input$div_index,
@@ -796,12 +797,12 @@ shinyServer(
                                               your_title = input$div_your_title
         ))
       }
-      
-      
+
+
       output$view_div_plot <- renderPlot({
         ClonalDiversityInput()
       })
-      
+
       output$downloadClonalDivData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "clonal_diversity_data.txt", sep = "_")},
         content = function(file){
@@ -819,25 +820,25 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$div_plot_over, {updateSelectizeInput(session,
                                                                 inputId = 'div_plot_over_choices',
                                                                 choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$div_plot_over]), decreasing = F))})
-      
+
       observeEvent(input$div_group_by, {updateSelectizeInput(session,
                                                                inputId = 'div_group_by_choices',
                                                                choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$div_group_by]))})
-      
+
       fluidRow(
         column(3,
                wellPanel(
                  selectInput("div_index", "Chooose Diversity Index",
                              choices = c("shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
-                 selectInput("div_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("div_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE), 
-                 selectInput("div_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("div_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE), 
+                 selectInput("div_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("div_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE),
+                 selectInput("div_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("div_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE),
                  textInput("div_your_title", "Title", value = ""),
                  br(),
                  numericInput("div_line_size", "Line size", value = 2),
@@ -848,22 +849,22 @@ shinyServer(
                  downloadButton('downloadClonalDivData', 'Download_data')
                )
         ),
-        
+
         column(8,
                plotOutput('view_div_plot', height = 500)
         )
       )
-      
+
     })
-    
+
 
     #======================================================================================================
     # Ridge Plot TAB
     output$RidgePlot <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       RidgePlotInput <- function(){
         print(barcodetrackR::bias_ridge_plot(your_SE = thresholded_data(),
                                         split_bias_on = input$ridge_split_bias_on,
@@ -877,12 +878,12 @@ shinyServer(
                                         add_dots = input$ridge_add_dots
         ))
       }
-      
-      
+
+
       output$view_ridge_plot <- renderPlot({
         RidgePlotInput()
       })
-      
+
       output$downloadRidgeData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "bias_ridge_plot_data.txt", sep = "_")},
         content = function(file){
@@ -900,29 +901,29 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       # Helper function to get unique values of the split_bias_on parameter
       observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
                                                              inputId = 'ridge_bias1',
                                                              choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_on]))})
-      
+
       observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
                                                              inputId = 'ridge_bias2',
                                                              choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_on]))})
-      
+
       observeEvent(input$ridge_split_bias_over, {updateSelectizeInput(session,
                                                               inputId = 'ridge_bias_over_select',
                                                               choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_over]), decreasing = F))})
-      
-      
+
+
       fluidRow(
         column(3,
                wellPanel(
-                 selectInput("ridge_split_bias_on", label = "Compare Samples by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("ridge_bias1", label = "Selection 1", choices = c(""), multiple = FALSE), 
-                 selectInput("ridge_bias2", label = "Selection 2", choices = c(""), multiple = FALSE), 
-                 selectInput("ridge_split_bias_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE), 
-                 selectInput("ridge_bias_over_select", label = "Include:", choices = c(""), multiple = TRUE), 
+                 selectInput("ridge_split_bias_on", label = "Compare Samples by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("ridge_bias1", label = "Selection 1", choices = c(""), multiple = FALSE),
+                 selectInput("ridge_bias2", label = "Selection 2", choices = c(""), multiple = FALSE),
+                 selectInput("ridge_split_bias_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("ridge_bias_over_select", label = "Include:", choices = c(""), multiple = TRUE),
                  strong("Options"),
                  checkboxInput("ridge_weighted", "Weighted", value = FALSE),
                  checkboxInput("ridge_rem_unique", "Remove unique barcodes", value = FALSE),
@@ -933,23 +934,23 @@ shinyServer(
                  downloadButton('downloadRidgeData', 'Download_data')
                )
         ),
-        
+
         column(8,
                plotOutput('view_ridge_plot', height = 500)
         )
       )
 
-      
+
     })
-    
-    
+
+
     #======================================================================================================
     # Chord Diagram TAB
     output$ChordDiagram <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       ChordDiagramInput <- function(){
         print(barcodetrackR::chord_diagram(your_SE = circos_data(),
                                          weighted = input$circos_weighted,
@@ -958,7 +959,7 @@ shinyServer(
                                          alpha = input$circos_alpha
         ))
       }
-      
+
       circos_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$circos_Samples] # subset samples
@@ -966,11 +967,11 @@ shinyServer(
         se <- se[,order(se$SAMPLENAME)]
         return(se)
       })
-      
+
       output$view_chord_diagram <- renderPlot({
         ChordDiagramInput()
       })
-      
+
       output$downloadChordData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "chord_diagram_data.txt", sep = "_")},
         content = function(file){
@@ -983,7 +984,7 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -998,38 +999,38 @@ shinyServer(
                  downloadButton('downloadChordData', 'Download_data')
                )
         ),
-        
+
         column(8,
                plotOutput('view_chord_diagram', height = 400)
         )
       )
-      
+
     })
-    
-  
+
+
     #======================================================================================================
     #BINARY HEATMAP TAB
-    
+
     output$BinaryHeatmap <- renderUI({
-      
+
       if (is.null(thresholded_data()))
         return()
-      
+
       BinaryHeatmapInput <- function(){
         print(barcodetrackR::barcode_binary_heatmap(your_SE = BinaryHeatmap_data(),
                                      plot_labels = NULL,
                                      threshold =  input$BinaryHeatmap_threshold,
                                      your_title = paste0(input$BinaryHeatmap_title),
                                      label_size = input$BinaryHeatmap_labels
-                                     
+
         ))}
-      
-      
+
+
       output$viewBinaryHeatmap <- renderPlot({
         BinaryHeatmapInput()
       })
-      
-      
+
+
       output$downloadBinaryHeatmapData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "binary_heatmap_data.txt", sep = "_")},
         content = function(file){
@@ -1042,24 +1043,24 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       BinaryHeatmap_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$BinaryHeatmap_samples] # subset samples
         se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$BinaryHeatmap_samples)
         se <- se[,order(se$SAMPLENAME)]
         return(se)
-        
+
       })
-      
-      
+
+
       BinaryHeatmap_uploaded_samples <- reactive({
         samples <- as.vector(t(read.delim(input$BinaryHeatmap_uploaded_samples$datapath, stringsAsFactors = FALSE, header = FALSE)))
         return(samples)
       })
-      
+
       observeEvent(input$BinaryHeatmap_uploaded_samples, {updateSelectizeInput(session, inputId = 'BinaryHeatmap_samples', selected = BinaryHeatmap_uploaded_samples())})
-      
+
       fluidRow(
         column(3,
                wellPanel(
@@ -1082,48 +1083,48 @@ shinyServer(
         )
       )
     })
-    
-    
 
-    
-    
+
+
+
+
     # #======================================================================================================
     # #SCATTER PLOT TAB
-    # 
+    #
     # output$ScatterPlot <- renderUI({
     #   if(is.null(thresholded_data()))
     #     return()
-    # 
+    #
     #   scatterInput <- function(){
     #     normdata <- 100*prop.table(as.matrix(scatter_data()), margin = 2)
     #     plot(normdata, col = 'black', ylim = c(0,input$scatter_Ylim), xlim = c(0,input$scatter_Xlim), cex = input$scatter_Dotsize, pch = 20)
     #     legend("topright", legend = paste("Correlation (R) =", cor(normdata[,1], normdata[,2])))
     #   }
-    # 
+    #
     #   output$viewscatter <- renderPlot({
     #     scatterInput()
     #     height = 700
     #   })
-    # 
+    #
     #   scatter_data <- reactive({
     #     scf <- thresholded_data()
-    # 
+    #
     #     scf <- scf[scf$GIVENNAME %in% c(input$scatter_Sample1, input$scatter_Sample2),] #subset samples
     #     newcolnames <- scf$GIVENNAME
-    # 
+    #
     #     scf$GIVENNAME <- NULL
     #     scf$EXPERIMENT <- NULL
     #     scf$CELLTYPE <- NULL
     #     scf$MONTH <- NULL
     #     scf$LOCATION <- NULL
     #     scf$MISC <- NULL
-    # 
+    #
     #     scf <- data.frame(t(scf))
     #     colnames(scf) <- newcolnames
     #     return(scf)
-    # 
+    #
     #   })
-    # 
+    #
     #   fluidRow(
     #     column(3,
     #            wellPanel(
@@ -1133,46 +1134,46 @@ shinyServer(
     #              numericInput("scatter_Ylim", "4. Y Limit: ", value = 100, step = 0.1, min = 0),
     #              numericInput("scatter_Xlim", "5. X Limit: ", value = 100, step = 0.1, min = 0),
     #              numericInput("scatter_Dotsize","6. Dot Size: ", value = 5)
-    # 
+    #
     #            )),
-    # 
-    # 
-    # 
+    #
+    #
+    #
     #     column(6,
     #            plotOutput('viewscatter', height = 700)
     #     )
-    # 
+    #
     #   )
-    # 
-    # 
+    #
+    #
     # })
-    # 
-    
-    # 
-    # 
+    #
+
+    #
+    #
     # # #======================================================================================================
     # #Binary Heatmap TAB
-    # 
+    #
     # output$BinaryHeatmap <- renderUI({
-    # 
-    # 
+    #
+    #
     #   if (is.null(thresholded_data()))
     #     return()
-    # 
-    # 
+    #
+    #
     #   BinaryheatmapInput <- function(){
     #     print(barcodetrackR::barcode_binary_heatmap(your_data = Binaryheatmap_data(),
     #                                                 label_size = input$Binaryheatmap_labels,
     #                                                 percent_threshold = input$Binaryheatmap_threshold
     #     ))
     #   }
-    # 
+    #
     #   output$viewBinaryheatmap <- renderPlot({
     #     BinaryheatmapInput()
     #     height = 900
     #   })
-    # 
-    # 
+    #
+    #
     #   Binaryheatmap_data <- reactive({
     #     BBdf <- thresholded_data()
     #     BBdf <- BBdf[BBdf$GIVENNAME %in% input$Binaryheatmap_samples,] #subset samples
@@ -1189,7 +1190,7 @@ shinyServer(
     #     colnames(BBdf) <- newcolnames
     #     return(BBdf)
     #   })
-    # 
+    #
     #   fluidRow(
     #     column(3,
     #            wellPanel(
@@ -1202,52 +1203,52 @@ shinyServer(
     #     column(8,
     #            plotOutput('viewBinaryheatmap', height = 700)
     #     )
-    # 
+    #
     #   )
-    # 
+    #
     # })
-    # 
+    #
     # #======================================================================================================
     # #TERNPLOT TAB
-    # 
+    #
     # output$TernPlot <- renderUI({
     #   if(is.null(thresholded_data()))
     #     return()
-    # 
+    #
     #   ternplotInput <- function(){
     #     print(barcodetrackR::ternary_plot(ternplot_data(),
     #                                       show_arrows = input$ternplot_Showarrows,
     #                                       show_ticks = input$ternplot_Showticks,
     #                                       density_mode = input$ternplot_Density))
-    # 
+    #
     #   }
-    # 
+    #
     #   output$viewternplot<- renderPlot({
     #     ternplotInput()
     #     height = 700
     #   })
-    # 
+    #
     #   ternplot_data <- reactive({
     #     terndf <- thresholded_data()
-    # 
+    #
     #     terndf <- terndf[terndf$GIVENNAME %in% input$ternplot_Samples,] #subset samples
     #     terndf$GIVENNAME <- factor(terndf$GIVENNAME, levels = input$ternplot_Samples)
     #     terndf <- terndf[order(terndf$GIVENNAME),]
     #     newcolnames <- terndf$GIVENNAME
-    # 
+    #
     #     terndf$GIVENNAME <- NULL
     #     terndf$EXPERIMENT <- NULL
     #     terndf$CELLTYPE <- NULL
     #     terndf$MONTH <- NULL
     #     terndf$LOCATION <- NULL
     #     terndf$MISC <- NULL
-    # 
+    #
     #     terndf <- data.frame(t(terndf))
     #     colnames(terndf) <- newcolnames
     #     return(terndf)
-    # 
+    #
     #   })
-    # 
+    #
     #   fluidRow(
     #     column(3,
     #            wellPanel(
@@ -1258,62 +1259,62 @@ shinyServer(
     #              checkboxInput("ternplot_Showarrows", label = "Show Arrows", value = TRUE),
     #              checkboxInput("ternplot_Showticks", label = "Show Tick Marks", value = FALSE)
     #            )),
-    # 
-    # 
-    # 
+    #
+    #
+    #
     #     column(9,
     #            plotOutput('viewternplot', height = 700)
     #     )
-    # 
+    #
     #   )
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
+    #
+    #
+    #
+    #
+    #
+    #
     # })
-    # 
-    # 
+    #
+    #
     # #======================================================================================================
     # #RANKABUNDANCE TAB
-    # 
+    #
     # output$RankAbundance <- renderUI({
     #   if(is.null(thresholded_data()))
     #     return()
-    # 
+    #
     #   rankabundanceInput <- function(){
     #     print(barcodetrackR::rank_abundance_plot(rankabundance_data(),
     #                                              dot_size = input$rankabundance_Dotsize,
     #                                              text_size = input$rankabundance_Textsize))
-    # 
+    #
     #   }
-    # 
+    #
     #   output$viewrankabundance<- renderPlot({
     #     rankabundanceInput()
     #     height = 700
     #   })
-    # 
+    #
     #   rankabundance_data <- reactive({
     #     rankabdf <- thresholded_data()
     #     rankabdf <- rankabdf[rankabdf$GIVENNAME %in% input$rankabundance_Samples,] #subset samples
     #     rankabdf$GIVENNAME <- factor(rankabdf$GIVENNAME, levels = input$rankabundance_Samples)
     #     rankabdf <- rankabdf[order(rankabdf$GIVENNAME),]
     #     newcolnames <- rankabdf$GIVENNAME
-    # 
+    #
     #     rankabdf$GIVENNAME <- NULL
     #     rankabdf$EXPERIMENT <- NULL
     #     rankabdf$CELLTYPE <- NULL
     #     rankabdf$MONTH <- NULL
     #     rankabdf$LOCATION <- NULL
     #     rankabdf$MISC <- NULL
-    # 
+    #
     #     rankabdf <- data.frame(t(rankabdf))
     #     colnames(rankabdf) <- newcolnames
     #     return(rankabdf)
-    # 
+    #
     #   })
-    # 
+    #
     #   fluidRow(
     #     column(3,
     #            wellPanel(
@@ -1322,29 +1323,29 @@ shinyServer(
     #              numericInput("rankabundance_Dotsize", "2. Enter Dot Size: ", value = 3),
     #              numericInput("rankabundance_Textsize", "3. Enter Text Size: ", value = 15)
     #            )),
-    # 
-    # 
-    # 
+    #
+    #
+    #
     #     column(9,
     #            plotOutput('viewrankabundance', height = 700)
     #     )
-    # 
+    #
     #   )
-    # 
-    # 
-    # 
-    # 
-    # 
-    # 
+    #
+    #
+    #
+    #
+    #
+    #
     # })
-    # 
+    #
     # #======================================================================================================
     # #CLONALBIAS TAB
-    # 
+    #
     # output$ClonalBias <- renderUI({
     #   if(is.null(thresholded_data()))
     #     return()
-    # 
+    #
     #   clonalbiasInput <- function(){
     #     if(input$clonalbias_Type == "Dots"){
     #       print(barcodetrackR::dot_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
@@ -1352,12 +1353,12 @@ shinyServer(
     #       print(barcodetrackR::clonal_bias(clonalbias_data(), text_size = input$clonalbias_Textsize))
     #     }
     #   }
-    # 
+    #
     #   output$viewclonalbias<- renderPlot({
     #     clonalbiasInput()
     #     height = 700
     #   })
-    # 
+    #
     #   clonalbias_data <- reactive({
     #     cb_df <- thresholded_data()
     #     cb_df <- cb_df[cb_df$GIVENNAME %in% input$clonalbias_Samples,] #subset samples
