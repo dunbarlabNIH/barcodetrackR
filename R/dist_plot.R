@@ -157,7 +157,7 @@ dist_plot = function(your_SE,
     left_gg_dendogram <- gg_dendrogram + ggplot2::coord_flip()+
       ggplot2::scale_x_reverse()+
       ggplot2::scale_y_reverse()
-    gg_distplot <- cowplot::plot_grid(left_gg_dendogram, gg_distplot, rel_widths = c(1,7), align = "h")
+    gg_distplot <- cowplot::plot_grid(left_gg_dendogram, gg_distplot, rel_widths = c(1,7), align = "hv", axis = "trb")
 
   }
 
