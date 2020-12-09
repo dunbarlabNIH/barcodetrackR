@@ -126,7 +126,7 @@ The [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) package includ
 barcodetrackR::launchApp()
 ```
 
-# Sample correlations, distances, and similarities
+# Correlations
 
 ## `scatter_plot`
 A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a `scatter_plot` function as part of the package.
@@ -182,19 +182,30 @@ cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          number_size = 3)
 ```
 
+# Distances and similarities
 
 ## `dist_plot`
-While correlation coefficients .
-```{r dist 1, eval = TRUE, fig.width = 6, fig.height = 5}
-wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
+While correlation coefficients provide some insight into pairwise comparisons between samples, there exist a number of measures and metrics possible for pairwise sample comparisons (namely, distances and similarities). The `proxy` package provides a number of distance and similarity measure we can incorporate for our purposes.
+```{r summary proxy, eval = TRUE}
+summary(proxy::pr_DB)
+```
+
+We will use the Wu dataset as in the correlation plots above, this time using the `logs` assay to determine pairwise sample distances or similarities. The use of a similarity or distance will be automatically detected in the argument `dist_method` and plotted appropriately. The samples may be clustered or not, using the `cluster_tree` argument. We first show the Manhattan distances calculated between samples for the Wu dataset.
+```{r dist plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
-          dist_method =  "euclidean",
+          dist_method =  "manhattan",
           plot_type = "color",
           assay = "logs")
+```
+
+Here is the same example, this time using the cosine similarity as the pairwise measure, and imposing a clustering on the resulting similarities (note, in the case of calculating hierarchical clustering on a similarity matrix, we use `proxy` to convert similarities to distances prior to clustering).
+
+```{r dist plot 2, eval = TRUE, fig.width = 6, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "cosine",
           plot_type = "color",
-          assay = "logs")
+          assay = "logs",
+          cluster_tree = TRUE)
 ```
 
 
