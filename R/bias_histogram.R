@@ -105,6 +105,9 @@ bias_histogram <- function(your_SE,
       dplyr::mutate(log2_bias = log2(bias)) %>%
       dplyr::mutate(log2_bias_cuts = cut(log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
     
+    if (return_table){
+      me <- temp_your_data
+    } else {
     g <- ggplot2::ggplot(temp_your_data[order(temp_your_data$added_percentages),],
                          ggplot2::aes(x = log2_bias_cuts, y = added_percentages))+
       ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize, color = "black")+
@@ -118,10 +121,9 @@ bias_histogram <- function(your_SE,
                      axis.text.x = ggplot2::element_text(vjust = 0.5, hjust = 1, angle = 90))+
       ggplot2::labs(title = paste0(split_bias_over,": ", bias_over[i]))+
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  }
     
-    if (return_table){
-      me <- temp_your_data
-    }
+
   })
   
   if (return_table){

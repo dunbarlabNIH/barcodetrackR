@@ -21,6 +21,8 @@ mds_plot(
 \arguments{
 \item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
+\item{group_by}{Column of metadata to color samples by. Can also specify "kmeans_cluster" if kmeans_cluster argument is set to TRUE, and then the grouping variables will be the clusterinng result.}
+
 \item{method_dist}{Dissimilarity index from vegan. One of "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", or "cao".}
 
 \item{assay}{The assay to calculate the index on}
@@ -33,7 +35,7 @@ mds_plot(
 
 \item{return_table}{Logical. If set to true, the function will return a dataframe containing each samples reduced measure of dissimilarity coordinates.}
 
-\item{kmeans_cluster}{Logical. If set to true, each sample will be assigned a cluster computed by kmeans on the reduced dimensional space computed on the measures of dissimilarity between samples.}
+\item{kmeans_cluster}{Logical. If set to true, each sample will be assigned a cluster computed by kmeans on the chosen assay.}
 
 \item{k.param}{Numeric. If kmeans_cluster is TRUE, provide the number of kmeans clusters to identify.}
 
