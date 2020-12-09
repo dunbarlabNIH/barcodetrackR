@@ -191,7 +191,7 @@ summary(proxy::pr_DB)
 ```
 
 We will use the Wu dataset as in the correlation plots above, this time using the `logs` assay to determine pairwise sample distances or similarities. The use of a similarity or distance will be automatically detected in the argument `dist_method` and plotted appropriately. The samples may be clustered or not, using the `cluster_tree` argument. We first show the Manhattan distances calculated between samples for the Wu dataset.
-```{r dist plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
+```{r dist plot 1, eval = TRUE, fig.width = 7, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "manhattan",
           plot_type = "color",
@@ -200,7 +200,7 @@ dist_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 Here is the same example, this time using the cosine similarity as the pairwise measure, and imposing a clustering on the resulting similarities (note, in the case of calculating hierarchical clustering on a similarity matrix, we use `proxy` to convert similarities to distances prior to clustering). We can also pick a number of color scales, here choosing "Greens".
 
-```{r dist plot 2, eval = TRUE, fig.width = 8, fig.height = 5}
+```{r dist plot 2, eval = TRUE, fig.width = 7, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "cosine",
           plot_type = "color",
