@@ -38,7 +38,7 @@ shinyServer(
         if(which_loader() == "none"){
           your_SE <- NULL
         } else if(which_loader() == "sample_data"){
-          your_SE <- wu_subset
+          your_SE <- barcodetrackR::wu_subset
         } else {
           your_data <- my_data()
           metadata <- my_metadata()
