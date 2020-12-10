@@ -9,7 +9,7 @@ shinyServer(
 
     my_data <- reactiveVal()
     observeEvent(input$file1, {
-      tmp1 <- read.delim(input$file1$datapath,  row.names =1)
+      tmp1 <- read.delim(input$file1$datapath,  row.names = 1)
       my_data(tmp1)
     })
     observeEvent(input$loadSampleData, {
@@ -34,7 +34,6 @@ shinyServer(
     })
 
     output$thresholdPanel <- renderUI({
-      # if (is.null(input$file1) | is.null(input$file2)) #| is.null(input$file3))
       if (is.null(my_data()) | is.null(my_metadata()))
         return()
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
@@ -286,18 +285,10 @@ shinyServer(
       })
 
       Heatmap_data <- reactive({
-        # df <- thresholded_data()
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$Heatmap_samples] # subset samples
         se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$Heatmap_samples)
         se <- se[,order(se$SAMPLENAME)]
-        # df <- df[df$GIVENNAME %in% input$Heatmap_samples,] #subset samples
-        # df$GIVENNAME <- factor(df$GIVENNAME, levels = input$Heatmap_samples)
-        #df <- df[order(df$GIVENNAME),]
-        # newcolnames <- df$GIVENNAME
-        # df$GIVENNAME <- NULL
-        # df <- data.frame(t(df))
-        # colnames(df) <- newcolnames
         return(se)
 
       })
@@ -377,16 +368,11 @@ shinyServer(
                  #             selected = "percents"),
                  strong("Press button to download Heatmap data."),
                  br(),
-                 downloadButton('downloadHeatmapData', 'Heatmap_data'),
-                 # br(),
-                 # strong("16. Press button to download Heatmap Stats."),
-                 # br(),
-                 # downloadButton('downloadHeatmapSTATS', 'Heatmap_STATS')
+                 downloadButton('downloadHeatmapData', 'Heatmap_data')
                )
         ),
         column(8,
                plotOutput('viewHeatmap', height = 800),
-            #   dataTableOutput('heatmap_datatable')
         )
       )
     })
