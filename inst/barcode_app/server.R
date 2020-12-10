@@ -25,22 +25,23 @@ shinyServer(
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
     })
 
-    which_loader <- reactiveVal("none")
+    which_loader <- reactiveVal()
     observeEvent(input$threshybutton, {
       which_loader("real_data")
+      message("loading real data")
     })
     observeEvent(input$samplebutton, {
       which_loader("sample_data")
+      message("loading sample_data")
     })
 
     thresholded_data <- eventReactive(c(input$threshybutton,input$samplebutton),ignoreInit = T, {
       withProgress(message = "Loading files and applying threshold", value = 0, {
-        val_loader <- which_loader()
-        if(val_loader == "none"){
+        if(is.null(which_loader())){
           your_SE <- NULL
-        } else if(val_loader == "sample_data"){
+        } else if(which_loader() == "sample_data"){
           your_SE <- barcodetrackR::wu_subset
-        } else {
+        } else if (which_loader() == "real_data"){
           your_data <- my_data()
           metadata <- my_metadata()
           if(!(all(c("SAMPLENAME") %in% colnames(metadata)))){
@@ -63,6 +64,8 @@ shinyServer(
           your_SE <- barcodetrackR::create_SE(your_data = your_data,
                                               meta_data  = metadata,
                                               threshold = input$thresholdvalue)
+        } else {
+          stop("This case should not logically happen")
         }
         return(your_SE)
       })})
@@ -86,32 +89,30 @@ shinyServer(
     #RENDER TABS AFTER UPLOAD
 
     observeEvent(c(input$threshybutton, input$samplebutton), {
-      # if(is.null(thresholded_data())){
-      #   return()
-      # }
-      if(which_loader() == "none"){
+      if(is.null(which_loader())){
         return()
+      } else {removeTab("Panel", "Descriptive Statistics")
+        removeTab("Panel", "Heatmap")
+        removeTab("Panel", "Correlation Plot")
+        removeTab("Panel", "Dissimilarity Plot")
+        removeTab("Panel", "Clonal Contribution")
+        removeTab("Panel", "Clone Count")
+        removeTab("Panel", "Clonal Diversity")
+        removeTab("Panel", "Chord Diagram")
+        removeTab("Panel", "Ridge Plot")
+        removeTab("Panel", "Binary Heatmap")
+        appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
+        appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
+        appendTab("Panel", tab = tabPanel("Correlation Plot", uiOutput("CorPlot")))
+        appendTab("Panel", tab = tabPanel("Dissimilarity Plot", uiOutput("mdsPlot")))
+        appendTab("Panel", tab = tabPanel("Clonal Contribution", uiOutput("ClonalContribution")))
+        appendTab("Panel", tab = tabPanel("Clone Count", uiOutput("CloneCount")))
+        appendTab("Panel", tab = tabPanel("Clonal Diversity", uiOutput("ClonalDiversity")))
+        appendTab("Panel", tab = tabPanel("Chord Diagram", uiOutput("ChordDiagram")))
+        appendTab("Panel", tab = tabPanel("Ridge Plot", uiOutput("RidgePlot")))
+        appendTab("Panel", tab = tabPanel("Binary Heatmap", uiOutput("BinaryHeatmap")))
       }
-      removeTab("Panel", "Descriptive Statistics")
-      removeTab("Panel", "Heatmap")
-      removeTab("Panel", "Correlation Plot")
-      removeTab("Panel", "Dissimilarity Plot")
-      removeTab("Panel", "Clonal Contribution")
-      removeTab("Panel", "Clone Count")
-      removeTab("Panel", "Clonal Diversity")
-      removeTab("Panel", "Chord Diagram")
-      removeTab("Panel", "Ridge Plot")
-      removeTab("Panel", "Binary Heatmap")
-      appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
-      appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
-      appendTab("Panel", tab = tabPanel("Correlation Plot", uiOutput("CorPlot")))
-      appendTab("Panel", tab = tabPanel("Dissimilarity Plot", uiOutput("mdsPlot")))
-      appendTab("Panel", tab = tabPanel("Clonal Contribution", uiOutput("ClonalContribution")))
-      appendTab("Panel", tab = tabPanel("Clone Count", uiOutput("CloneCount")))
-      appendTab("Panel", tab = tabPanel("Clonal Diversity", uiOutput("ClonalDiversity")))
-      appendTab("Panel", tab = tabPanel("Chord Diagram", uiOutput("ChordDiagram")))
-      appendTab("Panel", tab = tabPanel("Ridge Plot", uiOutput("RidgePlot")))
-      appendTab("Panel", tab = tabPanel("Binary Heatmap", uiOutput("BinaryHeatmap")))
+
 
     })
 

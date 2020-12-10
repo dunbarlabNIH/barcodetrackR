@@ -5,8 +5,8 @@ account: dunbarlabnih
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3290350
-bundleId: 3969858
+bundleId: 3972512
 url: https://dunbarlabnih.shinyapps.io/barcode_app/
-when: 1607587090.0088
+when: 1607633588.57179
 asMultiple: FALSE
 asStatic: FALSE
