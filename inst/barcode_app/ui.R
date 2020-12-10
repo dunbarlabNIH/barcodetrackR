@@ -2,7 +2,6 @@ shinyUI(
   fluidPage(
     titlePanel("barcodetrackR Shiny app"),
     br(),
-    br(),
     tabsetPanel(id="Panel", type="tabs",
                 tabPanel(title = "Upload Data",
                          fluidRow(column(4,
