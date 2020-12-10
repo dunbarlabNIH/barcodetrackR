@@ -25,7 +25,7 @@ shinyServer(
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
     })
 
-    which_loader <- reactiveVal(value = "none")
+    which_loader <- reactiveVal("none")
     observeEvent(input$threshybutton, {
       which_loader("real_data")
     })
@@ -33,11 +33,12 @@ shinyServer(
       which_loader("sample_data")
     })
 
-    thresholded_data <- eventReactive(c(input$threshybutton,input$samplebutton) ,ignoreInit = T, {
+    thresholded_data <- eventReactive(c(input$threshybutton,input$samplebutton),ignoreInit = T, {
       withProgress(message = "Loading files and applying threshold", value = 0, {
-        if(which_loader() == "none"){
+        val_loader <- which_loader()
+        if(val_loader == "none"){
           your_SE <- NULL
-        } else if(which_loader() == "sample_data"){
+        } else if(val_loader == "sample_data"){
           your_SE <- barcodetrackR::wu_subset
         } else {
           your_data <- my_data()
@@ -85,7 +86,10 @@ shinyServer(
     #RENDER TABS AFTER UPLOAD
 
     observeEvent(c(input$threshybutton, input$samplebutton), {
-      if(is.null(thresholded_data())){
+      # if(is.null(thresholded_data())){
+      #   return()
+      # }
+      if(which_loader() == "none"){
         return()
       }
       removeTab("Panel", "Descriptive Statistics")
