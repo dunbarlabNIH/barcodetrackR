@@ -441,8 +441,10 @@ shinyServer(
 
     output$mdsPlot <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
+      if (ncol(thresholded_data()) < 3){
+        stop("MDS plotting not available for experiments with less than 3 experiments")
+      }
+
 
       mdsInput <- function(){
         print(barcodetrackR::mds_plot(your_SE = mds_data(),
@@ -502,7 +504,7 @@ shinyServer(
                wellPanel(
                  div(style="display:inline-block; height:85px;",fileInput("mds_uploaded_samples", "Upload Prepared Sample List or Input Samples")),
                  selectizeInput("mds_samples", label = NULL, choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
-                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:3]),
                  selectInput("mds_group", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = "SAMPLENAME"),
                  selectInput("mds_method", label = "Dissimilarity index", choices = c("manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao"), multiple = FALSE, selected = "bray"),
                  selectInput("mds_assay", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE, selected = "percentages"),
@@ -598,7 +600,10 @@ shinyServer(
         column(3,
                wellPanel(
                  selectInput("cc_graph_type", "Chooose Graph Type", choices = c("bar", "line"), selected = "bar"),
-                 selectInput("cc_filter_by", label = "Filter By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("cc_filter_by", label = "Filter By",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))],
+                             multiple = FALSE),
                  selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE),
                  selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
                  selectInput("cc_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
@@ -671,7 +676,7 @@ shinyServer(
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$clone_plot_over, {updateSelectizeInput(session,
                                                                 inputId = 'clone_plot_over_choices',
-                                                                choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), decreasing = F))})
+                                                                choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]),decreasing = F))})
 
       observeEvent(input$clone_group_by, {updateSelectizeInput(session,
                                                                inputId = 'clone_group_by_choices',

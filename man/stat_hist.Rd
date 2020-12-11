@@ -9,7 +9,6 @@ stat_hist(
   data_choice = "assay stats",
   assay_choice = "counts",
   metadata_stat = NULL,
-  sample_select = NULL,
   group_meta_by = NULL,
   scale_all_y = FALSE,
   y_log_axis = FALSE,
@@ -25,6 +24,8 @@ stat_hist(
 
 \item{assay_choice}{When data_choice is set to "assay stats", designates which assay will be used.}
 
+\item{metadata_stat}{When data_choice is set to "metadata stats", The metadata values that will be used.}
+
 \item{group_meta_by}{When data_choice is set to "metadata stats", facet the histogram using this column of metadata. If NULL, no grouping or faceting applied}
 
 \item{scale_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
@@ -36,10 +37,6 @@ stat_hist(
 \item{n_bins}{Number of bins for histograms. Default is 30.}
 
 \item{n_cols}{Number of columns for faceted histograms. If NULL (default) will automatically choose n_cols for facetting.}
-
-\item{metadata_choice}{When data_choice is set to "metadata stats", The metadata values that will be used.}
-
-\item{x_log_axis}{Logical. Whether or not to put x axis on log scale}
 }
 \value{
 Histogram of chosen statistics

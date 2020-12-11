@@ -8,7 +8,6 @@
 #'@param metadata_stat When data_choice is set to "metadata stats", The metadata values that will be used.
 #'@param group_meta_by When data_choice is set to "metadata stats", facet the histogram using this column of metadata. If NULL, no grouping or faceting applied
 #'@param scale_all_y Logical. Whether or not to plot all plots on the same y axis limits.
-#'@param x_log_axis Logical. Whether or not to put x axis on log scale
 #'@param y_log_axis Logical. Whether or not to put y axis on log scale
 #'@param n_bins Number of bins for histograms. Default is 30.
 #'@param n_cols Number of columns for faceted histograms. If NULL (default) will automatically choose n_cols for facetting.
@@ -94,7 +93,7 @@ stat_hist <- function(your_SE,
         cowplot::theme_cowplot()+
         ggplot2::labs(x = paste0("metadata: ", metadata_stat)) +
         ggplot2::guides(color = FALSE)+
-        ggplot2::theme(text = ggplot2::element_text(size = text_size))
+        ggplot2::theme(text = ggplot2::element_text(size = text_size), axis.text.x = element_text(angle = 45))
       if(y_log_axis){
         g <- g + ggplot2::scale_y_continuous(trans = "log10")
       }
@@ -120,7 +119,7 @@ stat_hist <- function(your_SE,
         cowplot::theme_cowplot()+
         ggplot2::labs(x = paste0("metadata: ", metadata_stat)) +
         ggplot2::guides(color = FALSE)+
-        ggplot2::theme(text = ggplot2::element_text(size = text_size))+
+        ggplot2::theme(text = ggplot2::element_text(size = text_size), axis.text.x = element_text(angle = 45))+
         ggplot2::facet_wrap(~grouping_var)
 
       if(y_log_axis){

@@ -75,8 +75,10 @@ clonal_contribution <- function(your_SE,
   if(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices  %||% sort(unique(SummarizedExperiment::colData(temp_subset)[[plot_over]]))
     plot_over_display_choices <- as.numeric(as.character(plot_over_display_choices))
-  } else {
+  } else if (is.factor(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]]))) {
     plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(temp_subset)[[plot_over]])
+  } else {
+    plot_over_display_choices <- plot_over_display_choices %||% unique(SummarizedExperiment::colData(temp_subset)[[plot_over]])
   }
   temp_subset <- temp_subset[,temp_subset[[plot_over]] %in% plot_over_display_choices]
   temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% as.data.frame() %>% dplyr::mutate_if(is.factor,as.character)
@@ -117,7 +119,7 @@ clonal_contribution <- function(your_SE,
     plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences)))
     color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences))), selected_sequences)
   }
-  
+
   if (return_table){
     return(plotting_data[,1:3])
   }
@@ -154,5 +156,5 @@ clonal_contribution <- function(your_SE,
     g + ggplot2::scale_x_discrete(paste0(plot_over), breaks = plot_over_display_choices, labels = plot_over_display_choices) +
       ggplot2::theme(legend.position="none")
   }
-  
+
 }
