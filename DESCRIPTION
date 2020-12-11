@@ -6,7 +6,7 @@ Date: 2020-05-26
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
 Description: A package for the analysis of cellular barcoding data.
 URL: http://github.com/d93espinoza/barcodetrackR
-License: CC0
+License: CC0 + file LICENSE
 LazyData: TRUE
 Encoding: UTF-8
 Imports:
