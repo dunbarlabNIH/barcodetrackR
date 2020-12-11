@@ -20,6 +20,7 @@ Imports:
     RColorBrewer,
     scales,
     shiny,
+    stats,
     SummarizedExperiment,
     S4Vectors,
     tidyr,

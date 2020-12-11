@@ -51,7 +51,7 @@ barcode_binary_heatmap <- function(your_SE,
   plotting_data[["x_labels"]] <- factor(x_column, levels = plot_labels)
 
   ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$x_labels, y = .data$sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = value))+
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$value))+
     ggplot2::scale_fill_manual(paste0("Detection"),
                                values = c("0" = "white", "1" = "#4575B4"),
                                expand = c(0,0),
