@@ -4,7 +4,7 @@ Title: Functions for Analyzing Cellular Barcoding Data
 Version: 0.1
 Date: 2020-05-26
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
-Description: TBA
+Description: A package for the analysis of cellular barcoding data.
 URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
@@ -19,7 +19,6 @@ Imports:
     proxy,
     scales,
     shiny,
-    vegan,
     SummarizedExperiment,
     tidyr,
     rlang,
