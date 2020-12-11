@@ -21,7 +21,17 @@ shinyUI(
                                            h3("Option 2: Load sample data"),
                                            br(),
                                            br(),
-                                           actionButton("samplebutton", "Load Sample Data", width="100%"))),
+                                           actionButton("samplebutton", "Load Sample Data", width="100%"),
+                                           br(),
+                                           br(),
+                                           br(),
+                                           h5("What is the Sample Data?"),
+                                           tags$em("Sample Data is a subset of barcodes and samples from the larger dataset ",
+                                                   tags$a(href="https://github.com/dunbarlabNIH/barcodetrackR/tree/master/inst/sample_data/app_sample_data", "here")
+                                                   )
+                                           )
+                                         ),
+
                                   column(4,
                                          wellPanel(
                                            h3("Links to help"),
