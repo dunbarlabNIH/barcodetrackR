@@ -22,16 +22,3 @@ test_that("chord_diagram works", {
   testthat::expect_s3_class(barcodetrackR::chord_diagram(my_SE[,1:3], return_table = TRUE), "data.frame")
 })
 #> Test passed 🥳
-
-test_that("autocor_plot works", {
-  testthat::expect_type(barcodetrackR::autocor_plot(my_SE,
-                                                    filter_by = "celltype",
-                                                    filter_selection = "T",
-                                                    plot_over = "months"), "list")
-  testthat::expect_s3_class(barcodetrackR::autocor_plot(my_SE,
-                                                        filter_by = "celltype",
-                                                        filter_selection = "T",
-                                                        plot_over = "months",
-                                                        return_table = TRUE), "data.frame")
-})
-#> Test passed 🥳
