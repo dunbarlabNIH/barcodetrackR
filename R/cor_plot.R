@@ -20,6 +20,8 @@
 #'
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
+#'@importFrom stats cor.test
+#'@importFrom plyr .
 #'
 #'@export
 #'
@@ -84,10 +86,10 @@ cor_plot = function(your_SE,
 
   if(no_negatives){
     plotting_data_longer %>%
-      dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, p_value)) %>%
+      dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, .data$p_value)) %>%
    #   dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
   #    dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
-      dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
+      dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, .data$correlation_value)) -> plotting_data_longer
     color_limits <- c(0, 1)
     floor_limit <- ceiling(length(color_scale)/2)
     color_scale <- color_scale[floor_limit:length(color_scale)]
@@ -99,7 +101,7 @@ cor_plot = function(your_SE,
     return(plotting_data_longer)
   }
 
-  gg_corplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = sample_i, y = sample_j)) +
+  gg_corplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = .data$sample_i, y = .data$sample_j)) +
     ggplot2::scale_x_discrete(position = "top") +
     ggplot2::theme(axis.ticks = ggplot2::element_blank(),
                    rect = ggplot2::element_blank(),
@@ -110,19 +112,19 @@ cor_plot = function(your_SE,
 
   if(plot_type == "color"){
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "circle"){
     gg_corplot <- gg_corplot +
       ggplot2::geom_tile(color = ifelse(grid, "black", "white"), fill = "white") +
-      ggplot2::geom_point(ggplot2::aes(size = abs(correlation_value), fill = correlation_value), shape = 21)+
+      ggplot2::geom_point(ggplot2::aes(size = abs(.data$correlation_value), fill = correlation_value), shape = 21)+
       ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "number") {
     gg_corplot <- gg_corplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = correlation_value), color = "black") +
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$correlation_value), color = "black") +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")+
-      ggplot2::geom_text(ggplot2::aes(label = round(correlation_value, digits = 2)), color = "black", size = number_size)
+      ggplot2::geom_text(ggplot2::aes(label = round(.data$correlation_value, digits = 2)), color = "black", size = number_size)
   } else {
     stop("plot_type must be one of \"color\", \"circle\", or \"number\"")
   }
