@@ -327,10 +327,6 @@ shinyServer(
 
     output$CorPlot <- renderUI({
 
-
-      if (is.null(thresholded_data()))
-        return()
-
       corplotInput <- function(){
         barcodetrackR::cor_plot(your_SE = corplot_data(),
                                 # thresh = input$corplot_thresh,
@@ -345,27 +341,7 @@ shinyServer(
                                 point_scale = input$corplot_point_scale)
       }
 
-      # output$downloadcorplotzip <- downloadHandler(
-      #   filename = function() {"corplot_files.zip"},
-      #   content = function(file){
-      #     tmpdir <- tempdir()
-      #     setwd(tmpdir)
-      #     listoffiles <- barcodetrackR::cor_plot(your_data = corplot_data(),
-      #                                            # thresh = input$corplot_thresh,
-      #                                            your_title = input$corplot_Title,
-      #                                            method_corr = input$corplot_Method,
-      #                                            label_size = input$corplot_Labels,
-      #                                            plot_type = input$corplot_Type,
-      #                                            return_table = TRUE)
-      #     for(i in seq_along(listoffiles)){
-      #       write.table(listoffiles[[i]], file = paste0(names(listoffiles)[i], ".txt"), quote = FALSE, sep = '\t')
-      #     }
-      #     zip(zipfile = file, files = c("cortable.txt","cortable_pval.txt", "cortable_ci_hi.txt","cortable_ci_lo.txt"))
-      #     if(file.exists(file)) {file.rename(paste0(file), file)}
-      #   },
-      #   contentType = "application/zip"
-      # )
-      #
+
       output$viewcorplot <- renderPlot({
         corplotInput()
       })
@@ -534,8 +510,9 @@ shinyServer(
     # Clonal Contribution TAB
     output$ClonalContribution <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
+      if (ncol(SummarizedExperiment::colData(thresholded_data())) < 3){
+        stop("Clonal contributions requires at least 3 columns of metadata (including SAMPLENAME)")
+      }
 
       ClonalContributionInput <- function(){
         print(barcodetrackR::clonal_contribution(your_SE = thresholded_data(),
@@ -606,7 +583,10 @@ shinyServer(
                              multiple = FALSE),
                  selectInput("cc_filter_selection", label = "Filter Selection", choices = c(""), multiple = FALSE),
                  selectizeInput("cc_samplename_choice", "Sample name to color by", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = FALSE),
-                 selectInput("cc_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("cc_plot_over", label = "Plot Over",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))-1],
+                             multiple = FALSE),
                  selectInput("cc_plot_over_choices", label = "Include: (defaults to all values of Plot Over", choices = c(""), multiple = TRUE),
                  numericInput("cc_n_clones", "Number of clones to color", value = 10),
                  textInput("cc_your_title", "Title", value = ""),
@@ -633,12 +613,13 @@ shinyServer(
     # Clone Count TAB
     output$CloneCount <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
+      if (ncol(SummarizedExperiment::colData(thresholded_data())) < 3){
+        stop("Clonal counts requires at least 3 columns of metadata (including SAMPLENAME)")
+      }
 
       CloneCountInput <- function(){
         print(barcodetrackR::clonal_count(your_SE = thresholded_data(),
-                                          index_type = input$clone_index_type,
+                                          cumulative = (input$clone_index_type == "cumulative count"),
                                           group_by = input$clone_group_by,
                                           group_by_choices = input$clone_group_by_choices,
                                           plot_over = input$clone_plot_over,
@@ -659,7 +640,7 @@ shinyServer(
         filename = function() {paste(gsub(".txt","",input$file1), "clonal_count_data.txt", sep = "_")},
         content = function(file){
           write.table(barcodetrackR::clonal_count(your_SE = thresholded_data(),
-                                                  index_type = input$clone_index_type,
+                                                  cumulative = (input$clone_index_type != "cumulative"),
                                                   group_by = input$clone_group_by,
                                                   group_by_choices = input$clone_group_by_choices,
                                                   plot_over = input$clone_plot_over,
@@ -686,12 +667,16 @@ shinyServer(
         column(3,
                wellPanel(
                  selectInput("clone_index_type", "Chooose Count Index",
-                             choices = c("count","cumulative_count"), selected = "count"),
-                 selectInput("clone_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                             choices = c("count","cumulative count"), selected = "count"),
+                 selectInput("clone_group_by", label = "Group By",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))],
+                             multiple = FALSE),
                  selectInput("clone_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE),
-                 selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("clone_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))-1],
+                             multiple = FALSE),
                  selectInput("clone_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE),
-                 #  selectInput("clone_plot_over_choices", label = "Include:", choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]), multiple = TRUE, selected = unique(SummarizedExperiment::colData(thresholded_data())[,input$plot_over])),
                  textInput("clone_your_title", "Title", value = ""),
                  br(),
                  numericInput("clone_line_size", "Line size", value = 2),
@@ -716,8 +701,10 @@ shinyServer(
     # Clonal Diversity TAB
     output$ClonalDiversity <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
+
+      if (ncol(SummarizedExperiment::colData(thresholded_data())) < 3){
+        stop("Clonal diversity requires at least 3 columns of metadata (including SAMPLENAME)")
+      }
 
       ClonalDiversityInput <- function(){
         print(barcodetrackR::clonal_diversity(your_SE = thresholded_data(),
@@ -770,9 +757,15 @@ shinyServer(
                wellPanel(
                  selectInput("div_index", "Chooose Diversity Index",
                              choices = c("shannon","shannon_count","simpson", "invsimpson"), selected = "shannon"),
-                 selectInput("div_group_by", label = "Group By", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("div_group_by", label = "Group By",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))],
+                             multiple = FALSE),
                  selectInput("div_group_by_choices", label = "Include:", choices = c(""), multiple = TRUE),
-                 selectInput("div_plot_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("div_plot_over", label = "Plot Over",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))-1],
+                             multiple = FALSE),
                  selectInput("div_plot_over_choices", label = "Include: (all values included by default)", choices = c(""), multiple = TRUE),
                  textInput("div_your_title", "Title", value = ""),
                  br(),
@@ -797,8 +790,10 @@ shinyServer(
     # Ridge Plot TAB
     output$RidgePlot <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
+
+      if (ncol(SummarizedExperiment::colData(thresholded_data())) < 3){
+        stop("Clonal counts requires at least 3 columns of metadata (including SAMPLENAME)")
+      }
 
       RidgePlotInput <- function(){
         print(barcodetrackR::bias_ridge_plot(your_SE = thresholded_data(),
@@ -840,10 +835,12 @@ shinyServer(
       # Helper function to get unique values of the split_bias_on parameter
       observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
                                                                     inputId = 'ridge_bias1',
+                                                                    selected = unique(SummarizedExperiment::colData(thresholded_data())[,length(colnames(SummarizedExperiment::colData(thresholded_data())))])[1],
                                                                     choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_on]))})
 
       observeEvent(input$ridge_split_bias_on, {updateSelectizeInput(session,
                                                                     inputId = 'ridge_bias2',
+                                                                    selected = unique(SummarizedExperiment::colData(thresholded_data())[,length(colnames(SummarizedExperiment::colData(thresholded_data())))])[2],
                                                                     choices = unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_on]))})
 
       observeEvent(input$ridge_split_bias_over, {updateSelectizeInput(session,
@@ -854,10 +851,20 @@ shinyServer(
       fluidRow(
         column(3,
                wellPanel(
-                 selectInput("ridge_split_bias_on", label = "Compare Samples by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
-                 selectInput("ridge_bias1", label = "Selection 1", choices = c(""), multiple = FALSE),
-                 selectInput("ridge_bias2", label = "Selection 2", choices = c(""), multiple = FALSE),
-                 selectInput("ridge_split_bias_over", label = "Plot Over", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE),
+                 selectInput("ridge_split_bias_on", label = "Compare Samples by",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))],
+                             multiple = FALSE),
+                 selectInput("ridge_bias1", label = "Selection 1",
+                             choices = c(""),
+                             multiple = FALSE),
+                 selectInput("ridge_bias2", label = "Selection 2",
+                             choices = c(""),
+                             multiple = FALSE),
+                 selectInput("ridge_split_bias_over", label = "Plot Over",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             selected = colnames(SummarizedExperiment::colData(thresholded_data()))[length(colnames(SummarizedExperiment::colData(thresholded_data())))-1],
+                             multiple = FALSE),
                  selectInput("ridge_bias_over_select", label = "Include:", choices = c(""), multiple = TRUE),
                  strong("Options"),
                  checkboxInput("ridge_weighted", "Weighted", value = FALSE),

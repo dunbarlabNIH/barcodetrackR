@@ -75,7 +75,7 @@ clonal_contribution <- function(your_SE,
   if(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]])){
     plot_over_display_choices <- plot_over_display_choices  %||% sort(unique(SummarizedExperiment::colData(temp_subset)[[plot_over]]))
     plot_over_display_choices <- as.numeric(as.character(plot_over_display_choices))
-  } else if (is.factor(is.numeric(SummarizedExperiment::colData(temp_subset)[[plot_over]]))) {
+  } else if (is.factor(SummarizedExperiment::colData(temp_subset)[[plot_over]])) {
     plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(temp_subset)[[plot_over]])
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% unique(SummarizedExperiment::colData(temp_subset)[[plot_over]])

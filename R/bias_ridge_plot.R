@@ -55,8 +55,10 @@ bias_ridge_plot <- function(your_SE,
   #perform ordering for the split_bias_over element if numeric and set the variable if it was initially NULL
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
     bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]]))
-  } else {
+  } else if (is.factor(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
     bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
+  } else {
+    bias_over <- bias_over %||% unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
   }
 
   # ensure that the  chosen bias_over only is able to plot elements in which the chosen bias_1 and bias_2 are present at n = 1 each
@@ -96,7 +98,7 @@ bias_ridge_plot <- function(your_SE,
   if (return_table){
     return(plotting_data)
   }
-  
+
   # Weighted ridge plot
   if (weighted){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., weight = cumul_sum, fill = plot_over))
