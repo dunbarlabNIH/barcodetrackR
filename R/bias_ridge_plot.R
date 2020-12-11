@@ -17,6 +17,7 @@
 #'@return Bias plot for two lineages over time. Or a dataframe containing the bias value and added proportion of each barcode if return_table is set to TRUE.
 #'
 #'@importFrom rlang %||%
+#'@importFrom plyr .
 #'@import ggridges
 #'@import utils
 #'
@@ -93,7 +94,7 @@ bias_ridge_plot <- function(your_SE,
     temp_cumsum <- rowSums(temp_your_data)
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
-    do.call(rbind, .data$.) %>%
+    do.call(rbind, .) %>%
     dplyr::mutate(plot_over = factor(.data$plot_over, levels = bias_over)) -> plotting_data
 
   if (return_table){

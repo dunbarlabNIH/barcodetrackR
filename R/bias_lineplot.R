@@ -16,6 +16,7 @@
 #'@return Bias line plot for two lineages over time. Or if return_table is set to TRUE, a dataframe containing the bias values for each barcode sequence between the two samples at all points of comparison.
 #'
 #'@importFrom rlang %||%
+#'@importFrom plyr .
 #'
 #'@examples
 #'bias_lineplot(your_se = SE, split_bias_on = "selection_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
@@ -86,7 +87,7 @@ bias_lineplot <- function(your_SE,
     temp_cumsum <- rowSums(prop.table(as.matrix(temp_your_data), margin = 2))
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
-    do.call(rbind, .data$.) %>%
+    do.call(rbind, .) %>%
     dplyr::group_by(.data$barcode) %>%
     dplyr::mutate(peak_abundance = max(.data$cumul_sum)) %>%
     dplyr::arrange(.data$peak_abundance) %>%
