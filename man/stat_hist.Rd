@@ -6,32 +6,26 @@
 \usage{
 stat_hist(
   your_SE,
-  data_choice = "barcode_stats",
+  data_choice = "assay stats",
   assay_choice = "counts",
-  sample_select = NULL,
   metadata_stat = NULL,
-  group_by = NULL,
+  sample_select = NULL,
+  group_meta_by = NULL,
   scale_all_y = FALSE,
   y_log_axis = FALSE,
   text_size = 12,
-  n_bins = 10,
-  n_cols = 1,
-  alpha = 0.5,
-  your_title = NULL
+  n_bins = 30,
+  n_cols = NULL
 )
 }
 \arguments{
-\item{your_SE}{Your SummarizedExperiment of barcode data and associated metadata}
+\item{your_SE}{Your SummarizedExperiment of barcode data and associated metadata.}
 
-\item{data_choice}{Either "barcode_stats" which allows you to see the distribution of any assay for chosen samples or "aggregate_stats" which allows you to see distirbution of a piece of metadata cross all samples.}
+\item{data_choice}{Either "assay stats" which allows you to view the distribution of values in the `assay_choice` assay, or "metadata stats" which allows you to view the distribution of metadata values in your SummarizedExperiment object.}
 
-\item{assay_choice}{When data_choice is set to "barcode_stats", provide which assay fo the SE you want to display in the histogram.}
+\item{assay_choice}{When data_choice is set to "assay stats", designates which assay will be used.}
 
-\item{sample_select}{When data_choice is set to "barcode_stats", provide a list of sample names to display histograms for}
-
-\item{metadata_stat}{When data_choice is set to "aggregate_stats", The column of metadata to display in a histogram. Must be numeric.}
-
-\item{group_by}{When data_choice is set to "aggregate_stats", Group and color the histogram by another column of metadate. If NULL, no grouping applied}
+\item{group_meta_by}{When data_choice is set to "metadata stats", facet the histogram using this column of metadata. If NULL, no grouping or faceting applied}
 
 \item{scale_all_y}{Logical. Whether or not to plot all plots on the same y axis limits.}
 
@@ -39,11 +33,11 @@ stat_hist(
 
 \item{text_size}{Size of text.}
 
-\item{n_bins}{Number of bins for histogram. Default is 10.}
+\item{n_bins}{Number of bins for histograms. Default is 30.}
 
-\item{n_cols}{Number of columns for faceted histograms.}
+\item{n_cols}{Number of columns for faceted histograms. If NULL (default) will automatically choose n_cols for facetting.}
 
-\item{alpha}{The transparency of the histograms if group_by is provided. Lower = more transparent. 1 = opaque}
+\item{metadata_choice}{When data_choice is set to "metadata stats", The metadata values that will be used.}
 
 \item{x_log_axis}{Logical. Whether or not to put x axis on log scale}
 }
@@ -51,7 +45,7 @@ stat_hist(
 Histogram of chosen statistics
 }
 \description{
-Given a summarized experiment, gives a histogram of any barcoding assay or choice of metadata.
+Given a summarized experiment, gives a histogram of the acc assay or choice of metadata.
 }
 \examples{
 stat_hist(your_se = SE, metadata_stat = "GFP_percent")

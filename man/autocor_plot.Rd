@@ -51,7 +51,7 @@ autocor_plot(
 Plots pairwise correlation plot for the samples in your_SE. Or, a dataframe of the pairwise correlation values if return_table is set to TRUE.
 }
 \description{
-Gives the pairwise correlation between each sample-sample pair in the data frame. Considers all samples matching the provided "filter_selection" within the "filter_by" column of your metadata. For each unique value of the "plot_over" argument, plots the correlation of that sample with all other samples as a line plot.
+Gives the pairwise correlation between each sample-sample pair in the data frame in a group-by-group manner. Considers all samples matching the provided "filter_selection" within the "filter_by" column of your metadata. For each unique value of the "plot_over" argument, plots the correlation of that sample with all other samples in that group as a line plot.
 }
 \examples{
 autocor_plot(six_SE, plot_over = "months", filter_by = "celltype", filter_selection = "Gr", no_negatives = TRUE, keep_numeric = TRUE)
