@@ -129,48 +129,63 @@ shinyServer(
     #DATASTATISTICS TAB
     output$DataStatistics <- renderUI({
 
-      if (is.null(thresholded_data()))
-        return()
-
       stat_histInput <- function(){
-        print(barcodetrackR::stat_hist(your_SE = thresholded_data(),
+        print(stathist_data())
+        print(barcodetrackR::stat_hist(your_SE = stathist_data(),
                                        data_choice = input$stat_hist_data_choice,
                                        assay_choice = input$stat_hist_assay_choice,
-                                       sample_select = input$stat_hist_sample_select,
                                        metadata_stat = input$stat_hist_metadata_stat,
-                                       group_by = input$stat_hist_group_by,
+                                       group_meta_by = input$stat_hist_group_meta_by,
                                        scale_all_y = input$stat_hist_scale_all_y,
                                        y_log_axis = input$stat_hist_y_log_axis,
                                        text_size = input$stat_hist_text_size,
                                        n_bins = input$stat_hist_n_bins,
-                                       n_cols = input$stat_hist_n_cols,
-                                       alpha = input$stat_hist_alpha
-        ))}
+                                       n_cols = input$stat_hist_n_cols)
+        )}
 
       output$viewDataStatistics <- renderPlot({
         stat_histInput()
       })
 
+      stathist_data <- reactive({
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$stat_hist_samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$stat_hist_samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
+      })
+
       fluidRow(
         column(3,
                wellPanel(
-                 # div(style="display:inline-block; height:85px;",fileInput("Heatmap_uploaded_samples", "1. Upload Prepared Sample List or Input Samples")),
                  selectInput("stat_hist_data_choice", "Select Histogram Display Option",
-                             choices = c("barcode_stats", "aggregate_stats"),
-                             selected = "barcode_stats"),
-                 selectizeInput("stat_hist_sample_select", label = "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1], multiple = TRUE),
-                 selectInput("stat_hist_assay_choice", label = "Choose Assay", choices = names(SummarizedExperiment::assays(thresholded_data())), multiple = FALSE),
-                 numericInput("stat_hist_n_cols", "Number of columns", value = 1, min = 1),
-                 # br(),
-                 selectizeInput("stat_hist_metadata_stat", label = "Choose Metadata", choices = colnames(SummarizedExperiment::colData(thresholded_data()))[unlist(lapply(SummarizedExperiment::colData(thresholded_data()), is.numeric))], multiple = FALSE),
-                 selectInput("stat_hist_group_by", label = "Group by", choices = colnames(SummarizedExperiment::colData(thresholded_data())), multiple = FALSE, selected = FALSE, selectize = FALSE, size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
+                             choices = c("assay stats", "metadata stats"),
+                             selected = "assay stats"),
+                 selectizeInput("stat_hist_samples", label = "Samples",
+                                choices = as.vector(unique(thresholded_data()$SAMPLENAME)),
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2],
+                                multiple = TRUE),
+                 selectInput("stat_hist_assay_choice", label = "Choose Assay",
+                             choices = names(SummarizedExperiment::assays(thresholded_data())),
+                             multiple = FALSE),
+                 numericInput("stat_hist_n_cols", "Number of columns",
+                              value = 1,
+                              min = 1),
+                 selectizeInput("stat_hist_metadata_stat", label = "Choose Metadata",
+                                choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                                multiple = FALSE),
+                 selectInput("stat_hist_group_meta_by", label = "Group Metadata by",
+                             choices = colnames(SummarizedExperiment::colData(thresholded_data())),
+                             multiple = FALSE,
+                             selected = FALSE,
+                             selectize = FALSE,
+                             size = 6), # somehow adding selectize = FALSE and size = some number allows for null default
                  # br(),
                  strong("Options"),
                  checkboxInput("stat_hist_scale_all_y", label = "Scale all y", value = FALSE),
                  checkboxInput("stat_hist_y_log_axis", label = "Y log axis", value = FALSE),
                  numericInput("stat_hist_text_size", "Text size", value = 12),
-                 numericInput("stat_hist_n_bins", "Number of bins", value = 10),
-                 numericInput("stat_hist_alpha", "Alpha", value = 0.5, min = 0, max = 1, step = 0.1)
+                 numericInput("stat_hist_n_bins", "Number of bins", value = 10)
                )
         ),
         column(8,
@@ -208,33 +223,6 @@ shinyServer(
                                                # log_transform = input$Heatmap_log_transform,
                                                # log_choice = switch(as.character(input$Heatmap_scale), "2" = 2, "e" = exp(1), "10" = 10, "100" = 100),
         ))}
-
-
-
-
-      # HeatmapREADMEtable <- function(){
-      #   your_table <- readme_data()
-      #   your_table <- your_table[match(input$Heatmap_samples, your_table$GIVENNAME),]
-      #   temp_names <- your_table$GIVENNAME
-      #   temp_clones <- colSums(Heatmap_data() > 0)
-      #   your_table <- data.frame(THRESHOLDED_READS = your_table$THRESHOLDED_READS, TOTAL_READS = your_table$RAW_READS, THRESHOLDED_READS_PERCENT = your_table$THRESHOLDED_READS_PERCENT, N_CLONES = temp_clones)
-      #   rownames(your_table) <- temp_names
-      #   return(cbind(rownames(t(your_table)),t(your_table)))
-      # }
-
-
-      # output$heatmap_datatable <- renderDataTable({HeatmapREADMEtable()},
-      #                                             options = list(paging = FALSE, searching = FALSE))
-      #
-      #
-
-      #
-      # output$downloadHeatmapSTATS <- downloadHandler(
-      #   filename = function() {paste(input$file1, "_heatmapSTATS.txt", sep = "")},
-      #   content = function(file){
-      #     write.table(HeatmapREADMEtable(), file, sep = '\t', quote = FALSE)
-      #   }
-      # )
 
 
       output$viewHeatmap <- renderPlot({

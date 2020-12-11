@@ -5,7 +5,7 @@
 #'@param your_SE Your SummarizedExperiment of barcode data and associated metadata.
 #'@param data_choice Either "assay stats" which allows you to view the distribution of values in the `assay_choice` assay, or "metadata stats" which allows you to view the distribution of metadata values in your SummarizedExperiment object.
 #'@param assay_choice When data_choice is set to "assay stats", designates which assay will be used.
-#'@param metadata_choice When data_choice is set to "metadata stats", The metadata values that will be used.
+#'@param metadata_stat When data_choice is set to "metadata stats", The metadata values that will be used.
 #'@param group_meta_by When data_choice is set to "metadata stats", facet the histogram using this column of metadata. If NULL, no grouping or faceting applied
 #'@param scale_all_y Logical. Whether or not to plot all plots on the same y axis limits.
 #'@param x_log_axis Logical. Whether or not to put x axis on log scale
@@ -24,7 +24,6 @@ stat_hist <- function(your_SE,
                       data_choice = "assay stats",
                       assay_choice = "counts",
                       metadata_stat = NULL,
-                      sample_select = NULL,
                       group_meta_by = NULL,
                       scale_all_y = FALSE,
                       y_log_axis = FALSE,
