@@ -86,7 +86,7 @@ bias_lineplot <- function(your_SE,
     temp_cumsum <- rowSums(prop.table(as.matrix(temp_your_data), margin = 2))
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
-    do.call(rbind, .) %>%
+    do.call(rbind, .data$.) %>%
     dplyr::group_by(barcode) %>%
     dplyr::mutate(peak_abundance = max(cumul_sum)) %>%
     dplyr::arrange(peak_abundance) %>%
@@ -99,9 +99,9 @@ bias_lineplot <- function(your_SE,
 
   if (return_table){
     return(plotting_data)
-  }  
-  
-  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = plot_over, y = bias, color = cumul_sum, group = barcode)) +
+  }
+
+  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$plot_over, y = .data$bias, color = .data$cumul_sum, group = .data$barcode)) +
     ggplot2::geom_line()+
     ggplot2::geom_point()+
     ggplot2::scale_color_gradient(name = "Added Proportions", low = "gray85", high = "black")+

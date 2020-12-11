@@ -1,6 +1,6 @@
 #' Barcode Chord Diagram
 #'
-#' Creates a chord diagram showing each cell type (or other factor) as a region around a circle and shared clones between these cell types as links between the regions. The space around the regions which is not connected to a chord indicates clones unique to that sample, not shared with other samples. 
+#' Creates a chord diagram showing each cell type (or other factor) as a region around a circle and shared clones between these cell types as links between the regions. The space around the regions which is not connected to a chord indicates clones unique to that sample, not shared with other samples.
 #'
 #'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
 #'@param weighted Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = T will make the link width based on the clone's proportion in the samples.
@@ -13,6 +13,8 @@
 #'@return Displays a chord diagram in the current plot window depicting shared clonality between samples (regions) as chords or links between the regions. Or,
 #'
 #'@import viridis
+#'@import graphics
+#'
 # #'@import dplyr
 #'@rawNamespace import(dplyr, except = count)
 #'@importFrom plyr count
@@ -90,11 +92,11 @@ my_cols = viridis::viridis(nrow(unique_count))
 
 
 if (weighted == FALSE){
-  
+
   if (return_table){
     return(unique_count)
   }
-  
+
   # Initialize circos plot
   par(mar = c(0.5, 0.5, 1, 0.5))
   circlize::circos.par(points.overflow.warning = FALSE)
@@ -142,11 +144,11 @@ if (weighted == FALSE){
 }
 
 else if (weighted == TRUE){
-  
+
   if (return_table){
     return(unique_prop)
   }
-  
+
   # Initialize circos plot
   par(mar = c(0.5, 0.5, 1, 0.5))
   circlize::circos.par(points.overflow.warning = FALSE)

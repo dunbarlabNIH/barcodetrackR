@@ -14,7 +14,7 @@
 #'@param linesize The linewidth of the stacked bars which represent individual barcodes
 #'@param ncols Numeric. Number of columns to plot on using plot_grid from cowplot.
 #'@param scale_all_y Logical. Whether or not to plot all plots on the same y axis limits.
-#'@param return_table Logical. If set to TRUE, instead of a plot, tbe function will return a list containing a dataframe for each sample-sample log bias combination containing each barcode sequence and its bias between the samples. 
+#'@param return_table Logical. If set to TRUE, instead of a plot, tbe function will return a list containing a dataframe for each sample-sample log bias combination containing each barcode sequence and its bias between the samples.
 #'
 #'@return Histogram of log bias for two factors faceted over another set of factors. Or, if return_table is set to TRUE, a list of dataframes containing the log bias data for each bias comparison passed to the function.
 #'
@@ -86,9 +86,9 @@ bias_histogram <- function(your_SE,
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]
 
-  # pre-allocate 
+  # pre-allocate
   your_data_list <- list()
-  
+
   plot_list <- lapply(1:length(bias_over), function(i){
     loop_coldata <- temp_subset_coldata %>% dplyr::filter(!!as.name(split_bias_over) %in% bias_over[i])
     loop_bias_1 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_1) %>% dplyr::pull("SAMPLENAME") %>% as.character()
@@ -102,14 +102,14 @@ bias_histogram <- function(your_SE,
     temp_your_data %>%
       tibble::rownames_to_column(var = "barcode") %>%
       dplyr::mutate(added_percentages = bias_1 + bias_2, bias = bias_1/bias_2) %>%
-      dplyr::mutate(log2_bias = log2(bias)) %>%
-      dplyr::mutate(log2_bias_cuts = cut(log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
-    
+      dplyr::mutate(log2_bias = log2(.data$bias)) %>%
+      dplyr::mutate(log2_bias_cuts = cut(.data$log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
+
     if (return_table){
       me <- temp_your_data
     } else {
     g <- ggplot2::ggplot(temp_your_data[order(temp_your_data$added_percentages),],
-                         ggplot2::aes(x = log2_bias_cuts, y = added_percentages))+
+                         ggplot2::aes(x = .data$log2_bias_cuts, y = .data$added_percentages))+
       ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize, color = "black")+
       ggplot2::scale_x_discrete(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")"), drop = FALSE)+
       ggplot2::scale_y_continuous(name = "Added Proportions", labels = function(i)(paste0(i*100, "%")))+
@@ -122,19 +122,19 @@ bias_histogram <- function(your_SE,
       ggplot2::labs(title = paste0(split_bias_over,": ", bias_over[i]))+
       ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
   }
-    
+
 
   })
-  
+
   if (return_table){
     return(plot_list)
   }
-  
+
   if(scale_all_y){
     plot_max <- max(unlist(lapply(plot_list, function(x){ggplot2::ggplot_build(x)$layout$panel_params[[1]]$y.range[2]})))
     plot_list <- lapply(plot_list, function(x){x + ggplot2::coord_cartesian(ylim = c(0, plot_max))})
   }
-  
+
   cowplot::plot_grid(plotlist = plot_list, ncol = ncols)
 }
 

@@ -5,12 +5,12 @@
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0. 
+#'@param cellnote_assay Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0.
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
 #'@param dendro Logical. Whether or not to show row dendrogram when hierarchical clustering.
-#'@param cellnote_size The numerical size of the cell note labels. To have no cellnote, set cellnote_size to 0. 
+#'@param cellnote_size The numerical size of the cell note labels. To have no cellnote, set cellnote_size to 0.
 #'@param distance_method Character. Use summary(proxy::pr_DB) to see all possible options for distance metrics in clustering.
 #'@param minkowski_power The power of the Minkowski distance (if minkowski is the distance method used).
 #'@param hclust_linkage Character. One of "ward.D", "ward.D2", "single", "complete", "average" (= UPGMA), "mcquitty" (= WPGMA), "median" (= WPGMC) or "centroid" (= UPGMC).
@@ -20,9 +20,10 @@
 #'@param color_scale A character vector which indicates the colors of the color scale. Must be same length as percent_scale.
 #'@param return_table Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote for each sample instead of displaying a plot.
 #'
-#'@return Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnotes for each sample. 
+#'@return Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnotes for each sample.
 #'
 #'@importFrom rlang %||%
+#'@importFrom stats hclust
 #'@import ggplot2
 #'
 #'@export
@@ -143,9 +144,9 @@ barcode_ggheatmap <- function(your_SE,
   invisible_label <- plot_labels[which(max(nchar(as.character(plot_labels))) == nchar(as.character(plot_labels)))[1]]
 
 
-  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$sample_name, y = .data$sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = .data$cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,
@@ -172,7 +173,7 @@ barcode_ggheatmap <- function(your_SE,
     if(dendro){
       g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
       g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
-        ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
+        ggplot2::geom_segment(ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend))+
         ggplot2::scale_x_discrete(expand = c(.5/nrow(your_SE),0.01))+
         ggplot2::scale_y_reverse(expand = c(0.01,0), labels =invisible_label, breaks = 1)+
         ggplot2::coord_flip()+
@@ -191,7 +192,7 @@ barcode_ggheatmap <- function(your_SE,
     }
     if(clusters > 0){
       g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
-      g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
+      g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = .data$assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
         ggplot2::scale_y_discrete(expand=c(0,0))+

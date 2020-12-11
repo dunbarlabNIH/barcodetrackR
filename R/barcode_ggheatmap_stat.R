@@ -31,6 +31,7 @@
 #'@return Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnote for each sample.
 #'
 #'@importFrom rlang %||%
+#'@importFrom stats hclust
 #'
 #'@export
 #'
@@ -312,10 +313,10 @@ barcode_ggheatmap_stat <- function(your_SE,
   if(return_table){
     return(plotting_data)
   }
-  
-  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
+
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$sample_name, y = .data$sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = .data$cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,
@@ -343,7 +344,7 @@ barcode_ggheatmap_stat <- function(your_SE,
     if(dendro){
       g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
       g2_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
-        ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
+        ggplot2::geom_segment(ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend))+
         ggplot2::scale_x_discrete(expand = c(.5/nrow(your_SE),0.01))+
         ggplot2::scale_y_reverse(expand = c(0.01,0), labels =invisible_label, breaks = 1)+
         ggplot2::coord_flip()+
@@ -362,7 +363,7 @@ barcode_ggheatmap_stat <- function(your_SE,
     }
     if(clusters > 0){
       g1_heatmap <- g1_heatmap + ggplot2::theme(plot.margin = ggplot2::unit(c(5.5,5.5,5.5,1), "pt"))
-      g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = assignment, fill = factor(clusters)))+
+      g3_clusters <- ggplot2::ggplot(clustercuts_data, ggplot2::aes(x = 1, y = .data$assignment, fill = factor(clusters)))+
         ggplot2::geom_tile()+
         ggplot2::scale_x_continuous(expand=c(0,0), labels = invisible_label, breaks = 1)+
         ggplot2::scale_y_discrete(expand=c(0,0))+

@@ -18,6 +18,7 @@
 #'
 #'@importFrom rlang %||%
 #'@import ggridges
+#'@import utils
 #'
 #'@examples
 #'bias_ridge_plot(your_se = SE, split_bias_on = "cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
@@ -101,13 +102,13 @@ bias_ridge_plot <- function(your_SE,
 
   # Weighted ridge plot
   if (weighted){
-    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., weight = cumul_sum, fill = plot_over))
+    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$bias, y = .data$plot_over, height = .data$..density.., weight = .data$cumul_sum, fill = .data$plot_over))
   } else {
-    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = bias, y = plot_over, height = ..density.., fill = plot_over))
+    g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$bias, y = .data$plot_over, height = .data$..density.., fill = .data$plot_over))
   }
   if(add_dots){
     g <- g +
-      ggplot2::geom_point(data = plotting_data, ggplot2::aes(x = bias, y = plot_over, size = cumul_sum), inherit.aes = FALSE)
+      ggplot2::geom_point(data = plotting_data, ggplot2::aes(x = .data$bias, y = .data$plot_over, size = .data$cumul_sum), inherit.aes = FALSE)
   }
 
   g +

@@ -14,13 +14,13 @@ Imports:
     dplyr,
     ggplot2,
     ggdendro,
+    graphics,
     magrittr,
     plyr,
     proxy,
     RColorBrewer,
     scales,
     shiny,
-    stats,
     SummarizedExperiment,
     S4Vectors,
     tidyr,
@@ -29,6 +29,7 @@ Imports:
     ggridges,
     viridis,
     tibble,
+    utils,
     vegan
 RoxygenNote: 7.1.1
 Suggests: 
