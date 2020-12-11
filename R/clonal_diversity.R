@@ -7,7 +7,7 @@
 #'@param group_by_choices Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. timepoint
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.
-#'@param index_type Character. One of "shannon", "shannon_count", "simpson", or "invsimpson. 
+#'@param index_type Character. One of "shannon", "shannon_count", "simpson", or "invsimpson.
 #'@param point_size Numeric. Size of points.
 #'@param line_size Numeric. Size of lines.
 #'@param text_size Numeric. Size of text in plot.
@@ -16,7 +16,7 @@
 #'
 #'@return Outputs plot of a diversity measure tracked for groups over a factor. Or if return_table is set to true, a dataframe will be returned instead.
 #'
-# #'@importFrom diverse diversity 
+# #'@importFrom diverse diversity
 #'@importFrom vegan diversity
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
@@ -51,7 +51,7 @@ clonal_diversity <- function(your_SE,
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   }
-  
+
   group_by_choices <- group_by_choices %||% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]]))
 
   # More error handling
@@ -61,7 +61,7 @@ clonal_diversity <- function(your_SE,
   if(!all(group_by_choices %in% levels(as.factor(SummarizedExperiment::colData(your_SE)[[group_by]])))){
     stop("All elements of group_by_choices must match values in group_by column")
   }
-  
+
   # extract bc data and metadata
   temp_subset <- your_SE[,(your_SE[[plot_over]] %in% plot_over_display_choices)]
   # Keep only the data included in group_by_choices
@@ -83,7 +83,7 @@ clonal_diversity <- function(your_SE,
   } else {
     stop("index_type must be one of \"shannon\", \"shannon_count\", \"simpson\", or \"invsimpson\"")
   }
-  
+
   # #calculate measure for each sample
   # if(index_type %in% c("variety", "entropy","blau","gini-simpson", "simpson", "hill-numbers", "herfindahl-hirschman", "bergerparker", "renyi", "evenness", "rao", "rao-stirling")){
   #   diverse::diversity(as.matrix(your_data), type = index_type, category_row = TRUE) %>%
@@ -100,22 +100,22 @@ clonal_diversity <- function(your_SE,
     dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
 
   plotting_data[[plot_over]] <- factor(plotting_data[[plot_over]], levels = plot_over_display_choices)
-  
+
   if (return_table){
     return(plotting_data)
   }
-  
+
   plotting_data$x_value <- plotting_data[[plot_over]]
   plotting_data$group_by <- plotting_data[[group_by]]
-  
+
   # Create ggplot
-  ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
-    ggplot2::geom_line(size = line_size)+
-    ggplot2::geom_point(size = point_size)+
-    ggplot2::labs(x = plot_over, col = group_by, y = paste0(index_type, ifelse(index_type == "shannon_count", "", " index")))+
+  ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$x_value, y = .data$index, group= .data$group_by, colour= .data$group_by)) +
+    ggplot2::geom_line(size = .data$line_size)+
+    ggplot2::geom_point(size = .data$point_size)+
+    ggplot2::labs(x = .data$plot_over, col = .data$group_by, y = paste0(index_type, ifelse(index_type == "shannon_count", "", " index")))+
     ggplot2::theme_classic() +
-    ggplot2::theme(text = ggplot2::element_text(size=text_size))+
-    ggplot2::ggtitle(your_title)
+    ggplot2::theme(text = ggplot2::element_text(size=.data$text_size))+
+    ggplot2::ggtitle(.data$your_title)
 }
 
 

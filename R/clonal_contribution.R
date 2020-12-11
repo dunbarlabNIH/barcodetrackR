@@ -21,6 +21,8 @@
 #'@param y_limit Numeric. What the max value of the y scale should be for the "percentages" assay.
 #'@param return_table Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.
 #'
+#'@importFrom stats setNames
+#'
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 #'
 #'@examples
@@ -96,11 +98,11 @@ clonal_contribution <- function(your_SE,
     tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%
     dplyr::mutate(fill_label = ifelse(sequence %in% selected_sequences, sequence, "other")) %>%
     dplyr::mutate(fill_label = factor(fill_label, levels = c(selected_sequences, "other"))) %>%
-    dplyr::left_join(temp_subset_coldata %>% dplyr::rename(sample_name = SAMPLENAME), by = "sample_name") %>%
+    dplyr::left_join(temp_subset_coldata %>% dplyr::rename(sample_name = .data$SAMPLENAME), by = "sample_name") %>%
     dplyr::mutate(sample_name = !!as.name(plot_over))
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
-    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
-    plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(sample_name)))
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(.data$sample_name, levels = plot_over_display_choices))
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(.data$sample_name)))
   } else {
     plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
   }
@@ -108,7 +110,7 @@ clonal_contribution <- function(your_SE,
   #set up appropriate levels in plotting the selected elements and specify the colors
   if(plot_non_selected){
     non_selected_sequences <- plotting_data %>%
-      dplyr::arrange(desc(value)) %>%
+      dplyr::arrange(desc(.data$value)) %>%
       dplyr::pull(sequence) %>%
       unique() %>%
       .[!(. %in% selected_sequences)]
@@ -135,7 +137,7 @@ clonal_contribution <- function(your_SE,
                      plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
 
   } else if (graph_type == "line"){
-    g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
+    g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = .data$fill_label))+
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+

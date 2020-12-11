@@ -14,6 +14,7 @@
 #'
 #'@import viridis
 #'@import graphics
+#'@importFrom grDevices adjustcolor
 #'
 # #'@import dplyr
 #'@rawNamespace import(dplyr, except = count)

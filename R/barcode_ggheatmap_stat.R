@@ -32,6 +32,8 @@
 #'
 #'@importFrom rlang %||%
 #'@importFrom stats hclust
+#'@importFrom stats fisher.test
+#'@importFrom stats cutree
 #'
 #'@export
 #'

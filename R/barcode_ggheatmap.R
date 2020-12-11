@@ -24,6 +24,7 @@
 #'
 #'@importFrom rlang %||%
 #'@importFrom stats hclust
+#'@importFrom stats cutree
 #'@import ggplot2
 #'
 #'@export

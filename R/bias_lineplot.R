@@ -87,11 +87,11 @@ bias_lineplot <- function(your_SE,
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
     do.call(rbind, .data$.) %>%
-    dplyr::group_by(barcode) %>%
-    dplyr::mutate(peak_abundance = max(cumul_sum)) %>%
-    dplyr::arrange(peak_abundance) %>%
+    dplyr::group_by(.data$barcode) %>%
+    dplyr::mutate(peak_abundance = max(.data$cumul_sum)) %>%
+    dplyr::arrange(.data$peak_abundance) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(barcode = factor(barcode, levels = unique(barcode)))-> plotting_data
+    dplyr::mutate(barcode = factor(.data$barcode, levels = unique(.data$barcode)))-> plotting_data
 
   if(!keep_numeric & is.numeric(bias_over)){
     plotting_data$plot_over <- factor(plotting_data$plot_over, levels = bias_over)
