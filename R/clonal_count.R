@@ -113,9 +113,9 @@ clonal_count <- function(your_SE,
     # Put into proper structure
     as.data.frame(summarized_data) %>%
       dplyr::select(sample,.data$cumulative_count) %>%
-      dplyr::rename(SAMPLENAME = sample, index = cumulative_count) %>%
+      dplyr::rename(SAMPLENAME = sample, index = .data$cumulative_count) %>%
       dplyr::mutate(index_type = "unique barcodes") %>%
-      dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) -> calculated_index
+      dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) -> calculated_index
 
     # Fix the fact that certain samples will be dropped if they have 0 new clones
     # Hacky way to do it. Need to go back and make it better later.
@@ -126,7 +126,7 @@ clonal_count <- function(your_SE,
                                                              index_type = rep("unique barcodes", length(samples_not_found))))
       # Reorder
       calculated_index %>%
-        dplyr::arrange(factor(SAMPLENAME), levels = unique(tidy_counts_ordered$sample))  -> calculated_index
+        dplyr::arrange(factor(.data$SAMPLENAME), levels = unique(tidy_counts_ordered$sample))  -> calculated_index
 
       # Give the missing samples the same cumulative count as above samples
       for (i in 1:nrow(calculated_index)){
@@ -142,7 +142,7 @@ clonal_count <- function(your_SE,
 
   # merge measures with colData
   temp_subset_coldata %>%
-    dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) %>%
+    dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) %>%
     dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
 
   plotting_data[[plot_over]] <- factor(plotting_data[[plot_over]], levels = plot_over_display_choices)
@@ -155,7 +155,7 @@ clonal_count <- function(your_SE,
   plotting_data$group_by <- plotting_data[[group_by]]
 
   # Create ggplot
-  ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
+  ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$x_value, y = .data$index, group=group_by, colour=group_by)) +
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+
     ggplot2::labs(x = plot_over, col = group_by, y = ylabel)+

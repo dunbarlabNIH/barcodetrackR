@@ -96,7 +96,7 @@ clonal_diversity <- function(your_SE,
 
   # merge measures with colData
   temp_subset_coldata %>%
-    dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) %>%
+    dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) %>%
     dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
 
   plotting_data[[plot_over]] <- factor(plotting_data[[plot_over]], levels = plot_over_display_choices)
