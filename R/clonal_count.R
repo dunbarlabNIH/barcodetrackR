@@ -84,7 +84,7 @@ clonal_count <- function(your_SE,
     # Get count data into tidy format (and remove zeros)
     your_data %>%
       dplyr::mutate(barcode_seq = rownames(your_data)) %>%
-      dplyr::select(barcode_seq, everything()) %>%
+      dplyr::select(.data$barcode_seq, everything()) %>%
       tidyr::pivot_longer(cols = 1:ncol(your_data)+1,  names_to = "sample", values_to = "count") %>%
       dplyr::filter(count>0) -> tidy_counts
 
@@ -101,18 +101,18 @@ clonal_count <- function(your_SE,
     # Only keep the first occurence of each barcode within each group_by category
     tidy_counts_ordered %>%
       dplyr::group_by(group_by) %>%
-      dplyr::distinct(barcode_seq, .keep_all = TRUE) -> tidy_counts_filtered
+      dplyr::distinct(.data$barcode_seq, .keep_all = TRUE) -> tidy_counts_filtered
 
     # Summarize number of new barcodes and cumulative barcodes at each timepoint
     tidy_counts_filtered %>%
       dplyr::group_by(group_by,plot_over,sample) %>%
       dplyr::summarise(new_count = dplyr::n(), .groups = 'drop') %>%
       dplyr::group_by(group_by) %>%
-      dplyr::mutate(cumulative_count = cumsum(new_count)) -> summarized_data
+      dplyr::mutate(cumulative_count = cumsum(.data$new_count)) -> summarized_data
 
     # Put into proper structure
     as.data.frame(summarized_data) %>%
-      dplyr::select(sample,cumulative_count) %>%
+      dplyr::select(sample,.data$cumulative_count) %>%
       dplyr::rename(SAMPLENAME = sample, index = cumulative_count) %>%
       dplyr::mutate(index_type = "unique barcodes") %>%
       dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) -> calculated_index
