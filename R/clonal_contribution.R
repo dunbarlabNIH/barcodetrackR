@@ -113,7 +113,7 @@ clonal_contribution <- function(your_SE,
       dplyr::arrange(desc(.data$value)) %>%
       dplyr::pull(sequence) %>%
       unique() %>%
-      .[!(. %in% selected_sequences)]
+      .data$.[!(.data$. %in% selected_sequences)]
     plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences, non_selected_sequences)))
     color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences)), "grey"), c(selected_sequences, "other"))
   } else {
@@ -137,7 +137,7 @@ clonal_contribution <- function(your_SE,
                      plot.title = ggplot2::element_text(hjust = 0.5), panel.grid = ggplot2::element_blank())
 
   } else if (graph_type == "line"){
-    g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = .data$fill_label))+
+    g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=.data$sample_name, y = .data$value, group = sequence, fill = .data$fill_label))+
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
       ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
