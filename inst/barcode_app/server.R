@@ -25,53 +25,6 @@ shinyServer(
       actionButton("threshybutton", "Load Files and Apply Threshold", width="100%")
     })
 
-    which_loader <- reactiveVal()
-    observeEvent(input$threshybutton, {
-      which_loader("real_data")
-      message("loading real data")
-    })
-    observeEvent(input$samplebutton, {
-      which_loader("sample_data")
-      message("loading sample_data")
-    })
-
-    thresholded_data <- eventReactive(c(input$threshybutton,input$samplebutton),ignoreInit = T, {
-      withProgress(message = "Loading files and applying threshold", value = 0, {
-        if(is.null(which_loader())){
-          your_SE <- NULL
-        } else if(which_loader() == "sample_data"){
-          your_SE <- barcodetrackR::wu_subset
-        } else if (which_loader() == "real_data"){
-          your_data <- my_data()
-          metadata <- my_metadata()
-          if(!(all(c("SAMPLENAME") %in% colnames(metadata)))){
-            stop("metadata missing SAMPLENAME column")
-          }
-          if(any(duplicated(metadata$SAMPLENAME))){
-            stop("metadata contains duplicate SAMPLENAME")
-          }
-          if(!(all(colnames(your_data) %in% metadata$SAMPLENAME))){
-            stop("Column in data is not a SAMPLENAME in metadata")
-          }
-          if(!(all(metadata$SAMPLENAME %in% colnames(your_data)))){
-            stop("SAMPLENAME in metadata is not a column in data")
-          }
-          if(length(setdiff(metadata$SAMPLENAME, colnames(your_data))) != 0){
-            print(setdiff(metadata$SAMPLENAME, colnames(your_data)))
-            stop("Number of samples in metadata differs from number of samples in data")
-          }
-          metadata <- metadata[match(colnames(your_data), metadata$SAMPLENAME),]
-          your_SE <- barcodetrackR::create_SE(your_data = your_data,
-                                              meta_data  = metadata,
-                                              threshold = input$thresholdvalue)
-        } else {
-          stop("This case should not logically happen")
-        }
-        return(your_SE)
-      })})
-
-
-
     current_threshold <- eventReactive(input$threshybutton,{
       return(paste("Current threshold applied is:\n", paste0(input$thresholdvalue*100, "%"), sep = ""))
     })
@@ -88,10 +41,37 @@ shinyServer(
 
     #RENDER TABS AFTER UPLOAD
 
-    observeEvent(c(input$threshybutton, input$samplebutton), {
-      if(is.null(which_loader())){
-        return()
-      } else {removeTab("Panel", "Descriptive Statistics")
+    thresholded_data <- reactiveVal()
+
+    observeEvent(input$threshybutton, {
+      message("loading user data")
+      withProgress(message = "Loading files and applying threshold", value = 0, {
+        your_data <- my_data()
+        metadata <- my_metadata()
+        if(!(all(c("SAMPLENAME") %in% colnames(metadata)))){
+          stop("metadata missing SAMPLENAME column")
+        }
+        if(any(duplicated(metadata$SAMPLENAME))){
+          stop("metadata contains duplicate SAMPLENAME")
+        }
+        if(!(all(colnames(your_data) %in% metadata$SAMPLENAME))){
+          stop("Column in data is not a SAMPLENAME in metadata")
+        }
+        if(!(all(metadata$SAMPLENAME %in% colnames(your_data)))){
+          stop("SAMPLENAME in metadata is not a column in data")
+        }
+        if(length(setdiff(metadata$SAMPLENAME, colnames(your_data))) != 0){
+          print(setdiff(metadata$SAMPLENAME, colnames(your_data)))
+          stop("Number of samples in metadata differs from number of samples in data")
+        }
+        metadata <- metadata[match(colnames(your_data), metadata$SAMPLENAME),]
+        your_SE <- barcodetrackR::create_SE(your_data = your_data,
+                                            meta_data  = metadata,
+                                            threshold = input$thresholdvalue)
+        incProgress(0.5)
+        thresholded_data(your_SE)
+        incProgress(0.1)
+        removeTab("Panel", "Descriptive Statistics")
         removeTab("Panel", "Heatmap")
         removeTab("Panel", "Correlation Plot")
         removeTab("Panel", "Dissimilarity Plot")
@@ -111,9 +91,36 @@ shinyServer(
         appendTab("Panel", tab = tabPanel("Chord Diagram", uiOutput("ChordDiagram")))
         appendTab("Panel", tab = tabPanel("Ridge Plot", uiOutput("RidgePlot")))
         appendTab("Panel", tab = tabPanel("Binary Heatmap", uiOutput("BinaryHeatmap")))
-      }
+        incProgress(0.4
+        )
 
+      })
+    })
 
+    observeEvent(input$samplebutton, {
+      message("loading sample data")
+      thresholded_data(barcodetrackR::wu_subset)
+      removeTab("Panel", "Descriptive Statistics")
+      removeTab("Panel", "Heatmap")
+      removeTab("Panel", "Correlation Plot")
+      removeTab("Panel", "Dissimilarity Plot")
+      removeTab("Panel", "Clonal Contribution")
+      removeTab("Panel", "Clone Count")
+      removeTab("Panel", "Clonal Diversity")
+      removeTab("Panel", "Chord Diagram")
+      removeTab("Panel", "Ridge Plot")
+      removeTab("Panel", "Binary Heatmap")
+      appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
+      appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
+      appendTab("Panel", tab = tabPanel("Correlation Plot", uiOutput("CorPlot")))
+      appendTab("Panel", tab = tabPanel("Dissimilarity Plot", uiOutput("mdsPlot")))
+      appendTab("Panel", tab = tabPanel("Clonal Contribution", uiOutput("ClonalContribution")))
+      appendTab("Panel", tab = tabPanel("Clone Count", uiOutput("CloneCount")))
+      appendTab("Panel", tab = tabPanel("Clonal Diversity", uiOutput("ClonalDiversity")))
+      appendTab("Panel", tab = tabPanel("Chord Diagram", uiOutput("ChordDiagram")))
+      appendTab("Panel", tab = tabPanel("Ridge Plot", uiOutput("RidgePlot")))
+      appendTab("Panel", tab = tabPanel("Binary Heatmap", uiOutput("BinaryHeatmap")))
+      message("done loading sample data and creating tabs")
     })
 
 
