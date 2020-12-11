@@ -130,7 +130,6 @@ shinyServer(
     output$DataStatistics <- renderUI({
 
       stat_histInput <- function(){
-        print(stathist_data())
         print(barcodetrackR::stat_hist(your_SE = stathist_data(),
                                        data_choice = input$stat_hist_data_choice,
                                        assay_choice = input$stat_hist_assay_choice,

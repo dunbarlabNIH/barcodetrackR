@@ -31,9 +31,6 @@ stat_hist <- function(your_SE,
                       n_bins = 30,
                       n_cols = NULL){
 
-  if(metadata_stat == group_meta_by){
-    stop("cannot have metadata_stat and group_meta_by be the same column in colData")
-  }
 
   if (data_choice == "assay stats"){
 
@@ -105,6 +102,10 @@ stat_hist <- function(your_SE,
     } else {
       if (!(group_meta_by %in% colnames(meta_data))){
         stop("group_meta_by is not a piece of colData.")
+      }
+
+      if(metadata_stat == group_meta_by){
+        stop("cannot have metadata_stat and group_meta_by be the same column in colData")
       }
       meta_data_for_plot <- meta_data[,c(metadata_stat, group_meta_by)] %>%
         tibble::rownames_to_column(var = "samplename") %>%
