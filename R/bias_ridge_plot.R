@@ -94,7 +94,7 @@ bias_ridge_plot <- function(your_SE,
     return(tibble::tibble(barcode = rownames(temp_your_data), plot_over = bias_over[i], bias = temp_bias, cumul_sum = temp_cumsum))
   }) %>%
     do.call(rbind, .data$.) %>%
-    dplyr::mutate(plot_over = factor(.data$plot_over, levels = .data$bias_over)) -> plotting_data
+    dplyr::mutate(plot_over = factor(.data$plot_over, levels = bias_over)) -> plotting_data
 
   if (return_table){
     return(plotting_data)
