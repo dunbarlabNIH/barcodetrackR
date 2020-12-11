@@ -97,14 +97,14 @@ clonal_contribution <- function(your_SE,
   plotting_data <- tibble::rownames_to_column(your_data, var = "sequence") %>%
     tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%
     dplyr::mutate(fill_label = ifelse(sequence %in% selected_sequences, sequence, "other")) %>%
-    dplyr::mutate(fill_label = factor(fill_label, levels = c(selected_sequences, "other"))) %>%
+    dplyr::mutate(fill_label = factor(.data$fill_label, levels = c(selected_sequences, "other"))) %>%
     dplyr::left_join(temp_subset_coldata %>% dplyr::rename(sample_name = .data$SAMPLENAME), by = "sample_name") %>%
     dplyr::mutate(sample_name = !!as.name(plot_over))
   if(is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric){
     plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(.data$sample_name, levels = plot_over_display_choices))
     plotting_data <- dplyr::mutate(plotting_data, sample_name = as.numeric(as.character(.data$sample_name)))
   } else {
-    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(sample_name, levels = plot_over_display_choices))
+    plotting_data <- dplyr::mutate(plotting_data, sample_name = factor(.data$sample_name, levels = plot_over_display_choices))
   }
 
   #set up appropriate levels in plotting the selected elements and specify the colors
