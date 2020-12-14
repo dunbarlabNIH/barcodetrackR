@@ -74,6 +74,7 @@ shinyServer(
         removeTab("Panel", "Descriptive Statistics")
         removeTab("Panel", "Heatmap")
         removeTab("Panel", "Correlation Plot")
+        removeTab("Panel", "Distance Plot")
         removeTab("Panel", "Dissimilarity Plot")
         removeTab("Panel", "Clonal Contribution")
         removeTab("Panel", "Clone Count")
@@ -84,6 +85,7 @@ shinyServer(
         appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
         appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
         appendTab("Panel", tab = tabPanel("Correlation Plot", uiOutput("CorPlot")))
+        appendTab("Panel", tab = tabPanel("Distance Plot", uiOutput("DistPlot")))
         appendTab("Panel", tab = tabPanel("Dissimilarity Plot", uiOutput("mdsPlot")))
         appendTab("Panel", tab = tabPanel("Clonal Contribution", uiOutput("ClonalContribution")))
         appendTab("Panel", tab = tabPanel("Clone Count", uiOutput("CloneCount")))
@@ -103,6 +105,7 @@ shinyServer(
       removeTab("Panel", "Descriptive Statistics")
       removeTab("Panel", "Heatmap")
       removeTab("Panel", "Correlation Plot")
+      removeTab("Panel", "Distance Plot")
       removeTab("Panel", "Dissimilarity Plot")
       removeTab("Panel", "Clonal Contribution")
       removeTab("Panel", "Clone Count")
@@ -113,6 +116,7 @@ shinyServer(
       appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
       appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
       appendTab("Panel", tab = tabPanel("Correlation Plot", uiOutput("CorPlot")))
+      appendTab("Panel", tab = tabPanel("Distance Plot", uiOutput("DistPlot")))
       appendTab("Panel", tab = tabPanel("Dissimilarity Plot", uiOutput("mdsPlot")))
       appendTab("Panel", tab = tabPanel("Clonal Contribution", uiOutput("ClonalContribution")))
       appendTab("Panel", tab = tabPanel("Clone Count", uiOutput("CloneCount")))
@@ -410,6 +414,103 @@ shinyServer(
         )
       )
     })
+    
+    
+    #======================================================================================================
+    #DISTPLOT TAB
+    
+    output$DistPlot <- renderUI({
+      
+      distplotInput <- function(){
+        barcodetrackR::dist_plot(your_SE = distplot_data(),
+                                 assay = input$distplot_assay,
+                                 dist_method = input$distplot_method,
+                                 cluster_tree =  input$distplot_cluster_tree,
+                                 your_title = input$distplot_Title,
+                                 label_size = input$distplot_Labels,
+                                 plot_type = input$distplot_Type,
+                                 no_negatives = input$distplot_excludeneg,
+                                 grid = input$distplot_Grid,
+                                 color_pal = input$distplot_color_pal,
+                                 number_size = input$distplot_number_size,
+                                 point_scale = input$distplot_point_scale,
+                                 minkowski_p = input$displot_minkowski_p)
+      }
+      
+      
+      output$viewdistplot <- renderPlot({
+        distplotInput()
+      })
+      
+      output$downloadDistData <- downloadHandler(
+        filename = function() {paste(gsub(".txt","",input$file1), "distplot_data.txt", sep = "_")},
+        content = function(file){
+          write.table(barcodetrackR::dist_plot(your_SE = distplot_data(),
+                                               assay = input$distplot_assay,
+                                               dist_method = input$distplot_method,
+                                               cluster_tree =  input$distplot_cluster_tree,
+                                               your_title = input$distplot_Title,
+                                               label_size = input$distplot_Labels,
+                                               plot_type = input$distplot_Type,
+                                               no_negatives = input$distplot_excludeneg,
+                                               grid = input$distplot_Grid,
+                                               color_pal = input$distplot_color_pal,
+                                               number_size = input$distplot_number_size,
+                                               point_scale = input$distplot_point_scale,
+                                               minkowski_p = input$displot_minkowski_p,
+                                               return_table = TRUE),
+                      file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
+        }
+      )
+      
+      distplot_data <- reactive({
+        se <- thresholded_data()
+        se <- se[,se$SAMPLENAME %in% input$distplot_Samples] # subset samples
+        se$SAMPLENAME <- factor(se$SAMPLENAME, levels = input$distplot_Samples)
+        se <- se[,order(se$SAMPLENAME)]
+        return(se)
+      })
+      
+      #======================================================================================================
+      observeEvent(input$distplot_Copier, {updateSelectizeInput(session, inputId = 'distplot_Samples', selected = input$Heatmap_samples)})
+      
+      
+      fluidRow(
+        column(3,
+               wellPanel(
+                 selectizeInput("distplot_Samples", "Samples", choices = as.vector(unique(thresholded_data()$SAMPLENAME)), multiple = TRUE,
+                                selected = as.vector(unique(thresholded_data()$SAMPLENAME))[1:2]),
+                 actionButton("distplot_Copier", label = "Copy Samples from heatmap"),
+                 br(),
+                 br(),
+                 selectInput("distplot_assay", label = "Choose assay to calculate distances",
+                             choices = names(SummarizedExperiment::assays(thresholded_data())),
+                             multiple = FALSE,
+                             selected = "percentages"),
+                 selectInput("distplot_method", "Chooose Distance or Similarity Method", choices = tolower(proxy::pr_DB$get_entry_names()), selected = "euclidean"),
+                 checkboxInput("distplot_cluster_tree", "Cluster tree", value = FALSE),
+                 selectInput("distplot_Type", 'Choose Type of Plot', choices = c("color", "circle","number"), selected = "color"),
+                 textInput("distplot_Title", "Title", value = ""),
+                 strong("Options"),
+                 checkboxInput("distplot_excludeneg", "Exclude negatives", value = FALSE),
+                 checkboxInput("distplot_Grid", "Grid", value = TRUE),
+                 selectInput("distplot_color_pal", "Color brewer", choices = c('Reds', 'Purples', 'Oranges', 'Greys', 'Greens', 'Blues'), selected = 'Blues'),
+                 numericInput("distplot_Labels", "Set Label Size", value = 12),
+                 numericInput("distplot_number_size", "Set Number Size", value = 4),
+                 numericInput("distplot_point_scale", "Set Point Scale", value = 4),
+                 numericInput("displot_minkowski_p", "p value for minkowski distance", value = 2, min = 1, step = 1),
+                 strong("Press button to download Distance data."),
+                 br(),
+                 downloadButton('downloadDistData', 'Dist_data')
+               )
+        ),
+        
+        column(8,
+               plotOutput('viewdistplot', height = 800)
+        )
+      )
+    })
+    
 
 
     #======================================================================================================
