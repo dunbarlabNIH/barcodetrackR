@@ -12,6 +12,7 @@
 #'@param n_bins Number of bins for histograms. Default is 30.
 #'@param n_cols Number of columns for faceted histograms. If NULL (default) will automatically choose n_cols for facetting.
 #'@param text_size Size of text.
+#'@param your_title Character. The title for the plot.
 #'
 #'@return Histogram of chosen statistics
 #'
@@ -28,7 +29,8 @@ stat_hist <- function(your_SE,
                       y_log_axis = FALSE,
                       text_size = 12,
                       n_bins = 30,
-                      n_cols = NULL){
+                      n_cols = NULL,
+                      your_title = NULL){
 
 
   if (data_choice == "assay stats"){
@@ -43,13 +45,16 @@ stat_hist <- function(your_SE,
 
     # Make plots
     plot_list <- lapply(1:ncol(your_data), function(i){
-      your_title <- colnames(your_data)[i]
+      if (is.null(your_title)){
+        your_title <- colnames(your_data)[i]
+      }
+      
       g <-ggplot2::ggplot(your_data, ggplot2::aes(x = your_data[,i]))+
         ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
         cowplot::theme_cowplot()+
         ggplot2::labs(x = paste0("barcode ",assay_choice))+
         ggplot2::ggtitle(your_title)+
-        ggplot2::theme(text = ggplot2::element_text(size = text_size))
+        ggplot2::theme(text = ggplot2::element_text(size = text_size), plot.title = ggplot2::element_text(face = "plain"))
 
     })
 
