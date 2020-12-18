@@ -14,5 +14,5 @@ To run the barcodetrackR app from the web, please visit: https://dunbarlabnih.sh
 
 ## Issues
 
-Issues should be addressed at https://github.com/dunbarlabNIH/barcodetrackR/issues
+Issues should be addressed to: https://github.com/dunbarlabNIH/barcodetrackR/issues
 
