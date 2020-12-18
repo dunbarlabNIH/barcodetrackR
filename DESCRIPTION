@@ -9,6 +9,7 @@ URL: http://github.com/d93espinoza/barcodetrackR
 License: CC0
 LazyData: TRUE
 Encoding: UTF-8
+biocViews:
 Imports:
     circlize,
     dplyr,
@@ -26,8 +27,7 @@ Imports:
     ggridges,
     viridis,
     tibble,
-    vegan
-biocViews:
+    vegan,
     SummarizedExperiment
 RoxygenNote: 7.1.1
 Suggests: 
