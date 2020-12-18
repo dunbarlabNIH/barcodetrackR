@@ -8,6 +8,10 @@ The R package and functions were created by Diego A. Espinoza, Ryland D. Mortloc
 
 Please see examples and documentation at: http://dunbarlabNIH.github.io/barcodetrackR/
 
+## Web App
+
+To run the barcodetrackR app from the web, please visit: https://dunbarlabnih.shinyapps.io/barcode_app/
+
 ## Issues
 
 Issues should be addressed at https://github.com/dunbarlabNIH/barcodetrackR/issues
