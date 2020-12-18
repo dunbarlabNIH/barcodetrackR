@@ -318,9 +318,9 @@ cowplot::plot_grid(p1,p2,p3,p4,p5,p6,
                    p7,p8,p9,p10,p11,p12,
                    p13,p14,p15,p16,p17,p18,
                    ncol = 6, nrow = 3,
-                   labels = c("A","","B","","C","",
-                              "D","","E","","F","",
-                              "G","","H","","I",""), align = "h", axis = "b")
+                   labels = c("a","","b","","c","",
+                              "d","","e","","f","",
+                              "g","","h","","i",""), align = "h", axis = "b")
 dev.off()
 ```
 
@@ -408,7 +408,7 @@ cowplot::plot_grid(six_cor_plot, six_mds,
                    bel_cor_plot, bel_mds,
                    eld_cor_plot, eld_mds,
                    ncol = 2, nrow = 3,
-                   labels = LETTERS[1:6], align = "h", axis = "b")
+                   labels = letters[1:6], align = "h", axis = "b")
 dev.off()
 ```
 
@@ -486,7 +486,7 @@ cowplot::plot_grid(six_cc, six_cd,
                    esp_cc, esp_cd,
                    ncol = 2, nrow = 3, align = "h",
                    rel_widths = c(0.86,1),
-                   labels = LETTERS[1:6])
+                   labels = letters[1:6])
 dev.off()
 
 ```
@@ -527,7 +527,7 @@ esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
 pdf(file = file.path(results_dir, "Figure_S2.pdf"), width = 10, height = 3)
 cowplot::plot_grid(six_cumc,bel_cumc, esp_cumc,
                    ncol = 3, nrow = 1, align = "h",
-                   labels = LETTERS[1:3])
+                   labels = letters[1:3])
 dev.off()
 
 ```
@@ -574,7 +574,7 @@ wu_hm_st <- barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                                    your_title = " ")
 
 pdf(file = file.path(results_dir, "Figure_4.pdf"), width = 12, height = 5)
-cowplot::plot_grid(wu_hm_bh, wu_hm_tc, wu_hm_st, ncol = 3, labels = c("A", "B", "C"))
+cowplot::plot_grid(wu_hm_bh, wu_hm_tc, wu_hm_st, ncol = 3, labels = letters[1:3])
 dev.off()
 
 ```
@@ -626,7 +626,7 @@ six_circos <- function() chord_diagram(six_SE[,six_circos_selection],
 pdf(file = file.path(results_dir, "Figure_5.pdf"), width = 8, height = 8)
 cowplot::plot_grid(six_ridge, six_circos, ko_ridge, ko_circos,
                    ncol = 2, nrow = 2, align = "h",
-                   labels = c("A", "B", "C", "D"))
+                   labels = letters[1:4])
 dev.off()
 
 ```
@@ -743,7 +743,7 @@ cowplot::plot_grid(six_ridge2, six_ridge3, six_ridge4, six_circos2,
                    six_ridge5, six_ridge6, six_ridge7, six_circos3,
                    six_ridge8, six_ridge9, six_ridge10, six_circos4,
                    ncol = 4, nrow = 3, align = "h",
-                   labels = LETTERS[1:12])
+                   labels = letters[1:12])
 dev.off()
 
 ```
@@ -779,7 +779,7 @@ ko_ridge3 <- bias_ridge_plot(your_SE = koelle_SE,
 pdf(file = file.path(results_dir, "Figure_S4.pdf"), width = 8, height = 4)
 cowplot::plot_grid(ko_ridge2, ko_ridge3,
                    ncol = 2, nrow = 1, align = "h",
-                   labels = LETTERS[1:2])
+                   labels = letters[1:2])
 dev.off()
 
 ```
@@ -813,7 +813,7 @@ clarke_cd <- clonal_diversity(clarke_SE,
 pdf(file = file.path(results_dir, "Figure_S5.pdf"), width = 7, height = 8/3)
 cowplot::plot_grid(clarke_cc, clarke_cd,
                    ncol = 2, nrow = 1, align = "h",
-                   labels = LETTERS[1:2])
+                   labels = letters[1:2])
 dev.off()
 
 ```
