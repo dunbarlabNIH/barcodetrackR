@@ -100,7 +100,7 @@ shinyServer(
     })
 
     observeEvent(input$samplebutton, {
-      message("loading sample data")
+      message("loading sample data") 
       thresholded_data(barcodetrackR::wu_subset)
       removeTab("Panel", "Descriptive Statistics")
       removeTab("Panel", "Heatmap")

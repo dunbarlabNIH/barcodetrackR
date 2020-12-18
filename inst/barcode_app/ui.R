@@ -22,6 +22,7 @@ shinyUI(
                                            br(),
                                            br(),
                                            actionButton("samplebutton", "Load Sample Data", width="100%"),
+                                           h6("If using Chrome and tabs do not load, please click the button 4-5 times."),
                                            br(),
                                            br(),
                                            br(),
