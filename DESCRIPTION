@@ -27,7 +27,6 @@ Imports:
     ggridges,
     viridis,
     tibble,
-    vegan,
     SummarizedExperiment
 RoxygenNote: 7.1.1
 Suggests: 
