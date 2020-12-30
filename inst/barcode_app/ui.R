@@ -22,7 +22,7 @@ shinyUI(
                                            br(),
                                            br(),
                                            actionButton("samplebutton", "Load Sample Data", width="100%"),
-                                           h6("To work with sample data in the web app, please use Safari due to compatibility issues with Chrome."),
+                                         #  h6("To work with sample data in the web app, please use Safari due to compatibility issues with Chrome."),
                                            br(),
                                            br(),
                                            br(),
@@ -43,7 +43,9 @@ shinyUI(
                                            br(),
                                            tags$li(tags$a(href="https://github.com/dunbarlabNIH/barcodetrackR", "Link to GitHub repository (source code, sample data, issues, etc.).")),
                                            br(),
-                                           br()))))
+                                           br(),
+                                           h3("Note for web app users"),
+                                           tags$div("If you are launching the web-hosted barcode app using Chrome or Firefox, please reload your browser before switching data sources (i.e. uploading new data or switching to the sample data)."),))))
     )
   )
 
