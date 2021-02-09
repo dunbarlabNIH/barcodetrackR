@@ -8,6 +8,7 @@ create_SE(
   your_data = NULL,
   meta_data = NULL,
   threshold = 0,
+  threshold_type = "relative",
   log_base = exp(1),
   scale_factor = 1e+06
 )
@@ -17,7 +18,9 @@ create_SE(
 
 \item{meta_data}{A data frame containing all meta-data. Must, at the very least, include a column called "SAMPLENAME" that contains all of the colnames within the data frame passed as  `your_data` and only those colnames.}
 
-\item{threshold}{Optional. A numeric indicating which reads to filter out (only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero) prior to creating the SE object.}
+\item{threshold}{Numeric. The minimum threshold abundance for a barcode to be maintained in the SE. If `threshold_type` is relative, this parameter should be between 0 and 1. If `threshold_type` is absolute, this parameter should be greater than 1.}
+
+\item{threshold_type}{Character. One of "relative" or "absolute" relative. If a relative threshold is specified, only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero. If an absolute threshold is specified, only those rows which have an absolute read count higher than `threshold` in at least one sample will be kept as non-zero.}
 
 \item{log_base}{A numeric indicating which base to use when logging the percentages.}
 
