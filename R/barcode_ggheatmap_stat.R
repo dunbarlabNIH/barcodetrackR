@@ -35,7 +35,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = ZH33_SE, sample_size = rep(5000,ncol(ZH33_SE)), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars")
+#'barcode_ggheatmap_stat(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars", bc_threshold = 0.005)
 #'
 barcode_ggheatmap_stat <- function(your_SE,
                                    sample_size,
@@ -315,7 +315,7 @@ barcode_ggheatmap_stat <- function(your_SE,
   
   g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
     ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
+    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black", na.rm = TRUE)+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,

@@ -13,7 +13,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
+#'barcode_binary_heatmap(your_SE = wu_subset[,1:10])
 #'
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
