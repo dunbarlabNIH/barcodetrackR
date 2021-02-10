@@ -13,6 +13,7 @@ barcode_ggheatmap_stat(
   stat_display = "top",
   show_all_significant = FALSE,
   p_threshold = 0.05,
+  p_adjust = "none",
   bc_threshold = 0,
   plot_labels = NULL,
   n_clones = 10,
@@ -46,6 +47,8 @@ barcode_ggheatmap_stat(
 \item{stat_display}{Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.}
 
 \item{p_threshold}{The p_value threshold to use for statistical testing}
+
+\item{p_adjust}{Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".}
 
 \item{bc_threshold}{Clones must be above this proportion in at least one sample to be included in statistical testing.}
 

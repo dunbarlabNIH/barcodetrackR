@@ -10,6 +10,7 @@
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
 #'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
+#'@param p_adjust Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr". 
 #'@param bc_threshold Clones must be above this proportion in at least one sample to be included in statistical testing.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
@@ -45,6 +46,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    stat_display = "top",
                                    show_all_significant = FALSE,
                                    p_threshold = 0.05,
+                                   p_adjust = "none",
                                    bc_threshold = 0,
                                    plot_labels = NULL,
                                    n_clones = 10,
@@ -141,9 +143,11 @@ barcode_ggheatmap_stat <- function(your_SE,
       }
 
     }
-
+    # Adjust p values for multiple comparisons.
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
+    
     # Add results of statistical testing into SE
-    SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
 
   } else if (stat_display == "change" | stat_display == "increase" | stat_display == "decrease"){
     # Must perform statistical testing on all rows in order to rank most significant
@@ -193,8 +197,11 @@ barcode_ggheatmap_stat <- function(your_SE,
       }
     }
 
+    # Adjust p values for multiple comparisons.
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
+    
     # Add results of statistical testing into SE
-    SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
 
     # Create reference table for increasing or decreasing clones
     if (stat_display == "increase" | stat_display == "decrease"){
