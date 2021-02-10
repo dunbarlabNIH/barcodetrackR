@@ -8,6 +8,7 @@ clonal_diversity(
   your_SE,
   plot_over,
   plot_over_display_choices = NULL,
+  keep_numeric = TRUE,
   group_by,
   group_by_choices = NULL,
   index_type = "shannon",
@@ -24,6 +25,8 @@ clonal_diversity(
 \item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. timepoint}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
+
+\item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
 
 \item{group_by}{The column of metadata you want to group by e.g. cell_type}
 
