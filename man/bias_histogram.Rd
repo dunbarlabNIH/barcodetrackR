@@ -29,7 +29,7 @@ bias_histogram(
 
 \item{bias_2}{The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LEFT side of the ridge plot}
 
-\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split on.}
+\item{split_bias_over}{The column in `colData(your_SE)` that you wish to observe the bias split for. The output will contain a faceted plot: one facet for each value of `split_bias_over` comparing the samples matching `bias_1` and `bias_2` from the `split_bias_on` argument.}
 
 \item{bias_over}{Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.}
 
@@ -54,5 +54,5 @@ Histogram of log bias for two factors faceted over another set of factors. Or, i
 Given a summarized experiment, gives histogram of log biases for 2 cell types. Each stacked bar in the histogram represents a clone binned by log bias defined as the log2 of the percentage abundance in the sample specified in "bias_1" divided by the percentage abundance in "bias_2."
 }
 \examples{
-bias_histogram(your_SE = SE, split_bias_on = "Lineage", bias_1 = "B", bias_2 = "T", split_bias_over = "Month", bias_over = c(1,2,4.5,12))
+bias_histogram(your_SE = wu_subset, split_bias_on = "celltype", bias_1 = "B", bias_2 = "T", split_bias_over = "months")
 }

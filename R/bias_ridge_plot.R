@@ -20,7 +20,7 @@
 #'@import ggridges
 #'
 #'@examples
-#'bias_ridge_plot(your_se = SE, split_bias_on = "cell_type", bias_1 = "B", bias_2 = "T", split_bias_over = "Timepoint")
+#'bias_ridge_plot(your_SE = wu_subset, split_bias_on = "celltype", bias_1 = "B", bias_2 = "T", split_bias_over = "months")
 #'
 #'@export
 bias_ridge_plot <- function(your_SE,
@@ -61,6 +61,43 @@ bias_ridge_plot <- function(your_SE,
     bias_over <- bias_over %||% unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
   }
 
+  # Check each value of bias_over
+  for (i in 1:length(bias_over)){
+    num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
+    num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
+    
+    # If some values don't have a comparison, let the user know
+    if (num_samples1 == 0 | num_samples2 == 0){
+      cat("Note: For bias_over variable", split_bias_over, "the element", bias_over[i], "is missing one or both of the comparators: \n")
+      if (num_samples1 == 0){
+        cat(split_bias_on,bias_1, "not found. \n \n")
+      } 
+      if (num_samples2 == 0){
+        cat(split_bias_on,bias_2, "not found. \n \n")
+      }
+    }
+    
+    # If some values have multiple replicates, let the user know.
+    if (num_samples1 > 1 | num_samples2 > 1){
+      cat("For bias_over variable", split_bias_over, "the element", bias_over[i], "has more than one replicate for one or more of the comparators. \n")
+      if (num_samples1 > 1){
+        cat(split_bias_on, bias_1, "has", num_samples1, "replicates. \n \n")
+      } 
+      if (num_samples2 > 1){
+        cat(split_bias_on, bias_2, "has", num_samples2, "replicates. \n \n")
+      }
+    }
+  }
+  
+  # Repeat the loop to throw the error if there are ambiguous samples after printing all helpful info.
+  for (i in 1:length(bias_over)){
+    num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
+    num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
+    if (num_samples1 > 1 | num_samples2 > 1){
+      stop("In order to ensure that the function compares the correct samples, please disambiguate the samples by creating a column of the metadata with _repX appended to the desired `split_bias_over` variable.")
+    }
+  }
+  
   # ensure that the  chosen bias_over only is able to plot elements in which the chosen bias_1 and bias_2 are present at n = 1 each
   # within each split_bias_over choice
   colData(your_SE) %>%
