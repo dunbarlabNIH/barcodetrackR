@@ -6,16 +6,16 @@
 #'@description Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param SAMPLENAME_choice The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.
+#'@param SAMPLENAME_choice The identifying SAMPLENAME from which to obtain the top "n_clones" clones to color. If NULL and clone_sequences is NULL, all clones will be shown as gray.
 #'@param filter_by Name of metadata column to filter by e.g. Lineage
 #'@param filter_selection The value of the filter column to display e.g. "T" (within Lineage)
-#'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. Month
+#'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. Month. For numeric metadata, the x-axis will be ordered in ascending fashion. For categorical metadata, the sample order will be followed.
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.
-#'@param clones_sequences The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.
-#'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.
+#'@param clones_sequences The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.
+#'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be assigned a unique color.
 #'@param graph_type Choice of "bar" or "line" for how to display the clonal contribution data
 #'@param keep_numeric If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.
-#'@param plot_non_selected Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice
+#'@param plot_non_selected Plot clones NOT found within the top clones in SAMPLENAME_choice or the specified clones passed to clone_sequences. These clones are colored gray. If both SAMPLENAME_choice and clone_sequences are NULL, this argument must be set to TRUE. Otherwise, there will be no data to show.
 #'@param linesize Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
 #'@param y_limit Numeric. What the max value of the y scale should be for the "percentages" assay.
@@ -24,11 +24,11 @@
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 #'
 #'@examples
-#'clonal_contribution(your_data = your_barcoding_SE, graph_type = "bar",  SAMPLENAME_choice = "Granulocytes_3m", filter_by = "celltype", filter_selection = "Granulocytes", plot_over = "Timepoint_weeks", n_clones = 20)
+#'clonal_contribution(your_data = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
 #'@export
 
 clonal_contribution <- function(your_SE,
-                                SAMPLENAME_choice,
+                                SAMPLENAME_choice = NULL,
                                 filter_by,
                                 filter_selection,
                                 plot_over,
@@ -45,19 +45,24 @@ clonal_contribution <- function(your_SE,
                                 return_table = FALSE){
 
 
-  # Some basic error checking before running the function
+  # Error checking
   coldata_names <- colnames(SummarizedExperiment::colData(your_SE))
   if(any(! c(plot_over) %in% coldata_names)){
     stop("plot_over must match a column name in colData(your_SE)")
-  }
-  if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) != 1){
-    stop("please specify only one of SAMPLENAME_choice or clone_sequences")
   }
   if(any(! c(filter_by) %in% coldata_names)){
     stop("filter_by must match a column name in colData(your_SE)")
   }
   if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
     stop("filter_selection must be an element in the colData column specified with filter_by")
+  }
+  
+  if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) == 0){
+    stop("please specify only ONE of SAMPLENAME_choice or clone_sequences.")
+  }
+  
+  if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) == 2 & plot_non_selected == FALSE){
+    stop("If neither SAMPLENAME_choice nor clone_sequences are specified, plot_non_selected must be TRUE. Otherwise, there is no data to plot.")
   }
 
   #get appropriate rows to use in plotting
@@ -66,9 +71,8 @@ clonal_contribution <- function(your_SE,
   } else if(!is.null(clone_sequences)){
     selected_sequences <- clone_sequences
   } else {
-    stop("one of SAMPLENAME_choice or clone_sequences must be not-NULL")
+    selected_sequences <- c("Filler text")
   }
-
 
   #select those samples which to plot_over and to filter_by
   temp_subset <- your_SE[,your_SE[[filter_by]] == filter_selection]
@@ -84,14 +88,30 @@ clonal_contribution <- function(your_SE,
   temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% as.data.frame() %>% dplyr::mutate_if(is.factor,as.character)
 
 
-  #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
-  if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
-    stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
-  }
+  # #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
+  # if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
+  #   stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
+  # }
 
-  #fetch percentages and turn sample_name into the plot_over equivalents
+  #fetch percentages
   your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
   your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]
+  
+  # If there are duplicate samples within the chosen plot_over argument for the x-axis, then combine but warn the user
+  if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
+    duplicated_plot_over <- temp_subset_coldata[[plot_over]][duplicated(temp_subset_coldata[[plot_over]])]
+    cat("Duplicate samples with the same value of the plot_over variable:",plot_over, "\n")
+    for (i in 1:length(duplicated_plot_over)){
+      duplicated_samplenames <- temp_subset_coldata[["SAMPLENAME"]][temp_subset_coldata[[plot_over]] == duplicated_plot_over[i]]
+      cat(plot_over, "value =",duplicated_plot_over[i], "; Duplicate sample names =", duplicated_samplenames, "\n")
+      your_data[,duplicated_samplenames[1]] <- rowMeans(your_data[,duplicated_samplenames])
+      your_data[,duplicated_samplenames[-1]] <- NULL
+      temp_subset_coldata <- temp_subset_coldata[temp_subset_coldata[["SAMPLENAME"]] %in% duplicated_samplenames[-1] == FALSE,]
+    }
+    cat("Barcode percentages have been averaged for duplicate samples.\nTo see the duplicate samples as separate replicates, create a categorical column of metadata with your desired plot_over values but _repX appended to the replicate samples. \n")
+  }
+  
+  # turn sample_name into the plot_over equivalents
   plotting_data <- tibble::rownames_to_column(your_data, var = "sequence") %>%
     tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%
     dplyr::mutate(fill_label = ifelse(sequence %in% selected_sequences, sequence, "other")) %>%
