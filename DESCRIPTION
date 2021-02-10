@@ -27,7 +27,8 @@ Imports:
     ggridges,
     viridis,
     tibble,
-    SummarizedExperiment
+    SummarizedExperiment,
+    rmdformats
 RoxygenNote: 7.1.1
 Suggests: 
     BiocStyle,
