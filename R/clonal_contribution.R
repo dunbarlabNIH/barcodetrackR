@@ -18,13 +18,13 @@
 #'@param plot_non_selected Plot clones NOT found within the top clones in SAMPLENAME_choice or the specified clones passed to clone_sequences. These clones are colored gray. If both SAMPLENAME_choice and clone_sequences are NULL, this argument must be set to TRUE. Otherwise, there will be no data to show.
 #'@param linesize Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
-#'@param y_limit Numeric. What the max value of the y scale should be for the "percentages" assay.
+#'@param y_limit Numeric. What the max value of the y scale should be for the "proportions" assay.
 #'@param return_table Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.
 #'
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 #'
 #'@examples
-#'clonal_contribution(your_data = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
+#'clonal_contribution(your_SE = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
 #'@export
 
 clonal_contribution <- function(your_SE,
@@ -93,8 +93,8 @@ clonal_contribution <- function(your_SE,
   #   stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
   # }
 
-  #fetch percentages
-  your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
+  #fetch proportions
+  your_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]
   
   # If there are duplicate samples within the chosen plot_over argument for the x-axis, then combine but warn the user
@@ -108,7 +108,7 @@ clonal_contribution <- function(your_SE,
       your_data[,duplicated_samplenames[-1]] <- NULL
       temp_subset_coldata <- temp_subset_coldata[temp_subset_coldata[["SAMPLENAME"]] %in% duplicated_samplenames[-1] == FALSE,]
     }
-    cat("Barcode percentages have been averaged for duplicate samples.\nTo see the duplicate samples as separate replicates, create a categorical column of metadata with your desired plot_over values but _repX appended to the replicate samples. \n")
+    cat("Barcode proportions have been averaged for duplicate samples.\nTo see the duplicate samples as separate replicates, create a categorical column of metadata with your desired plot_over values but _repX appended to the replicate samples. \n")
   }
   
   # turn sample_name into the plot_over equivalents
@@ -147,7 +147,7 @@ clonal_contribution <- function(your_SE,
   if (graph_type == "bar"){
     g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_col(colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
+      ggplot2::scale_y_continuous(name = "proportions", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_classic()+
       ggplot2::ggtitle(your_title)+
@@ -157,7 +157,7 @@ clonal_contribution <- function(your_SE,
   } else if (graph_type == "line"){
     g <-  ggplot2::ggplot(plotting_data, ggplot2::aes(x=sample_name, y = value, group = sequence, fill = fill_label))+
       ggplot2::geom_area(position = "stack", colour = "black",  size= linesize)+
-      ggplot2::scale_y_continuous(name = "percentages", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
+      ggplot2::scale_y_continuous(name = "proportions", labels = function(x){paste0(x * 100, "%")}, expand = c(0.01,0))+
       ggplot2::scale_fill_manual("selected_sequences", values = color_vector)+
       ggplot2::theme_classic()+
       ggplot2::ggtitle(your_title)+

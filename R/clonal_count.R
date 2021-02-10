@@ -23,7 +23,7 @@
 #'@import tibble
 #'
 #'@examples
-#'clonal_count(your_data = wu_SE, cumulative = FALSE, plot_by = "timepoint", group_by = "cell_type")
+#'clonal_count(your_SE = wu_subset, cumulative = FALSE, plot_over = "months", group_by = "celltype")
 #'
 #'@export
 clonal_count <- function(your_SE,
@@ -70,7 +70,7 @@ clonal_count <- function(your_SE,
   # Keep only the data included in group_by_choices
   temp_subset <- temp_subset[,(temp_subset[[group_by]] %in% group_by_choices)]
   temp_subset_coldata <- SummarizedExperiment::colData(temp_subset) %>% tibble::as_tibble()
-  your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
+  your_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]
 
   #calculate measure for each sample

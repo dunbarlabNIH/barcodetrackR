@@ -5,7 +5,7 @@
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0. 
+#'@param cellnote_assay Character. One of "stars", "counts", or "proportions." To have no cellnote, set cellnote_size to 0. 
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
@@ -28,7 +28,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 3)
+#'barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 6)
 #'
 barcode_ggheatmap <- function(your_SE,
                               plot_labels = NULL,
@@ -97,7 +97,7 @@ barcode_ggheatmap <- function(your_SE,
 
 
     } else if(row_order == "emergence"){
-      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$percentages)]
+      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$proportions)]
     }
 
   } else {
@@ -125,7 +125,7 @@ barcode_ggheatmap <- function(your_SE,
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
   if(is.numeric(plotting_data$cellnote)){
-    if(cellnote_assay == "percentages"){
+    if(cellnote_assay == "proportions"){
       plotting_data$cellnote <- paste0(round(plotting_data$cellnote*100, digits = 2), "%")
     } else {
       plotting_data$cellnote <- round(plotting_data$cellnote, digits = 2)

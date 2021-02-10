@@ -7,7 +7,7 @@
 #'
 #' @format A SummarizedExperiment object with 215 features rows and 20 samples:
 #' \describe{
-#'   \item{assays}{includes the counts, percentages, ranks, normalized, and logs assays}
+#'   \item{assays}{includes the counts, proportions, ranks, normalized, and logs assays}
 #'   \item{colData}{includes the accompanying metadata for the samples}
 #'   \item{metadata}{includes the scale_factor used and the log_base used in the log assay}
 #'   ...

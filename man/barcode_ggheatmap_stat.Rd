@@ -56,7 +56,7 @@ barcode_ggheatmap_stat(
 
 \item{n_clones}{The top 'n' clones to plot.}
 
-\item{cellnote_assay}{Character. One of "stars", "reads", "percentages" or "p_val"}
+\item{cellnote_assay}{Character. One of "stars", "reads", "proportions" or "p_val"}
 
 \item{your_title}{The title for the plot.}
 

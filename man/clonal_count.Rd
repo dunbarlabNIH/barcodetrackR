@@ -51,6 +51,6 @@ Outputs plot of a diversity measure tracked for groups over a factor. Or if retu
 A line plot that tracks the total number of clones or the cumulative number of clones from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
-clonal_count(your_data = wu_SE, cumulative = FALSE, plot_by = "timepoint", group_by = "cell_type")
+clonal_count(your_SE = wu_subset, cumulative = FALSE, plot_over = "months", group_by = "celltype")
 
 }

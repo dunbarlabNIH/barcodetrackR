@@ -6,7 +6,7 @@
 \usage{
 cor_plot(
   your_SE,
-  assay = "percentages",
+  assay = "proportions",
   plot_labels = colnames(your_SE),
   method_corr = "pearson",
   your_title = "",
@@ -23,7 +23,7 @@ cor_plot(
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
 
-\item{assay}{The choice of assay to use for the correlation calculation. Set to "percentages" by default.}
+\item{assay}{The choice of assay to use for the correlation calculation. Set to "proportions" by default.}
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
@@ -54,5 +54,5 @@ Plots pairwise correlation plot for the samples in your_SE.
 Plots the pairwise correlation between the specified assay of each sample-sample pair in the provided SummarizedExperiment.
 }
 \examples{
-cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")
+cor_plot(your_SE = wu_subset, your_title = "Pearson correlation of all samples", plot_type = "color")
 }

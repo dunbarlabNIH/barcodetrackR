@@ -27,7 +27,7 @@ barcode_stat_test <- function(your_SE,
                               bc_threshold = 0) {
 
   # Apply bc_threshold
-  bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$percentages, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
+  bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$proportions, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
   your_SE <- your_SE[bc_passing_threshold,]
 
   #error checking
@@ -36,9 +36,9 @@ barcode_stat_test <- function(your_SE,
   }
 
   # Initialize dataframes of the right dimensions
-  FC_df <- SummarizedExperiment::assays(your_SE)$percentages
-  log_FC_df <- SummarizedExperiment::assays(your_SE)$percentages
-  p_val_df <- SummarizedExperiment::assays(your_SE)$percentages
+  FC_df <- SummarizedExperiment::assays(your_SE)$proportions
+  log_FC_df <- SummarizedExperiment::assays(your_SE)$proportions
+  p_val_df <- SummarizedExperiment::assays(your_SE)$proportions
 
   if (stat_option == "subsequent"){
     stat_ref_index <- 1
@@ -53,20 +53,20 @@ barcode_stat_test <- function(your_SE,
     for (i in stat_test_index){
 
       # Calculate FC and log_FC
-      FC_df[,i] <- SummarizedExperiment::assays(your_SE)$percentages[,i] / SummarizedExperiment::assays(your_SE)$percentages[,i-1]
+      FC_df[,i] <- SummarizedExperiment::assays(your_SE)$proportions[,i] / SummarizedExperiment::assays(your_SE)$proportions[,i-1]
       log_FC_df[,i] <- log2(FC_df[,i])
 
       # Perform statistical test
       if (stat_test == "chi-squared"){
-        p_val_df[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                              c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        p_val_df[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                              c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
       } else if (stat_test == "fisher") {
-        p_val_df[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                 SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                               c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                 sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+        p_val_df[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                 SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                               c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                 sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
       }
     }
 
@@ -88,20 +88,20 @@ barcode_stat_test <- function(your_SE,
     for (i in stat_test_index){
 
       # Calculate FC and log_FC
-      FC_df[,i] <- SummarizedExperiment::assays(your_SE)$percentages[,i] / SummarizedExperiment::assays(your_SE)$percentages[,i-1]
+      FC_df[,i] <- SummarizedExperiment::assays(your_SE)$proportions[,i] / SummarizedExperiment::assays(your_SE)$proportions[,i-1]
       log_FC_df[,i] <- log2(FC_df[,i])
 
       # Perform statistical test compared to reference
       if (stat_test == "chi-squared"){
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                              c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                              c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
       } else if (stat_test == "fisher") {
-        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                 SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                               c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                 sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+        p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                 SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                               c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                 sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
       }
     }
   }

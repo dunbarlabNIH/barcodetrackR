@@ -20,7 +20,7 @@
 #'@export
 #'
 #'@examples
-#'chord_diagram(your_SE = my_SE,  plot_label = 'Cell_type')
+#'chord_diagram(your_SE = wu_subset[,c(4,8,12)],  plot_label = 'celltype')
 #'
 chord_diagram <- function(your_SE,
                         weighted = FALSE,
