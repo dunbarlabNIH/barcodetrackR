@@ -22,9 +22,9 @@ create_SE(
 
 \item{threshold_type}{Character. One of "relative" or "absolute" relative. If a relative threshold is specified, only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero. If an absolute threshold is specified, only those rows which have an absolute read count higher than `threshold` in at least one sample will be kept as non-zero.}
 
-\item{log_base}{A numeric indicating which base to use when logging the percentages.}
+\item{log_base}{A numeric indicating which base to use when logging the normalized data}
 
-\item{scale_factor}{A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode percentages on a per sample basis will be multiplied by 1 million before log+1 normalization.}
+\item{scale_factor}{A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode proportions on a per sample basis will be multiplied by 1 million before log+1 normalization.}
 }
 \value{
 Returns a SummarizedExperiment holding your clonal tracking data and the associated metadata.
@@ -33,6 +33,6 @@ Returns a SummarizedExperiment holding your clonal tracking data and the associa
 Creates a SummarizedExperiment object from a data frame containing clonal tracking counts (`your_data`) with rows as observations and columns as samples, and the associated metadata (`meta_data`) with rows as samples and columns of information describing those samples.
 }
 \examples{
-create_SE(your_data = exp1_clonal_counts_data, meta_data = exp1_meta_data)
+create_SE(your_data = read.delim(system.file("sample_data/app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1), meta_data = read.delim(system.file("sample_data/app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR")))
 
 }

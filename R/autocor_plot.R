@@ -23,7 +23,7 @@
 #'
 #'
 #'@examples
-#'autocor_plot(six_SE, plot_over = "months", filter_by = "celltype", filter_selection = "Gr", no_negatives = TRUE, keep_numeric = TRUE)
+#'autocor_plot(wu_subset, plot_over = "months", filter_by = "celltype", filter_selection = "T", no_negatives = TRUE, keep_numeric = TRUE)
 #"
 
 autocor_plot = function(your_SE,
@@ -70,13 +70,13 @@ autocor_plot = function(your_SE,
     stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
   }
 
-  #extracts percentages assay from your_SE
+  #extracts proportions assay from your_SE
   temp_subset_coldata  %>%
     dplyr::mutate(my_order = !!as.name(plot_over)) %>%
     dplyr::mutate(my_order = factor(my_order, levels = plot_over_display_choices)) %>%
     dplyr::arrange(my_order) %>%
     dplyr::mutate(my_order = as.character(my_order)) -> sorted_temp_subset_coldata
-  plotting_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
+  plotting_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   colnames(plotting_data) <- plyr::mapvalues(colnames(plotting_data),
                                              from = sorted_temp_subset_coldata$SAMPLENAME,
                                              to = sorted_temp_subset_coldata$my_order)

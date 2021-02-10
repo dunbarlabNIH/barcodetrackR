@@ -6,15 +6,15 @@
 #'@param meta_data A data frame containing all meta-data. Must, at the very least, include a column called "SAMPLENAME" that contains all of the colnames within the data frame passed as  `your_data` and only those colnames.
 #'@param threshold Numeric. The minimum threshold abundance for a barcode to be maintained in the SE. If `threshold_type` is relative, this parameter should be between 0 and 1. If `threshold_type` is absolute, this parameter should be greater than 1. 
 #'@param threshold_type Character. One of "relative" or "absolute" relative. If a relative threshold is specified, only those rows which have higher than `threshold` proportion of reads within at least one sample will be kept as non-zero. If an absolute threshold is specified, only those rows which have an absolute read count higher than `threshold` in at least one sample will be kept as non-zero. 
-#'@param log_base A numeric indicating which base to use when logging the percentages.
-#'@param scale_factor A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode percentages on a per sample basis will be multiplied by 1 million before log+1 normalization.
+#'@param log_base A numeric indicating which base to use when logging the normalized data
+#'@param scale_factor A numeric indicating what scaling factor to use in normalization. For the default value of 1 million, barcode proportions on a per sample basis will be multiplied by 1 million before log+1 normalization.
 #'
 #'@return Returns a SummarizedExperiment holding your clonal tracking data and the associated metadata.
 #'
 #'@import SummarizedExperiment
 #'
 #'@examples
-#'create_SE(your_data = exp1_clonal_counts_data, meta_data = exp1_meta_data)
+#'create_SE(your_data = read.delim(system.file("sample_data/app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1), meta_data = read.delim(system.file("sample_data/app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR")))
 #'
 #'@export
 #'
@@ -76,11 +76,11 @@ create_SE <- function(your_data = NULL,
   }
   
   your_data.ranks <-  as.data.frame(apply(-your_data, 2, rank, ties.method = "min", na.last = "keep"))
-  your_data.percentages <-  as.data.frame(prop.table(as.matrix(your_data),2))
-  your_data.normalized <- your_data.percentages * scale_factor
+  your_data.proportions <-  as.data.frame(prop.table(as.matrix(your_data),2))
+  your_data.normalized <- your_data.proportions * scale_factor
   your_data.logged <- log(1+your_data.normalized, base = log_base)
   your_SE <- SummarizedExperiment::SummarizedExperiment(assays = list(counts = your_data,
-                                                                      percentages = your_data.percentages,
+                                                                      proportions = your_data.proportions,
                                                                       ranks = your_data.ranks,
                                                                       normalized = your_data.normalized,
                                                                       logs = your_data.logged),
