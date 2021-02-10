@@ -109,7 +109,7 @@ Our input dataframes to create the `SummarizedExperiment` (SE) objects are each 
 `create_SE` takes the input `dataframe` and metadata and creates a SummarizedExperiment object with the following assays:
 
 * `counts`: the raw values from the input dataframe
-* `percentages`: the per-column proportions of each entry in each column
+* `proportions`: the per-column proportions of each entry in each column
 * `ranks`: the rank of each entry in each column
 * `normalized`: the normalized read values (CPM)
 * `logs`: the log of the normalized values
@@ -131,24 +131,24 @@ barcodetrackR::launchApp()
 ## `scatter_plot`
 A straightforward way to view the relationship between samples in a pairwise manner is to view basic scatter plots of two samples using the provided assays. We provide a `scatter_plot` function as part of the package.
 
-Here, we view the correlation of barcode _"percentages"_ between different cell types at the 20 month timepoint of the Wu et al study. We compare granulocytes (Gr) to B and T cells.
+Here, we view the correlation of barcode _"proportions"_ between different cell types at the 20 month timepoint of the Wu et al study. We compare granulocytes (Gr) to B and T cells.
 
 ```{r scatter_plot, eval = TRUE, fig.width = 7, fig.height=4}
 Gr_B_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_B")
 Gr_T_20 <- c("ZJ31_20m_Gr", "ZJ31_20m_T")
-wu_scatterplot_1 <- scatter_plot(wu_SE[,Gr_B_20], your_title = "Gr vs B", assay = "percentages")
-wu_scatterplot_2 <- scatter_plot(wu_SE[,Gr_T_20], your_title = "Gr vs T", assay = "percentages")
+wu_scatterplot_1 <- scatter_plot(wu_SE[,Gr_B_20], your_title = "Gr vs B", assay = "proportions")
+wu_scatterplot_2 <- scatter_plot(wu_SE[,Gr_T_20], your_title = "Gr vs T", assay = "proportions")
 cowplot::plot_grid(wu_scatterplot_1, wu_scatterplot_2, ncol = 2)
 ```
 
 ## `cor_plot`
-A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we visualize the Pearson correlation of the barcode _"percentages"_ between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
+A more comprehensive way to view the relationship between samples in a pairwise manner is to use a correlation plot. Here, we visualize the Pearson correlation of the barcode _"proportions"_ between the T, B, Gr, NK CD56+/CD16-, and NK CD56-/CD16+ fractions within the Wu dataset for the 6, 9.5, 12, and 20 month post-transplant timepoints.
 ```{r cor_plot 1, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
          plot_type = "color",
-         assay = "percentages")
+         assay = "proportions")
 ```
 
 If desired, we can also calculate and visualize the Pearson correlations for the _"logs"_ assay for the same samples above.
@@ -160,12 +160,12 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          assay = "logs")
 ```
 
-We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization. Here, we return the p-values and confidence intervals for the correlations calculated using the _"percentages"_ assay.
+We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization. Here, we return the p-values and confidence intervals for the correlations calculated using the _"proportions"_ assay.
 
 ```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
-         assay = "percentages",
+         assay = "proportions",
          return_table = TRUE) %>% head
 ```
 
@@ -178,7 +178,7 @@ belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
          plot_type = "number",
-         assay = "percentages",
+         assay = "proportions",
          number_size = 3)
 ```
 
@@ -245,7 +245,7 @@ barcode_ggheatmap(your_SE = six_SE[,six_celltype_order],
                   distance_method = "euclidean")
 ```
 
-The Belderbos dataset generally contains less clones than either the Wu or Six datasets, so by using the "percentages" option of the `cellnote_assay` we can see the actual percentages of each sample.
+The Belderbos dataset generally contains less clones than either the Wu or Six datasets, so by using the "proportions" option of the `cellnote_assay` we can see the actual proportions of each sample.
 
 ```{r barcode_ggheatmap belderbos_SE, echo=TRUE, warning = FALSE, fig.width = 7, fig.height = 5}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
@@ -254,7 +254,7 @@ barcode_ggheatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                   label_size = 18,
                   dendro = FALSE,
                   cellnote_size = 4,
-                  cellnote_assay = "percentages")
+                  cellnote_assay = "proportions")
 ```
 
 ## `barcode_ggheatmap_stat`
@@ -491,12 +491,12 @@ Measures of simmilarity or dissimilarity between samples are known as beta-diver
 
 One of the most commonly used beta-diversity indices is the [Bray-Curtis Dissimilarity](https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity). Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
 ```{r wu bray diversity, eval = TRUE}
-mds_plot(wu_SE, group_by = "celltype", method_dist = "bray", assay = "percentages")
+mds_plot(wu_SE, group_by = "celltype", method_dist = "bray", assay = "proportions")
 ```
 
 When using the Bray-Curtis dissimilarity index between all of the samples in the Six dataset, we find that similarly to the Wu dataset, NK cells appear dissimilar from the remainder of the celltypes, while Monocytes and Granulocytes appear most similar to one another.
 ```{r six bray diversity, eval = TRUE}
-mds_plot(six_SE, group_by = "celltype", method_dist = "bray", assay = "percentages")
+mds_plot(six_SE, group_by = "celltype", method_dist = "bray", assay = "proportions")
 ```
 
 

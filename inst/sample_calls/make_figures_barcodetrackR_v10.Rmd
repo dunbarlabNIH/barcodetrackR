@@ -1,0 +1,819 @@
+---
+title: "make_figures_barcodetrackR"
+author: "Ryland Mortlock and Diego Espinoza"
+date: "02/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+Currently, [barcodetrackR](http://github.com/d93espinoza/barcodetrackR) is available at Github and can be downloaded using the devtools package.
+```{r installation, eval = FALSE}
+devtools::install_github("DunbarLabNIH/barcodetrackR", force = TRUE)
+```
+
+## Contributors
+The R package and functions were created by Diego A. Espinoza, Ryland D. Mortlock, Samson J. Koelle, and others at Cynthia Dunbar's laboratory at the National Heart, Lung, and Blood Institutes of Health. Issues should be addressed to https://github.com/d93espinoza/barcodetrackR/issues.
+
+# Loading data
+
+## Loading required packages
+
+The [barcodetrackR](http://github.com/d93espinoza/barcodetrackR) package operates on [SummarizedExperiment](https://bioconductor.org/packages/release/bioc/html/SummarizedExperiment.html) objects from the Bioconductor repository. It stores associated colData for each sample in this object as well as any metadata. We load the `barcodetrackR` and `SummarizedExperiment` packages here for our analyses, as well as the `magrittr` package in order to improve legibility of code through using the pipe `%>%` operator.
+
+```{r load packages required, eval = TRUE, warning=FALSE, message=FALSE}
+require("magrittr")
+require("barcodetrackR")
+require("SummarizedExperiment")
+require("ggplot2")
+require("cowplot")
+require("dplyr")
+```
+
+## Creating objects with `create_SE`
+
+For this vignette, we will load publically available data from the following papers (these sample datasets are included in the R package):
+
+* [Wu, Chuanfeng, et al. "Clonal expansion and compartmentalized maintenance of rhesus macaque NK cell subsets." Science Immunology (2018)](http://dx.doi.org/10.1126/sciimmunol.aat9781)
+* [Koelle, Samson J., et al. "Quantitative stability of hematopoietic stem and progenitor cell clonal output in rhesus macaques receiving transplants." Blood (2017)](https://doi.org/10.1182/blood-2016-07-728691)
+* [Belderbos, Mirjam E., et al. "Donor-to-Donor Heterogeneity in the Clonal Dynamics of Transplanted Human Cord Blood Stem Cells in Murine Xenografts." Biology of Blood and Marrow Transplantation (2020)](http://dx.doi.org/10.1016/j.bbmt.2019.08.026)
+* [Six, Emmanuelle, et al. "Clonal tracking in gene therapy patients reveals a diversity of human hematopoietic differentiation programs." Blood (2020)](http://doi.org/10.1182/blood.2019002350)
+* [Espinoza, Diego A., et al. "Aberrant Clonal Hematopoiesis following Lentiviral Vector Transduction of HSPCs in a Rhesus Macaque." Molecular Therapy 27.6 (2019): 1074-1086.](10.1016/j.ymthe.2019.04.003)
+* [Elder A, et al. "Abundant and equipotent founder cells establish and maintain acute lymphoblastic leukaemia." Leukemia (2017)](https://doi.org/10.1038/leu.2017.140)
+* [Clarke, Erik L., et al. "T cell dynamics and response of the microbiota after gene therapy to treat X-linked severe combined immunodeficiency." Genome medicine (2018)](https://doi.org/10.1186/s13073-018-0580-z)
+
+```{r load data, eval = TRUE}
+system.file("sample_data/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> wu_dataframe
+
+system.file("sample_data/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> wu_metadata
+
+wu_SE <- create_SE(your_data = wu_dataframe,
+                   meta_data = wu_metadata,
+                   threshold = 0.0001)
+
+system.file("sample_data/KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> koelle_dataframe
+
+system.file("sample_data/KoelleSJ_etal/ZH33_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> koelle_metadata
+
+# Fix a typo in Koelle dataset
+koelle_metadata["ZH33_14m_T","months"]  <- 14
+
+koelle_SE <- create_SE(your_data = koelle_dataframe,
+                       meta_data = koelle_metadata,
+                       threshold = 0.0001)
+
+system.file("sample_data/BelderbosME_etal/count_matrix_mouse_C21.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> belderbos_dataframe
+
+system.file("sample_data/BelderbosME_etal/metadata_mouse_C21.txt", package = "barcodetrackR") %>%
+  read.delim() %>%
+  set_rownames(value = .$SAMPLENAME) -> belderbos_metadata
+
+belderbos_metadata$celltype <- factor(belderbos_metadata$celltype, levels = c("T", "B", "G", "bulk"))
+belderbos_metadata$weeks <- factor(belderbos_metadata$weeks, levels = c("9", "14", "20", "22", "sac"))
+belderbos_metadata$organ <- factor(belderbos_metadata$organ, levels = unique(belderbos_metadata$organ))
+
+belderbos_SE <- create_SE(your_data = belderbos_dataframe,
+                          meta_data = belderbos_metadata,
+                          threshold = 0)
+
+# Make Belderbos celltype label consistent with other datasets
+colData(belderbos_SE)$celltype <- gsub("G","Gr",colData(belderbos_SE)$celltype)
+colData(belderbos_SE)$SAMPLENAME <- gsub("G","Gr",colData(belderbos_SE)$SAMPLENAME)
+colnames(belderbos_SE) <- gsub("G","Gr",colnames(belderbos_SE))
+
+system.file("sample_data/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> six_dataframe
+
+system.file("sample_data/SixE_etal/WAS5_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> six_metadata
+
+six_SE <- create_SE(your_data = six_dataframe,
+                    meta_data = six_metadata,
+                    threshold = 0.0001)
+
+system.file("sample_data/EspinozaDA_etal/zl34_count_matrix.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> esp_dataframe
+
+system.file("sample_data/EspinozaDA_etal/zl34_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> esp_metadata
+
+esp_SE <- create_SE(your_data = esp_dataframe,
+                    meta_data = esp_metadata,
+                    threshold = 0.0001)
+
+system.file("sample_data/ElderA_etal/L4951_count_matrix.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> eld_dataframe
+
+system.file("sample_data/ElderA_etal/L4951_metadata.txt", package = "barcodetrackR") %>%
+  read.delim() -> eld_metadata
+
+eld_SE <- create_SE(your_data = eld_dataframe,
+                    meta_data = eld_metadata,
+                    threshold = 0.0001)
+
+system.file("sample_data/ClarkeEL_etal/tcr_reads_p00007.txt", package = "barcodetrackR") %>%
+  read.delim(row.names = 1) -> clarke_dataframe
+
+system.file("sample_data/ClarkeEL_etal/tcr_metadata_p00007.txt", package = "barcodetrackR") %>%
+  read.delim() -> clarke_metadata
+
+clarke_SE <- create_SE(your_data = clarke_dataframe,
+                       meta_data = clarke_metadata,
+                       threshold = 0)
+
+# Fix error in sample names of clarke SE
+clarke_SE@colData@rownames <- clarke_metadata$SAMPLENAME
+
+# Change nmonths to months to make it consistent with naming convention of other datasets
+colData(clarke_SE)$months <- colData(clarke_SE)$nmonths
+
+```
+
+## Set results directory
+
+```{r set results dir, eval = TRUE}
+#results_dir <- "/Users/mortlockrd/Desktop/barcodetrackR manuscript/figures"
+# results_dir <- "~/Documents/dunbar_lab/projects/diego_barcodetrackR/manuscript_figures/"
+results_dir <- "/Users/mortlockrd/Desktop/barcodetrackR manuscript/figures v9"
+```
+
+## Fig S1: Influence of normalization and thresholding
+
+```{r supp figure normalization and thresholding, eval = TRUE, warning = FALSE, message = FALSE}
+
+p1 <- stat_hist(belderbos_SE[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Belderbos et al B cells 22wk timepoint")
+
+p2 <- stat_hist(belderbos_SE[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(belderbos_SE)))
+
+
+belderbos_SE2 <- create_SE(your_data = belderbos_dataframe,
+                          meta_data = belderbos_metadata,
+                          threshold = 0.0001)
+
+p3 <- stat_hist(belderbos_SE2[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.01%")
+
+
+p4 <- stat_hist(belderbos_SE2[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(belderbos_SE2)))
+
+belderbos_SE3 <- create_SE(your_data = belderbos_dataframe,
+                          meta_data = belderbos_metadata,
+                          threshold = 0.001)
+
+p5 <- stat_hist(belderbos_SE3[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.1%")
+
+
+p6 <- stat_hist(belderbos_SE3[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(belderbos_SE3)))
+
+six_SE <- create_SE(your_data = six_dataframe,
+                    meta_data = six_metadata,
+                    threshold = 0)
+
+p7 <- stat_hist(six_SE[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Six et al Monocytes 13m timepoint")
+
+
+p8 <- stat_hist(six_SE[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(six_SE)))
+
+six_SE2 <- create_SE(your_data = six_dataframe,
+                    meta_data = six_metadata,
+                    threshold = 0.0001)
+
+p9 <- stat_hist(six_SE2[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.01%")
+
+
+p10 <- stat_hist(six_SE2[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(six_SE2)))
+
+six_SE3 <- create_SE(your_data = six_dataframe,
+                    meta_data = six_metadata,
+                    threshold = 0.001)
+
+p11 <- stat_hist(six_SE3[,5],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.1%")
+
+
+p12 <- stat_hist(six_SE3[,5],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(six_SE3)))
+
+eld_SE <- create_SE(your_data = eld_dataframe,
+                    meta_data = eld_metadata,
+                    threshold = 0)
+
+p13 <- stat_hist(eld_SE[,1],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Elder et al Mouse AE3 spleen")
+
+p14 <- stat_hist(eld_SE[,1],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(eld_SE)))
+
+eld_SE2 <- create_SE(your_data = eld_dataframe,
+                    meta_data = eld_metadata,
+                    threshold = 0.0001)
+
+p15 <- stat_hist(eld_SE2[,1],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.01%")
+
+p16 <- stat_hist(eld_SE2[,1],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(eld_SE2)))
+
+eld_SE3 <- create_SE(your_data = eld_dataframe,
+                    meta_data = eld_metadata,
+                    threshold = 0.001)
+
+p17 <- stat_hist(eld_SE3[,1],
+                data_choice = "assay stats",
+                assay_choice = "proportions",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = "Threshold of 0.1%")
+
+p18 <- stat_hist(eld_SE3[,1],
+                data_choice = "assay stats",
+                assay_choice = "logs",
+                y_log_axis = TRUE,
+                n_bins = 20,
+                your_title = paste0("Number of unique barcodes: ",nrow(eld_SE3)))
+
+pdf(file = file.path(results_dir, "Figure_S1.pdf"), width = 24, height = 12)
+cowplot::plot_grid(p1,p2,p3,p4,p5,p6,
+                   p7,p8,p9,p10,p11,p12,
+                   p13,p14,p15,p16,p17,p18,
+                   ncol = 6, nrow = 3,
+                   labels = c("a","","b","","c","",
+                              "d","","e","","f","",
+                              "g","","h","","i",""), align = "h", axis = "b")
+dev.off()
+```
+
+
+## Figure 2: Global Clonal Distribution
+
+```{r figure 2, eval = TRUE}
+
+fig2_text_size <- 6 
+
+six_cor_plot_sample_selection <- colData(six_SE) %>% as.data.frame() %>% dplyr::mutate(celltype = factor(celltype, levels = c("T", "B", "Gr", "Mo", "NK"))) %>% dplyr::arrange(celltype, months) %>% dplyr::pull(SAMPLENAME)
+
+six_cor_plot_simple_names <- c("m13_T","m36_T","m43_T","m55_T",
+                               "m13_B","m36_B","m43_B","m55_B",
+                               "m13_Gr","m36_Gr","m43_Gr","m55_Gr",
+                               "m13_Mo","m36_Mo","m43_Mo","m55_Mo",
+                               "m13_NK","m36_NK","m43_NK","m55_NK")
+
+six_cor_plot <- cor_plot(six_SE[,six_cor_plot_sample_selection],
+                         method_corr = "pearson",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = six_cor_plot_simple_names)+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+bel_cor_plot_sample_selection <- colData(belderbos_SE) %>%
+  as.data.frame() %>%
+  dplyr::filter(weeks == "sac") %>%
+  dplyr::arrange(organ, celltype) %>%
+  dplyr::pull(SAMPLENAME) 
+
+bel_cor_plot <- cor_plot(belderbos_SE[,bel_cor_plot_sample_selection],
+                         method_corr = "pearson",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = gsub("sac_","",colData(belderbos_SE[,bel_cor_plot_sample_selection])$SAMPLENAME))+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+eld_cor_plot_sample_selection <- colData(eld_SE) %>% as.data.frame() %>% dplyr::filter(mouse %in% c("AE12", "AE32", "AE88", "AE89", "AE90")) %>% dplyr::pull(SAMPLENAME)
+eld_cor_plot_labels <- colData(eld_SE) %>% as.data.frame() %>% dplyr::filter(mouse %in% c("AE12", "AE32", "AE88", "AE89", "AE90")) %>% dplyr::pull(short_name)
+
+eld_cor_plot <- cor_plot(eld_SE[,eld_cor_plot_sample_selection],
+                         method_corr = "pearson",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = eld_cor_plot_labels)+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+six_mds <- mds_plot(six_SE,
+                    group_by = "celltype",
+                    method_dist = "bray",
+                    assay = "proportions",
+                    point_size = 2,
+                    text_size = fig2_text_size)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
+  ggrepel::geom_text_repel(aes(label = months), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
+
+bel_mds <- mds_plot(belderbos_SE[,bel_cor_plot_sample_selection],
+                    group_by = "organ",
+                    method_dist = "bray",
+                    assay = "proportions",
+                    point_size = 2,
+                    text_size = fig2_text_size)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
+  ggrepel::geom_text_repel(aes(label = celltype), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
+
+# Shorten organ namee
+colData(eld_SE)$organ <- gsub("part ","",colData(eld_SE)$organ)
+
+eld_mds <- mds_plot(eld_SE[,eld_cor_plot_sample_selection],
+                    group_by = "mouse",
+                    method_dist = "bray",
+                    assay = "proportions",
+                    point_size = 2,
+                    text_size = fig2_text_size)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
+  ggrepel::geom_text_repel(aes(label = organ), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
+
+
+pdf(file = file.path(results_dir, "Figure_2.pdf"), width = 8.5, height = 11)
+cowplot::plot_grid(six_cor_plot, six_mds,
+                   bel_cor_plot, bel_mds,
+                   eld_cor_plot, eld_mds,
+                   ncol = 2, nrow = 3,
+                   labels = letters[1:6], align = "h", axis = "b")
+dev.off()
+```
+
+## Figure 3: Clone number and diversity
+
+```{r figure 3, eval = TRUE}
+
+fig3_ptsz <- 1.5
+fig3_txsz <- 8
+
+six_cc <- clonal_count(six_SE,
+                       plot_over = "months",
+                       group_by = "celltype",
+                       cumulative = FALSE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.position = "none")
+
+six_cd <- clonal_diversity(six_SE,
+                           plot_over = "months",
+                           group_by = "celltype",
+                           index_type = "shannon",
+                           point_size = fig3_ptsz,
+                           line_size = 1,
+                           text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
+
+bel_cc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
+                       plot_over = "weeks",
+                       group_by = "celltype",
+                       cumulative = FALSE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.position = "none")
+
+bel_cd <- clonal_diversity(belderbos_SE[,c(1:6, 13:16)],
+                           plot_over = "weeks",
+                           group_by = "celltype",
+                           index_type = "shannon",
+                           point_size = fig3_ptsz,
+                           line_size = 1,
+                           text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
+
+# Make espinoza cell type naming consistent with Six
+colData(esp_SE)$celltype <- gsub("Mono","Mo",colData(esp_SE)$celltype)
+
+# Name metadata days not day
+colnames(colData(esp_SE))[2] <- "days"
+
+esp_cc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
+                       plot_over = "days",
+                       group_by = "celltype",
+                       cumulative = FALSE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.position = "none")
+
+esp_cd <- clonal_diversity(esp_SE[,colData(esp_SE)$celltype != "EOS"],
+                           plot_over = "days",
+                           group_by = "celltype",
+                           index_type = "shannon",
+                           point_size = fig3_ptsz,
+                           line_size = 1,
+                           text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
+
+pdf(file = file.path(results_dir, "Figure_3.pdf"), width = 7.5, height = 8)
+cowplot::plot_grid(six_cc, six_cd, 
+                   bel_cc, bel_cd, 
+                   esp_cc, esp_cd,
+                   ncol = 2, nrow = 3, align = "h",
+                   rel_widths = c(0.86,1),
+                   labels = letters[1:6])
+dev.off()
+
+```
+
+## Figure S2: Cumulative clone number
+
+```{r supplemental figure cumulative clone count, eval = TRUE}
+
+six_cumc <- clonal_count(six_SE,
+                       plot_over = "months",
+                       group_by = "celltype",
+                       cumulative = TRUE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
+
+bel_cumc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
+                       plot_over = "weeks",
+                       group_by = "celltype",
+                       cumulative = TRUE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
+
+esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
+                       plot_over = "days",
+                       group_by = "celltype",
+                       cumulative = TRUE,
+                       point_size = fig3_ptsz,
+                       line_size = 1,
+                       text_size = fig3_txsz)+
+  ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
+
+
+pdf(file = file.path(results_dir, "Figure_S2.pdf"), width = 10, height = 3)
+cowplot::plot_grid(six_cumc,bel_cumc, esp_cumc,
+                   ncol = 3, nrow = 1, align = "h",
+                   labels = letters[1:3])
+dev.off()
+
+```
+
+
+## Figure 4: Tracking individual clones
+
+```{r figure 4, echo=TRUE, warning = FALSE, eval = TRUE}
+
+fig3_txsz <- 8
+
+wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
+                      "ZJ31_6m_NK_CD56n_CD16p", "ZJ31_8.5m_NK_CD56n_CD16p",
+                      "ZJ31_9.5m_NK_CD56n_CD16p", "ZJ31_12m_NK_CD56n_CD16p",
+                      "ZJ31_17.5m_NK_CD56n_CD16p", "ZJ31_20m_NK_CD56n_CD16p")
+
+wu_hm_bh <- barcode_binary_heatmap(your_SE = wu_SE[,wu_CD16_NK_order],
+                                   label_size = fig3_txsz,
+                                   plot_labels = c("3m NK 16", "4m NK 16", "6m NK 16",
+                                                   "8.5m NK 16", "9.5m NK 16", "12m NK 16",
+                                                   "17.5m NK 16", "20m NK 16"),
+                                   your_title = " ")
+wu_hm_tc <- barcode_ggheatmap(your_SE = wu_SE[,wu_CD16_NK_order],
+                              n_clones = 10,
+                              cellnote_assay = "stars",
+                              cellnote_size = 4,
+                              label_size = fig3_txsz,
+                              plot_labels = c("3m NK 16", "4m NK 16", "6m NK 16",
+                                              "8.5m NK 16", "9.5m NK 16", "12m NK 16",
+                                              "17.5m NK 16", "20m NK 16"),
+                              your_title = " ")
+wu_hm_st <- barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
+                                   sample_size = rep(40000,length(wu_CD16_NK_order)),
+                                   stat_test = "chi-squared",
+                                   stat_option = "subsequent",
+                                   p_threshold = 0.05,
+                                   n_clones = 10,
+                                   cellnote_assay = "stars",
+                                   cellnote_size = 4,
+                                   label_size = fig3_txsz,
+                                   plot_labels = c("3m NK 16", "4m NK 16", "6m NK 16",
+                                                   "8.5m NK 16", "9.5m NK 16", "12m NK 16",
+                                                   "17.5m NK 16", "20m NK 16"),
+                                   your_title = " ")
+
+pdf(file = file.path(results_dir, "Figure_4.pdf"), width = 12, height = 5)
+cowplot::plot_grid(wu_hm_bh, wu_hm_tc, wu_hm_st, ncol = 3, labels = letters[1:3])
+dev.off()
+
+```
+
+
+## Figure 5: Clonal bias comparing Gr and T
+
+```{r figure 5, eval = TRUE}
+
+fig5_txsz <- 8
+
+# Ridge plots
+six_ridge <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Gr",
+                        bias_2 = "T",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = fig5_txsz)
+
+ko_ridge <- bias_ridge_plot(your_SE = koelle_SE,
+                       split_bias_on = "celltype",
+                       bias_1 = "Gr",
+                       bias_2 = "T",
+                       split_bias_over = "months",
+                       bias_over = c(4.5,21,30,38),
+                       weighted = TRUE,
+                       add_dots = TRUE,
+                       text_size = fig5_txsz)
+
+# Circos plots
+
+# Make koelle naming consistent with six
+colData(koelle_SE)$celltype <- gsub("Mono",  "Mo", colData(koelle_SE)$celltype)
+
+# When saving circos plots to variables, I have to use this hacky way of doing it :/
+ko_circos_selection <- c("ZH33_38m_Gr_Ficoll","ZH33_38m_T","ZH33_38m_Mono")
+ko_circos <- function() chord_diagram(koelle_SE[,ko_circos_selection],
+                                    weighted = TRUE,
+                                    plot_label = "celltype",
+                                    text_size = fig5_txsz)
+six_circos_selection <- c("m55_GRANULOCYTES","m55_TCELLS","m55_MONOCYTES")
+six_circos <- function() chord_diagram(six_SE[,six_circos_selection],
+                                     weighted = TRUE,
+                                     plot_label = "celltype",
+                                     text_size = fig5_txsz)
+
+pdf(file = file.path(results_dir, "Figure_5.pdf"), width = 8, height = 8)
+cowplot::plot_grid(six_ridge, six_circos, ko_ridge, ko_circos,
+                   ncol = 2, nrow = 2, align = "h",
+                   labels = letters[1:4])
+dev.off()
+
+```
+
+## Figure S3: Further Clonal Bias from Six et al
+
+```{r figure S3, eval = TRUE}
+
+figS3_txsz <- 8
+
+# Ridge plots
+six_ridge2 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Gr",
+                        bias_2 = "Mo",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge3 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Gr",
+                        bias_2 = "B",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge4 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Gr",
+                        bias_2 = "NK",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge5 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Mo",
+                        bias_2 = "T",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge6 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Mo",
+                        bias_2 = "B",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge7 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "Mo",
+                        bias_2 = "NK",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge8 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "T",
+                        bias_2 = "B",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge9 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "T",
+                        bias_2 = "NK",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+six_ridge10 <- bias_ridge_plot(your_SE = six_SE,
+                        split_bias_on = "celltype",
+                        bias_1 = "B",
+                        bias_2 = "NK",
+                        split_bias_over = "months",
+                        weighted = TRUE,
+                        add_dots = TRUE,
+                        text_size = figS3_txsz)
+
+# Chord diagrams
+six_circos_selection2 <- c("m55_GRANULOCYTES","m55_BCELLS","m55_MONOCYTES")
+six_circos2 <- function() chord_diagram(six_SE[,six_circos_selection2],
+                                     weighted = TRUE,
+                                     plot_label = "celltype",
+                                     text_size = figS3_txsz)
+
+six_circos_selection3 <- c("m55_GRANULOCYTES","m55_NKCELLS","m55_MONOCYTES")
+six_circos3 <- function() chord_diagram(six_SE[,six_circos_selection3],
+                                     weighted = TRUE,
+                                     plot_label = "celltype",
+                                     text_size = figS3_txsz)
+
+six_circos_selection4 <- c("m55_TCELLS","m55_BCELLS","m55_NKCELLS")
+six_circos4 <- function() chord_diagram(six_SE[,six_circos_selection4],
+                                     weighted = TRUE,
+                                     plot_label = "celltype",
+                                     text_size = figS3_txsz)
+
+pdf(file = file.path(results_dir, "Figure_S3.pdf"), width = 11, height = 8)
+cowplot::plot_grid(six_ridge2, six_ridge3, six_ridge4, six_circos2,
+                   six_ridge5, six_ridge6, six_ridge7, six_circos3,
+                   six_ridge8, six_ridge9, six_ridge10, six_circos4,
+                   ncol = 4, nrow = 3, align = "h",
+                   labels = letters[1:12])
+dev.off()
+
+```
+
+
+## Figure S4: Further Clonal Bias from Koelle et al
+
+```{r figure S4, eval = TRUE}
+
+figS4_txsz <- 8
+
+# Ridge plots
+ko_ridge2 <- bias_ridge_plot(your_SE = koelle_SE,
+                       split_bias_on = "celltype",
+                       bias_1 = "Gr",
+                       bias_2 = "Mo",
+                       split_bias_over = "months",
+                       bias_over = c(4.5,21,30,38),
+                       weighted = TRUE,
+                       add_dots = TRUE,
+                       text_size = figS4_txsz)
+
+ko_ridge3 <- bias_ridge_plot(your_SE = koelle_SE,
+                       split_bias_on = "celltype",
+                       bias_1 = "Mo",
+                       bias_2 = "T",
+                       split_bias_over = "months",
+                       bias_over = c(4.5,21,30,38),
+                       weighted = TRUE,
+                       add_dots = TRUE,
+                       text_size = figS4_txsz)
+
+pdf(file = file.path(results_dir, "Figure_S4.pdf"), width = 8, height = 4)
+cowplot::plot_grid(ko_ridge2, ko_ridge3,
+                   ncol = 2, nrow = 1, align = "h",
+                   labels = letters[1:2])
+dev.off()
+
+```
+
+
+## Figure S5: Clone number and diversity of Clarke et al TCR data
+
+```{r figure S4, eval = TRUE}
+
+figS5_text_size <- 6 
+
+clarke_cc <- clonal_count(clarke_SE,
+                              plot_over = "months",
+                              group_by = "SAMPLENAME",
+                              cumulative = FALSE,
+                              point_size = 2,
+                              line_size = 1,
+                              text_size = figS5_text_size)+
+  ggplot2::theme(legend.position = "none")
+
+clarke_cd <- clonal_diversity(clarke_SE,
+                              plot_over = "months",
+                              group_by = "SAMPLENAME",
+                              index_type = "shannon",
+                              point_size = 2,
+                              line_size = 1,
+                              text_size = figS5_text_size)+
+  ggplot2::theme(legend.position = "none")+
+  ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
+
+pdf(file = file.path(results_dir, "Figure_S5.pdf"), width = 7, height = 8/3)
+cowplot::plot_grid(clarke_cc, clarke_cd,
+                   ncol = 2, nrow = 1, align = "h",
+                   labels = letters[1:2])
+dev.off()
+
+```
