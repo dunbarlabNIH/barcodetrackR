@@ -48,5 +48,5 @@ Histogram of chosen statistics
 Given a summarized experiment, gives a histogram of the acc assay or choice of metadata.
 }
 \examples{
-stat_hist(your_se = SE, metadata_stat = "GFP_percent")
+stat_hist(your_SE = wu_subset[,1], data_choice = "assay stats", assay_choice = "counts")
 }

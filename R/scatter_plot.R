@@ -3,7 +3,7 @@
 #' Plots a scatter plot of two samples in the Summarized Experiment object
 #'
 #'@param your_SE A Summarized Experiment object of two samples.
-#'@param assay The choice of assay to plot on the scatter plot. Set to "percentages" by default.
+#'@param assay The choice of assay to plot on the scatter plot. Set to "proportions" by default.
 #'@param plot_labels The labels for the X and Y axis of the plot
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall". Can also use "manhattan" to compute manhattan distance instead.
 #'@param display_corr Logical. Whether to display the computer correlation or not.
@@ -19,11 +19,11 @@
 #'@export
 #'
 #'@examples
-#'scatter_plot(your_SE = zh33[,1:2])
+#'scatter_plot(your_SE = wu_subset[,c(4,8)])
 #"
 
 scatter_plot = function(your_SE,
-                        assay = "percentages",
+                        assay = "proportions",
                         plot_labels = colnames(your_SE),
                         method_corr ="pearson",
                         display_corr = TRUE,

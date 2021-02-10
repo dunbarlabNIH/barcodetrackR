@@ -6,7 +6,7 @@
 \usage{
 scatter_plot(
   your_SE,
-  assay = "percentages",
+  assay = "proportions",
   plot_labels = colnames(your_SE),
   method_corr = "pearson",
   display_corr = TRUE,
@@ -18,7 +18,7 @@ scatter_plot(
 \arguments{
 \item{your_SE}{A Summarized Experiment object of two samples.}
 
-\item{assay}{The choice of assay to plot on the scatter plot. Set to "percentages" by default.}
+\item{assay}{The choice of assay to plot on the scatter plot. Set to "proportions" by default.}
 
 \item{plot_labels}{The labels for the X and Y axis of the plot}
 
@@ -39,5 +39,5 @@ Displays a scatter plot of the specified assay for the specified samples in your
 Plots a scatter plot of two samples in the Summarized Experiment object
 }
 \examples{
-scatter_plot(your_SE = zh33[,1:2])
+scatter_plot(your_SE = wu_subset[,c(4,8)])
 }

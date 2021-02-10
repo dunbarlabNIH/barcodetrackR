@@ -16,7 +16,7 @@
 #'@export
 #'
 #'@examples
-#'rank_abundance_stat_test(your_data = my_SE, statistical_test = "ks")
+#'rank_abundance_stat_test(your_SE = wu_subset, statistical_test = "ks")
 rank_abundance_stat_test = function(your_SE,
                                     statistical_test = "ks") {
 
@@ -26,7 +26,7 @@ rank_abundance_stat_test = function(your_SE,
     stop("statistical_test must be set to 'ks' since that is the only option for now.")
   }
   
-  your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
+  your_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
   
   # Initialize data frames
   D_stat_DF <- data.frame(matrix(ncol=ncol(your_data),nrow=ncol(your_data),

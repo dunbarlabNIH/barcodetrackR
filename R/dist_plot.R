@@ -3,7 +3,7 @@
 #' Plots the pairwise distances of the specified assay between each sample-sample pair in the provided SummarizedExperiment.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param assay The choice of assay to use for the correlation calculation. Set to "percentages" by default.
+#'@param assay The choice of assay to use for the correlation calculation. Set to "proportions" by default.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param dist_method Character. Distance OR similarity measure from the `proxy` package. Full list of distance and similarity measures can be found using `summary(proxy::pr_DB)`. Default is "euclidean".
 #'Distances will be calculated for distance measures, while similarities will be calculated for similarity measures. Distance OR similarity measure will be calculated using the `assay`
@@ -28,11 +28,11 @@
 #'@export
 #'
 #'@examples
-#'dist_plot(your_SE = zh33, your_title = "Pairwise Euclidean distances between all samples", plot_type = "color")
+#'dist_plot(your_SE = wu_subset, your_title = "Pairwise Euclidean distances between all samples", plot_type = "color")
 #"
 
 dist_plot = function(your_SE,
-                    assay = "percentages",
+                    assay = "proportions",
                     plot_labels = colnames(your_SE),
                     dist_method = "euclidean",
                     cluster_tree = FALSE,

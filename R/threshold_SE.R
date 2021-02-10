@@ -55,13 +55,13 @@ threshold_SE <- function(your_SE,
   
   # Re-calculate other assays
   your_data.ranks <-  as.data.frame(apply(-your_data, 2, rank, ties.method = "min", na.last = "keep"))
-  your_data.percentages <-  as.data.frame(prop.table(as.matrix(your_data),2))
-  your_data.normalized <- your_data.percentages * your_SE@metadata$scale_factor
+  your_data.proportions <-  as.data.frame(prop.table(as.matrix(your_data),2))
+  your_data.normalized <- your_data.proportions * your_SE@metadata$scale_factor
   your_data.logged <- log(1+your_data.normalized, base = your_SE@metadata$log_base)
   
   # Create new thresholded SE
   thresh_SE <- SummarizedExperiment::SummarizedExperiment(assays = list(counts = your_data,
-                                                                        percentages = your_data.percentages,
+                                                                        proportions = your_data.proportions,
                                                                         ranks = your_data.ranks,
                                                                         normalized = your_data.normalized,
                                                                         logs = your_data.logged),

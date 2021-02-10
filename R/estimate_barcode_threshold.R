@@ -64,7 +64,7 @@ estimate_barcode_threshold <- function(your_SE,
   # Print results if desired
   if (verbose){
     cat("Relative threshold. Barcodes above", output_list[["relative_threshold"]]*100, "% of a given sample are estimated to be reliable. \n")
-    cat("Absolute threshold. Barcodes with counts above", round(output_list[["absolute_threshold"]], 2), "are estimated to be reliable.")
+    cat("Absolute threshold. Barcodes with counts above", round(output_list[["absolute_threshold"]], 2), "are estimated to be reliable. \n")
   }
   
   return(output_list)

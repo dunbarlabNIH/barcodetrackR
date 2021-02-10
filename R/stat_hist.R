@@ -18,7 +18,7 @@
 #'
 #'@importFrom magrittr %>%
 #'@examples
-#'stat_hist(your_se = SE, metadata_stat = "GFP_percent")
+#'stat_hist(your_SE = wu_subset[,1], data_choice = "assay stats", assay_choice = "counts")
 #'@export
 stat_hist <- function(your_SE,
                       data_choice = "assay stats",
