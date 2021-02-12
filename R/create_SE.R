@@ -70,7 +70,7 @@ create_SE <- function(your_data = NULL,
     } else if (threshold != 0){
       cat("The following samples have no data after thresholding. \n")
       cat(colnames(your_data)[bad_samples], sep = ", ")
-      at("\n")
+      cat("\n")
       stop("Please try a more permissive threshold or remove the sample(s) prior to instantiating the SE.")
     }
   }
