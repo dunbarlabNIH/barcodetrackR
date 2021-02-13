@@ -140,9 +140,7 @@ colData(clarke_SE)$months <- colData(clarke_SE)$nmonths
 ## Set results directory
 
 ```{r set results dir, eval = TRUE}
-#results_dir <- "/Users/mortlockrd/Desktop/barcodetrackR manuscript/figures"
-# results_dir <- "~/Documents/dunbar_lab/projects/diego_barcodetrackR/manuscript_figures/"
-results_dir <- "/Users/mortlockrd/Desktop/barcodetrackR manuscript/figures v9"
+results_dir <- "/Users/mortlockrd/Desktop/barcodetrackR manuscript/figures_v10"
 ```
 
 ## Fig S1: Influence of normalization and thresholding
@@ -329,7 +327,7 @@ dev.off()
 
 ```{r figure 2, eval = TRUE}
 
-fig2_text_size <- 6 
+fig2_text_size <- 8
 
 six_cor_plot_sample_selection <- colData(six_SE) %>% as.data.frame() %>% dplyr::mutate(celltype = factor(celltype, levels = c("T", "B", "Gr", "Mo", "NK"))) %>% dplyr::arrange(celltype, months) %>% dplyr::pull(SAMPLENAME)
 
@@ -376,7 +374,7 @@ six_mds <- mds_plot(six_SE,
                     point_size = 2,
                     text_size = fig2_text_size)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
-  ggrepel::geom_text_repel(aes(label = months), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggrepel::geom_text_repel(aes(label = months), size = fig2_text_size*0.4, show.legend = FALSE)+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
 
 bel_mds <- mds_plot(belderbos_SE[,bel_cor_plot_sample_selection],
@@ -386,20 +384,24 @@ bel_mds <- mds_plot(belderbos_SE[,bel_cor_plot_sample_selection],
                     point_size = 2,
                     text_size = fig2_text_size)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
-  ggrepel::geom_text_repel(aes(label = celltype), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggrepel::geom_text_repel(aes(label = celltype), size = fig2_text_size*0.4, show.legend = FALSE)+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
 
 # Shorten organ namee
 colData(eld_SE)$organ <- gsub("part ","",colData(eld_SE)$organ)
 
+# Make metadata with mouse name and pri/sec/ter label
+colData(eld_SE)$animal <- gsub("spleen |spleen 1 |spleen 2 |spleen 3 |meninges |L femur |R femur |L tibia |R tibia ",
+                                    "",colData(eld_SE)$short_name)
+
 eld_mds <- mds_plot(eld_SE[,eld_cor_plot_sample_selection],
-                    group_by = "mouse",
+                    group_by = "animal",
                     method_dist = "bray",
                     assay = "proportions",
                     point_size = 2,
                     text_size = fig2_text_size)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
-  ggrepel::geom_text_repel(aes(label = organ), size = fig2_text_size*0.5, show.legend = FALSE)+
+  ggrepel::geom_text_repel(aes(label = organ), size = fig2_text_size*0.4, show.legend = FALSE, max.overlaps = Inf)+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,1,0), "lines")) 
 
 
@@ -412,10 +414,64 @@ cowplot::plot_grid(six_cor_plot, six_mds,
 dev.off()
 ```
 
+## Figure S2: Global Clonal Distribution Hierarchically Clustered by Correlation Similarity
+
+```{r figure S2, eval = TRUE}
+fig2_text_size <- 8
+
+six_dist_plot_sample_selection <- colData(six_SE) %>% as.data.frame() %>% dplyr::mutate(celltype = factor(celltype, levels = c("T", "B", "Gr", "Mo", "NK"))) %>% dplyr::arrange(celltype, months) %>% dplyr::pull(SAMPLENAME)
+
+six_dist_plot_simple_names <- c("m13_T","m36_T","m43_T","m55_T",
+                               "m13_B","m36_B","m43_B","m55_B",
+                               "m13_Gr","m36_Gr","m43_Gr","m55_Gr",
+                               "m13_Mo","m36_Mo","m43_Mo","m55_Mo",
+                               "m13_NK","m36_NK","m43_NK","m55_NK")
+
+six_dist_plot <- dist_plot(six_SE[,six_dist_plot_sample_selection],
+                         dist_method = "correlation",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = six_dist_plot_simple_names,
+                         cluster_tree = TRUE)+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+bel_dist_plot_sample_selection <- colData(belderbos_SE) %>%
+  as.data.frame() %>%
+  dplyr::filter(weeks == "sac") %>%
+  dplyr::arrange(organ, celltype) %>%
+  dplyr::pull(SAMPLENAME) 
+
+bel_dist_plot <- dist_plot(belderbos_SE[,bel_dist_plot_sample_selection],
+                         dist_method = "correlation",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = gsub("sac_","",colData(belderbos_SE[,bel_cor_plot_sample_selection])$SAMPLENAME),
+                         cluster_tree = TRUE)+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+eld_dist_plot_sample_selection <- colData(eld_SE) %>% as.data.frame() %>% dplyr::filter(mouse %in% c("AE12", "AE32", "AE88", "AE89", "AE90")) %>% dplyr::pull(SAMPLENAME)
+eld_dist_plot_labels <- colData(eld_SE) %>% as.data.frame() %>% dplyr::filter(mouse %in% c("AE12", "AE32", "AE88", "AE89", "AE90")) %>% dplyr::pull(short_name)
+
+eld_dist_plot <- dist_plot(eld_SE[,eld_dist_plot_sample_selection],
+                         dist_method = "correlation",
+                         plot_type = "color",
+                         label_size = fig2_text_size,
+                         plot_labels = eld_dist_plot_labels,
+                         cluster_tree = TRUE)+
+  ggplot2::theme(legend.key.width=ggplot2::unit(0.2, "cm"))
+
+
+pdf(file = file.path(results_dir, "Figure_S2.pdf"), width = 10, height = 6)
+cowplot::plot_grid(six_dist_plot, bel_dist_plot, eld_dist_plot, 
+                   ncol = 2, nrow = 2,
+                   labels = letters[1:3], align = "h", axis = "b")
+dev.off()
+```
+
+
 ## Figure 3: Clone number and diversity
 
 ```{r figure 3, eval = TRUE}
-
 fig3_ptsz <- 1.5
 fig3_txsz <- 8
 
@@ -425,7 +481,8 @@ six_cc <- clonal_count(six_SE,
                        cumulative = FALSE,
                        point_size = fig3_ptsz,
                        line_size = 1,
-                       text_size = fig3_txsz)+
+                       text_size = fig3_txsz,
+                       keep_numeric = TRUE)+
   ggplot2::theme(legend.position = "none")
 
 six_cd <- clonal_diversity(six_SE,
@@ -434,7 +491,8 @@ six_cd <- clonal_diversity(six_SE,
                            index_type = "shannon",
                            point_size = fig3_ptsz,
                            line_size = 1,
-                           text_size = fig3_txsz)+
+                           text_size = fig3_txsz,
+                           keep_numeric = TRUE)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
 
 bel_cc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
@@ -467,7 +525,8 @@ esp_cc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        cumulative = FALSE,
                        point_size = fig3_ptsz,
                        line_size = 1,
-                       text_size = fig3_txsz)+
+                       text_size = fig3_txsz,
+                       keep_numeric = TRUE)+
   ggplot2::theme(legend.position = "none")
 
 esp_cd <- clonal_diversity(esp_SE[,colData(esp_SE)$celltype != "EOS"],
@@ -476,7 +535,8 @@ esp_cd <- clonal_diversity(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                            index_type = "shannon",
                            point_size = fig3_ptsz,
                            line_size = 1,
-                           text_size = fig3_txsz)+
+                           text_size = fig3_txsz,
+                           keep_numeric = TRUE)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
 
@@ -488,20 +548,19 @@ cowplot::plot_grid(six_cc, six_cd,
                    rel_widths = c(0.86,1),
                    labels = letters[1:6])
 dev.off()
-
 ```
 
-## Figure S2: Cumulative clone number
+## Figure S3: Cumulative clone number
 
-```{r supplemental figure cumulative clone count, eval = TRUE}
-
+```{r figure S3, eval = TRUE}
 six_cumc <- clonal_count(six_SE,
                        plot_over = "months",
                        group_by = "celltype",
                        cumulative = TRUE,
                        point_size = fig3_ptsz,
                        line_size = 1,
-                       text_size = fig3_txsz)+
+                       text_size = fig3_txsz,
+                       keep_numeric = TRUE)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))
 
 bel_cumc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
@@ -519,24 +578,23 @@ esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        cumulative = TRUE,
                        point_size = fig3_ptsz,
                        line_size = 1,
-                       text_size = fig3_txsz)+
+                       text_size = fig3_txsz,
+                       keep_numeric = TRUE)+
   ggplot2::theme(legend.key.height = ggplot2::unit(0.25, "cm"))+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
 
 
-pdf(file = file.path(results_dir, "Figure_S2.pdf"), width = 10, height = 3)
+pdf(file = file.path(results_dir, "Figure_S3.pdf"), width = 10, height = 3)
 cowplot::plot_grid(six_cumc,bel_cumc, esp_cumc,
                    ncol = 3, nrow = 1, align = "h",
                    labels = letters[1:3])
 dev.off()
-
 ```
 
 
 ## Figure 4: Tracking individual clones
 
 ```{r figure 4, echo=TRUE, warning = FALSE, eval = TRUE}
-
 fig3_txsz <- 8
 
 wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
@@ -564,6 +622,7 @@ wu_hm_st <- barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                                    stat_test = "chi-squared",
                                    stat_option = "subsequent",
                                    p_threshold = 0.05,
+                                   p_adjust = "bonferroni",
                                    n_clones = 10,
                                    cellnote_assay = "stars",
                                    cellnote_size = 4,
@@ -576,14 +635,12 @@ wu_hm_st <- barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
 pdf(file = file.path(results_dir, "Figure_4.pdf"), width = 12, height = 5)
 cowplot::plot_grid(wu_hm_bh, wu_hm_tc, wu_hm_st, ncol = 3, labels = letters[1:3])
 dev.off()
-
 ```
 
 
 ## Figure 5: Clonal bias comparing Gr and T
 
 ```{r figure 5, eval = TRUE}
-
 fig5_txsz <- 8
 
 # Ridge plots
@@ -607,7 +664,6 @@ ko_ridge <- bias_ridge_plot(your_SE = koelle_SE,
                        text_size = fig5_txsz)
 
 # Circos plots
-
 # Make koelle naming consistent with six
 colData(koelle_SE)$celltype <- gsub("Mono",  "Mo", colData(koelle_SE)$celltype)
 
@@ -628,14 +684,13 @@ cowplot::plot_grid(six_ridge, six_circos, ko_ridge, ko_circos,
                    ncol = 2, nrow = 2, align = "h",
                    labels = letters[1:4])
 dev.off()
-
 ```
 
-## Figure S3: Further Clonal Bias from Six et al
 
-```{r figure S3, eval = TRUE}
+## Figure S4: Further Clonal Bias from Six et al
 
-figS3_txsz <- 8
+```{r figure S4, eval = TRUE}
+figS4_txsz <- 8
 
 # Ridge plots
 six_ridge2 <- bias_ridge_plot(your_SE = six_SE,
@@ -645,7 +700,7 @@ six_ridge2 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge3 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -654,7 +709,7 @@ six_ridge3 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge4 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -663,7 +718,7 @@ six_ridge4 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge5 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -672,7 +727,7 @@ six_ridge5 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge6 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -681,7 +736,7 @@ six_ridge6 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge7 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -690,7 +745,7 @@ six_ridge7 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge8 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -699,7 +754,7 @@ six_ridge8 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge9 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -708,7 +763,7 @@ six_ridge9 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 six_ridge10 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_on = "celltype",
@@ -717,43 +772,41 @@ six_ridge10 <- bias_ridge_plot(your_SE = six_SE,
                         split_bias_over = "months",
                         weighted = TRUE,
                         add_dots = TRUE,
-                        text_size = figS3_txsz)
+                        text_size = figS4_txsz)
 
 # Chord diagrams
 six_circos_selection2 <- c("m55_GRANULOCYTES","m55_BCELLS","m55_MONOCYTES")
 six_circos2 <- function() chord_diagram(six_SE[,six_circos_selection2],
                                      weighted = TRUE,
                                      plot_label = "celltype",
-                                     text_size = figS3_txsz)
+                                     text_size = figS4_txsz)
 
 six_circos_selection3 <- c("m55_GRANULOCYTES","m55_NKCELLS","m55_MONOCYTES")
 six_circos3 <- function() chord_diagram(six_SE[,six_circos_selection3],
                                      weighted = TRUE,
                                      plot_label = "celltype",
-                                     text_size = figS3_txsz)
+                                     text_size = figS4_txsz)
 
 six_circos_selection4 <- c("m55_TCELLS","m55_BCELLS","m55_NKCELLS")
 six_circos4 <- function() chord_diagram(six_SE[,six_circos_selection4],
                                      weighted = TRUE,
                                      plot_label = "celltype",
-                                     text_size = figS3_txsz)
+                                     text_size = figS4_txsz)
 
-pdf(file = file.path(results_dir, "Figure_S3.pdf"), width = 11, height = 8)
+pdf(file = file.path(results_dir, "Figure_S4.pdf"), width = 11, height = 8)
 cowplot::plot_grid(six_ridge2, six_ridge3, six_ridge4, six_circos2,
                    six_ridge5, six_ridge6, six_ridge7, six_circos3,
                    six_ridge8, six_ridge9, six_ridge10, six_circos4,
                    ncol = 4, nrow = 3, align = "h",
                    labels = letters[1:12])
 dev.off()
-
 ```
 
 
-## Figure S4: Further Clonal Bias from Koelle et al
+## Figure S5: Further Clonal Bias from Koelle et al
 
-```{r figure S4, eval = TRUE}
-
-figS4_txsz <- 8
+```{r figure S5, eval = TRUE}
+figS5_txsz <- 8
 
 # Ridge plots
 ko_ridge2 <- bias_ridge_plot(your_SE = koelle_SE,
@@ -764,7 +817,7 @@ ko_ridge2 <- bias_ridge_plot(your_SE = koelle_SE,
                        bias_over = c(4.5,21,30,38),
                        weighted = TRUE,
                        add_dots = TRUE,
-                       text_size = figS4_txsz)
+                       text_size = figS5_txsz)
 
 ko_ridge3 <- bias_ridge_plot(your_SE = koelle_SE,
                        split_bias_on = "celltype",
@@ -774,22 +827,20 @@ ko_ridge3 <- bias_ridge_plot(your_SE = koelle_SE,
                        bias_over = c(4.5,21,30,38),
                        weighted = TRUE,
                        add_dots = TRUE,
-                       text_size = figS4_txsz)
+                       text_size = figS5_txsz)
 
-pdf(file = file.path(results_dir, "Figure_S4.pdf"), width = 8, height = 4)
+pdf(file = file.path(results_dir, "Figure_S5.pdf"), width = 8, height = 4)
 cowplot::plot_grid(ko_ridge2, ko_ridge3,
                    ncol = 2, nrow = 1, align = "h",
                    labels = letters[1:2])
 dev.off()
-
 ```
 
 
-## Figure S5: Clone number and diversity of Clarke et al TCR data
+## Figure S6: Clone number and diversity of Clarke et al TCR data
 
-```{r figure S4, eval = TRUE}
-
-figS5_text_size <- 6 
+```{r figure S6, eval = TRUE}
+figS6_text_size <- 6 
 
 clarke_cc <- clonal_count(clarke_SE,
                               plot_over = "months",
@@ -797,7 +848,7 @@ clarke_cc <- clonal_count(clarke_SE,
                               cumulative = FALSE,
                               point_size = 2,
                               line_size = 1,
-                              text_size = figS5_text_size)+
+                              text_size = figS6_text_size)+
   ggplot2::theme(legend.position = "none")
 
 clarke_cd <- clonal_diversity(clarke_SE,
@@ -806,14 +857,13 @@ clarke_cd <- clonal_diversity(clarke_SE,
                               index_type = "shannon",
                               point_size = 2,
                               line_size = 1,
-                              text_size = figS5_text_size)+
+                              text_size = figS6_text_size)+
   ggplot2::theme(legend.position = "none")+
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
 
-pdf(file = file.path(results_dir, "Figure_S5.pdf"), width = 7, height = 8/3)
+pdf(file = file.path(results_dir, "Figure_S6.pdf"), width = 7, height = 8/3)
 cowplot::plot_grid(clarke_cc, clarke_cd,
                    ncol = 2, nrow = 1, align = "h",
                    labels = letters[1:2])
 dev.off()
-
 ```

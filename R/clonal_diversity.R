@@ -52,7 +52,7 @@ clonal_diversity <- function(your_SE,
     plot_over_display_choices <- plot_over_display_choices  %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
     plot_over_display_choices <- as.numeric(as.character(plot_over_display_choices))
   } else if (is.factor(SummarizedExperiment::colData(your_SE)[[plot_over]])) {
-    plot_over_display_choices <- plot_over_display_choices %||% levels(SummarizedExperiment::colData(your_SE)[[plot_over]])
+    plot_over_display_choices <- plot_over_display_choices %||% factor(SummarizedExperiment::colData(your_SE)[[plot_over]],, levels = levels(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   } else {
     plot_over_display_choices <- plot_over_display_choices %||% factor(SummarizedExperiment::colData(your_SE)[[plot_over]], levels = unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
   }
