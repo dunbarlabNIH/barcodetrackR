@@ -408,6 +408,7 @@ bias_ridge_plot(your_SE = wu_SE,
                 bias_1 = "B",
                 bias_2 = "Gr",
                 split_bias_over = "months",
+                bias_over = c("5","6","9.5","12","20"),
                 weighted = TRUE,
                 add_dots = TRUE)
 ```
@@ -420,6 +421,7 @@ bias_ridge_plot(your_SE = wu_SE,
                 bias_1 = "B",
                 bias_2 = "Gr",
                 split_bias_over = "months",
+                bias_over = c("5","6","9.5","12","20"),
                 weighted = FALSE,
                 add_dots = TRUE)
 ```
