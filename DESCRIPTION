@@ -2,10 +2,10 @@ Package: barcodetrackR
 Type: Package
 Title: Functions for Analyzing Cellular Barcoding Data
 Version: 0.1
-Date: 2020-05-26
+Date: 2021-02-18
 Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
 Description: TBA
-URL: http://github.com/d93espinoza/barcodetrackR
+URL: https://github.com/dunbarlabNIH/barcodetrackR
 License: CC0
 LazyData: TRUE
 Encoding: UTF-8
@@ -28,7 +28,8 @@ Imports:
     viridis,
     tibble,
     SummarizedExperiment,
-    rmdformats
+    rmdformats,
+    gridGraphics
 RoxygenNote: 7.1.1
 Suggests: 
     BiocStyle,

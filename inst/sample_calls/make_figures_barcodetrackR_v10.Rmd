@@ -1,7 +1,7 @@
 ---
 title: "make_figures_barcodetrackR"
 author: "Ryland Mortlock and Diego Espinoza"
-date: "02/10/2021"
+date: "02/18/2021"
 output: html_document
 ---
 
@@ -30,6 +30,7 @@ require("barcodetrackR")
 require("SummarizedExperiment")
 require("ggplot2")
 require("cowplot")
+require("gridGraphics")
 require("dplyr")
 ```
 
@@ -521,6 +522,7 @@ colnames(colData(esp_SE))[2] <- "days"
 
 esp_cc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        plot_over = "days",
+                       plot_over_display_choices = c("32","119","187","266","309","365","393","494","553"),
                        group_by = "celltype",
                        cumulative = FALSE,
                        point_size = fig3_ptsz,
@@ -531,6 +533,7 @@ esp_cc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
 
 esp_cd <- clonal_diversity(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                            plot_over = "days",
+                           plot_over_display_choices = c("32","119","187","266","309","365","393","494","553"),
                            group_by = "celltype",
                            index_type = "shannon",
                            point_size = fig3_ptsz,
@@ -574,6 +577,7 @@ bel_cumc <- clonal_count(belderbos_SE[,c(1:6, 13:16)],
 
 esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
                        plot_over = "days",
+                       plot_over_display_choices = c("32","119","187","266","309","365","393","494","553"),
                        group_by = "celltype",
                        cumulative = TRUE,
                        point_size = fig3_ptsz,
@@ -584,7 +588,7 @@ esp_cumc <- clonal_count(esp_SE[,colData(esp_SE)$celltype != "EOS"],
   ggplot2::theme(plot.margin = ggplot2::unit(c(1.5,0,0,0), "lines")) # Will be reflected in all of them
 
 
-pdf(file = file.path(results_dir, "Figure_S3.pdf"), width = 10, height = 3)
+pdf(file = file.path(results_dir, "Figure_S3.pdf"), width = 12, height = 3)
 cowplot::plot_grid(six_cumc,bel_cumc, esp_cumc,
                    ncol = 3, nrow = 1, align = "h",
                    labels = letters[1:3])
@@ -681,9 +685,10 @@ six_circos <- function() chord_diagram(six_SE[,six_circos_selection],
 
 pdf(file = file.path(results_dir, "Figure_5.pdf"), width = 8, height = 8)
 cowplot::plot_grid(six_ridge, six_circos, ko_ridge, ko_circos,
-                   ncol = 2, nrow = 2, align = "h",
+                   ncol = 2, nrow = 2, # align = "h",
                    labels = letters[1:4])
 dev.off()
+
 ```
 
 
