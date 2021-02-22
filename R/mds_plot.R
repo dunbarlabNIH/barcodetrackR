@@ -22,13 +22,13 @@
 #'@export
 #'
 #'@examples
-#'mds_plot(your_SE = wu_SE, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray",group_by = "celltype")
+#'mds_plot(your_SE = wu_subset, your_title = "MDS plot of Bray-Curtis dissimilarities", method_dist = "bray",group_by = "celltype")
 #"
 
 mds_plot = function(your_SE,
                     group_by = "SAMPLENAME",
                     method_dist ="bray",
-                    assay = "percentages",
+                    assay = "proportions",
                     your_title = NULL,
                     point_size = 3,
                     text_size = 12,

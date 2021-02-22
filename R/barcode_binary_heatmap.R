@@ -13,7 +13,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
+#'barcode_binary_heatmap(your_SE = wu_subset[,1:4])
 #'
 barcode_binary_heatmap <- function(your_SE,
                                    plot_labels = NULL,
@@ -29,7 +29,7 @@ barcode_binary_heatmap <- function(your_SE,
   }
 
   #changing plotting_data to binary
-  plotting_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
+  plotting_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
   plotting_data[plotting_data < threshold] <- 0
   plotting_data[plotting_data > 0] <- 1
   plotting_data <- plotting_data[rowSums(plotting_data) > 0,]

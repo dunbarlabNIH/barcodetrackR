@@ -31,7 +31,7 @@ barcode_ggheatmap(
 
 \item{n_clones}{The top 'n' clones to plot.}
 
-\item{cellnote_assay}{Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0.}
+\item{cellnote_assay}{Character. One of "stars", "counts", or "proportions." To have no cellnote, set cellnote_size to 0.}
 
 \item{your_title}{The title for the plot.}
 
@@ -66,6 +66,6 @@ Displays a heatmap in the current plot window. Or if return_table is set to TRUE
 Creates a heatmap displaying the log abundance of the top 'n' clones from each sample in the Summarized Experiment object, using ggplot2. Clones are on the y-axis and samples are on the x-axis. The ordering and clustering of clones on the y-axis as well as all aesthetics of the plot can be controlled through the arguments described below.
 }
 \examples{
-barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 6)
 
 }

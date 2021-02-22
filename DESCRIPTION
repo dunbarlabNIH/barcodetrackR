@@ -2,36 +2,41 @@ Package: barcodetrackR
 Type: Package
 Title: Functions for Analyzing Cellular Barcoding Data
 Version: 0.1
-Date: 2020-05-26
-Authors@R: person(c("Diego", "Alexander"), "Espinoza", email = "d93espinoza@gmail.com", role = c("aut", "cre"))
+Date: 2021-02-18
+Authors@R: 
+    c(person(c("Diego", "Alexander"), "Espinoza", email = "diego.espinoza@pennmedicine.upenn.edu", role = c("aut", "cre")),
+      person("Ryland", "Mortlock", email = "ryland.mortlock@nih.gov", role = c("aut")))
 Description: A package for the analysis of cellular barcoding data.
-URL: http://github.com/d93espinoza/barcodetrackR
-License: CC0 + file LICENSE
+URL: https://github.com/dunbarlabNIH/barcodetrackR
+License: CC0
 LazyData: TRUE
 Encoding: UTF-8
+biocViews:
 Imports:
+    cowplot,
     circlize,
     dplyr,
     ggplot2,
     ggdendro,
+    ggridges,
     graphics,
     grDevices,
+    gridGraphics,
     magrittr,
     plyr,
     proxy,
     RColorBrewer,
+    rlang,
+    rmdformats,
     scales,
     shiny,
     SummarizedExperiment,
     S4Vectors,
-    tidyr,
-    rlang,
-    cowplot,
-    ggridges,
-    viridis,
     tibble,
-    utils,
-    vegan
+    tidyr,
+    vegan,
+    viridis,
+    utils
 RoxygenNote: 7.1.1
 Suggests: 
     BiocStyle,

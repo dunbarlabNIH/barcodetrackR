@@ -10,10 +10,11 @@
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
 #'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
+#'@param p_adjust Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".
 #'@param bc_threshold Clones must be above this proportion in at least one sample to be included in statistical testing.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "reads", "percentages" or "p_val"
+#'@param cellnote_assay Character. One of "stars", "reads", "proportions" or "p_val"
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
@@ -38,7 +39,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = ZH33_SE, sample_size = rep(5000,ncol(ZH33_SE)), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars")
+#'barcode_ggheatmap_stat(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars", bc_threshold = 0.005)
 #'
 barcode_ggheatmap_stat <- function(your_SE,
                                    sample_size,
@@ -48,6 +49,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    stat_display = "top",
                                    show_all_significant = FALSE,
                                    p_threshold = 0.05,
+                                   p_adjust = "none",
                                    bc_threshold = 0,
                                    plot_labels = NULL,
                                    n_clones = 10,
@@ -67,7 +69,7 @@ barcode_ggheatmap_stat <- function(your_SE,
                                    return_table = FALSE) {
 
   # Apply bc_threshold
-  bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$percentages, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
+  bc_passing_threshold <- apply(SummarizedExperiment::assays(your_SE)$proportions, 1, function(x){any(x>bc_threshold, na.rm = TRUE)})
   your_SE <- your_SE[bc_passing_threshold,]
 
   #get labels for heatmap
@@ -81,8 +83,8 @@ barcode_ggheatmap_stat <- function(your_SE,
     stop("stat_test must be either 'chi-squared' or 'fisher' for now.")
   }
 
-  if (cellnote_assay != "stars" & cellnote_assay != "reads" & cellnote_assay != "percentages" & cellnote_assay != "p_val"){
-    stop("cellnote_assay must be one of 'stars', 'reads', 'percentages' or 'p_val'. ")
+  if (cellnote_assay != "stars" & cellnote_assay != "reads" & cellnote_assay != "proportions" & cellnote_assay != "p_val"){
+    stop("cellnote_assay must be one of 'stars', 'reads', 'proportions' or 'p_val'. ")
   }
 
   if(length(percent_scale) != length(color_scale)){
@@ -96,7 +98,7 @@ barcode_ggheatmap_stat <- function(your_SE,
     your_SE <- your_SE[top_clones_choices,]
 
     # Initialize p value matrix
-    p_mat <- SummarizedExperiment::assays(your_SE)$percentages
+    p_mat <- SummarizedExperiment::assays(your_SE)$proportions
 
     if (stat_option == "subsequent"){
       stat_ref_index <- 1 # for book-keeping
@@ -105,15 +107,15 @@ barcode_ggheatmap_stat <- function(your_SE,
       for (i in stat_test_index){
         # Perform statistical test
         if (stat_test == "chi-squared"){
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
         } else if (stat_test == "fisher") {
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
         }
 
       }
@@ -131,26 +133,28 @@ barcode_ggheatmap_stat <- function(your_SE,
       for (i in stat_test_index){
         # Perform statistical test compared to reference
         if (stat_test == "chi-squared"){
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
         } else if (stat_test == "fisher") {
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
         }
       }
 
     }
+    # Adjust p values for multiple comparisons.
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
 
     # Add results of statistical testing into SE
-    SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
 
   } else if (stat_display == "change" | stat_display == "increase" | stat_display == "decrease"){
     # Must perform statistical testing on all rows in order to rank most significant
-    p_mat <- SummarizedExperiment::assays(your_SE)$percentages # Initialize matrix to store p values
+    p_mat <- SummarizedExperiment::assays(your_SE)$proportions # Initialize matrix to store p values
     if (stat_option == "subsequent"){
       stat_ref_index <- 1 # for book-keeping
       stat_test_index <- 2:length(colnames(your_SE))
@@ -158,15 +162,15 @@ barcode_ggheatmap_stat <- function(your_SE,
       for (i in stat_test_index){
         # Perform statistical test
         if (stat_test == "chi-squared"){
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
         } else if (stat_test == "fisher") {
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1]),
-                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   sample_size[i-1] - SummarizedExperiment::assays(your_SE)$percentages[z,i-1]*sample_size[i-1])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   sample_size[i-1] - SummarizedExperiment::assays(your_SE)$proportions[z,i-1]*sample_size[i-1])))$p.val)
         }
       }
     } else if (stat_option == "reference"){
@@ -183,28 +187,31 @@ barcode_ggheatmap_stat <- function(your_SE,
       for (i in stat_test_index){
         # Perform statistical test compared to reference
         if (stat_test == "chi-squared"){
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) chisq.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                  sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
         } else if (stat_test == "fisher") {
-          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index]),
-                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$percentages[z,i]*sample_size[i],
-                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$percentages[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
+          p_mat[,i] <- sapply(1:nrow(your_SE), function(z) fisher.test(x = rbind(c(SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index]),
+                                                                                 c(sample_size[i] - SummarizedExperiment::assays(your_SE)$proportions[z,i]*sample_size[i],
+                                                                                   sample_size[stat_ref_index] - SummarizedExperiment::assays(your_SE)$proportions[z,stat_ref_index]*sample_size[stat_ref_index])))$p.val)
         }
       }
     }
 
+    # Adjust p values for multiple comparisons.
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
+
     # Add results of statistical testing into SE
-    SummarizedExperiment::assays(your_SE)$p_val <- p_mat
+    SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
 
     # Create reference table for increasing or decreasing clones
     if (stat_display == "increase" | stat_display == "decrease"){
-      increase_matrix = SummarizedExperiment::assays(your_SE)$percentages # Initialize
+      increase_matrix = SummarizedExperiment::assays(your_SE)$proportions # Initialize
       increase_matrix[,stat_ref_index] <- rep("filler", times = nrow(your_SE))
       for (i in stat_test_index){
-        increase_matrix[,i] <- SummarizedExperiment::assays(your_SE)$percentages[,i] > SummarizedExperiment::assays(your_SE)$percentages[,stat_ref_index]
+        increase_matrix[,i] <- SummarizedExperiment::assays(your_SE)$proportions[,i] > SummarizedExperiment::assays(your_SE)$proportions[,stat_ref_index]
       }
       SummarizedExperiment::assays(your_SE)$increasing <- increase_matrix
     }
@@ -269,7 +276,7 @@ barcode_ggheatmap_stat <- function(your_SE,
 
 
     } else if(row_order == "emergence"){
-      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$percentages)]
+      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$proportions)]
     }
 
   } else {
@@ -297,7 +304,7 @@ barcode_ggheatmap_stat <- function(your_SE,
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
   if(is.numeric(plotting_data$cellnote)){
-    if(cellnote_assay == "percentages"){
+    if(cellnote_assay == "proportions"){
       plotting_data$cellnote <- paste0(round(plotting_data$cellnote*100, digits = 2), "%")
     } else if (cellnote_assay == "p_val"){
       plotting_data$cellnote <- signif(plotting_data$cellnote, digits = 2)
@@ -316,9 +323,9 @@ barcode_ggheatmap_stat <- function(your_SE,
     return(plotting_data)
   }
 
-  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$sample_name, y = .data$sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = .data$value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = .data$cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black", na.rm = TRUE)+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,

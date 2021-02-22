@@ -21,5 +21,5 @@ The two-sided Kolmogorov-Smirnov statistical test is carried out comparing each 
 Note that this test compares rank-abundance distribution regardless of whether the samples share the same barcodes or lineage tracing elements. The test could be employed on two samples with no barcode sequence overlap, simply to compare whether the rank abundance distribution of barcodes is drawn from the same distribution.
 }
 \examples{
-rank_abundance_stat_test(your_data = my_SE, statistical_test = "ks")
+rank_abundance_stat_test(your_SE = wu_subset, statistical_test = "ks")
 }

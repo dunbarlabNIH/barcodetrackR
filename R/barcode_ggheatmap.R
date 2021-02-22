@@ -5,7 +5,7 @@
 #'@param your_SE A Summarized Experiment object.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param n_clones The top 'n' clones to plot.
-#'@param cellnote_assay Character. One of "stars", "counts", or "percentages." To have no cellnote, set cellnote_size to 0.
+#'@param cellnote_assay Character. One of "stars", "counts", or "proportions." To have no cellnote, set cellnote_size to 0.
 #'@param your_title The title for the plot.
 #'@param grid Logical. Include a grid or not in the heatmap.
 #'@param label_size The size of the column labels.
@@ -30,7 +30,7 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = ZH33_SE,  n_clones = 100,  grid = TRUE, label_size = 3)
+#'barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 6)
 #'
 barcode_ggheatmap <- function(your_SE,
                               plot_labels = NULL,
@@ -99,7 +99,7 @@ barcode_ggheatmap <- function(your_SE,
 
 
     } else if(row_order == "emergence"){
-      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$percentages)]
+      barcode_order <- rownames(your_SE)[do.call(order, SummarizedExperiment::assays(your_SE)$proportions)]
     }
 
   } else {
@@ -127,7 +127,7 @@ barcode_ggheatmap <- function(your_SE,
   plotting_cellnote <- tidyr::pivot_longer(plotting_cellnote, cols = -sequence, names_to = "sample_name", values_to = "label")
   plotting_data$cellnote <- plotting_cellnote$label
   if(is.numeric(plotting_data$cellnote)){
-    if(cellnote_assay == "percentages"){
+    if(cellnote_assay == "proportions"){
       plotting_data$cellnote <- paste0(round(plotting_data$cellnote*100, digits = 2), "%")
     } else {
       plotting_data$cellnote <- round(plotting_data$cellnote, digits = 2)
@@ -145,9 +145,9 @@ barcode_ggheatmap <- function(your_SE,
   invisible_label <- plot_labels[which(max(nchar(as.character(plot_labels))) == nchar(as.character(plot_labels)))[1]]
 
 
-  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$sample_name, y = .data$sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = .data$value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = .data$cellnote), vjust = 0.75, size = cellnote_size, color = "black")+
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black", na.rm = TRUE)+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,

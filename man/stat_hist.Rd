@@ -14,7 +14,8 @@ stat_hist(
   y_log_axis = FALSE,
   text_size = 12,
   n_bins = 30,
-  n_cols = NULL
+  n_cols = NULL,
+  your_title = NULL
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ stat_hist(
 \item{n_bins}{Number of bins for histograms. Default is 30.}
 
 \item{n_cols}{Number of columns for faceted histograms. If NULL (default) will automatically choose n_cols for facetting.}
+
+\item{your_title}{Character. The title for the plot.}
 }
 \value{
 Histogram of chosen statistics
@@ -45,5 +48,5 @@ Histogram of chosen statistics
 Given a summarized experiment, gives a histogram of the acc assay or choice of metadata.
 }
 \examples{
-stat_hist(your_se = SE, metadata_stat = "GFP_percent")
+stat_hist(your_SE = wu_subset[,1], data_choice = "assay stats", assay_choice = "counts")
 }

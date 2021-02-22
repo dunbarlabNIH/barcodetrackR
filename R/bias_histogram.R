@@ -6,7 +6,7 @@
 #'@param split_bias_on The column in `colData(your_SE)` from which `bias_1` and `bias_2` will be chosen
 #'@param bias_1 The first cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the RIGHT side of the histogram.
 #'@param bias_2 The second cell type (or other factor) to be compared. Must be a possible value of the split_bias_on column of your metadata. Will be on the LEFT side of the ridge plot
-#'@param split_bias_over The column in `colData(your_SE)` that you wish to observe the bias split on.
+#'@param split_bias_over The column in `colData(your_SE)` that you wish to observe the bias split for. The output will contain a faceted plot: one facet for each value of `split_bias_over` comparing the samples matching `bias_1` and `bias_2` from the `split_bias_on` argument.
 #'@param bias_over Choice(s) from the column designated in `split_bias_over` that will be used for plotting. Defaults to all.
 #'@param remove_unique If set to true, only clones present in both samples will be considered.
 #'@param breaks Numeric. The breaks specified for bins on the x-axis (how biased the clones are towards one factor or the other).
@@ -22,7 +22,7 @@
 #'@importFrom magrittr %>%
 #'
 #'@examples
-#'bias_histogram(your_SE = SE, split_bias_on = "Lineage", bias_1 = "B", bias_2 = "T", split_bias_over = "Month", bias_over = c(1,2,4.5,12))
+#'bias_histogram(your_SE = wu_subset, split_bias_on = "celltype", bias_1 = "B", bias_2 = "T", split_bias_over = "months", ncols = 2)
 #'@export
 bias_histogram <- function(your_SE,
                            split_bias_on,
@@ -62,11 +62,49 @@ bias_histogram <- function(your_SE,
   if(! all(bias_over %in% unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]]))){
     stop("An element in bias_over is not in split_bias_over")
   }
+
   #perform ordering for the split_bias_over element if numeric and set the variable if it was initially NULL
   if(is.numeric(SummarizedExperiment::colData(your_SE)[[split_bias_over]])){
     bias_over <- bias_over %||% sort(unique(SummarizedExperiment::colData(your_SE)[[split_bias_over]]))
   } else {
     bias_over <- bias_over %||% levels(SummarizedExperiment::colData(your_SE)[[split_bias_over]])
+  }
+
+  # Check each value of bias_over
+  for (i in 1:length(bias_over)){
+    num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
+    num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
+
+    # If some values don't have a comparison, let the user know
+    if (num_samples1 == 0 | num_samples2 == 0){
+      cat("Note: For bias_over variable", split_bias_over, "the element", bias_over[i], "is missing one or both of the comparators: \n")
+      if (num_samples1 == 0){
+        cat(split_bias_on,bias_1, "not found. \n \n")
+      }
+      if (num_samples2 == 0){
+        cat(split_bias_on,bias_2, "not found. \n \n")
+      }
+    }
+
+    # If some values have multiple replicates, let the user know.
+    if (num_samples1 > 1 | num_samples2 > 1){
+      cat("For bias_over variable", split_bias_over, "the element", bias_over[i], "has more than one replicate for one or more of the comparators. \n")
+      if (num_samples1 > 1){
+        cat(split_bias_on, bias_1, "has", num_samples1, "replicates. \n \n")
+      }
+      if (num_samples2 > 1){
+        cat(split_bias_on, bias_2, "has", num_samples2, "replicates. \n \n")
+      }
+    }
+  }
+
+  # Repeat the loop to throw the error if there are ambiguous samples after printing all helpful info.
+  for (i in 1:length(bias_over)){
+    num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
+    num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
+    if (num_samples1 > 1 | num_samples2 > 1){
+      stop("In order to ensure that the function compares the correct samples, please disambiguate the samples by creating a column of the metadata with _repX appended to the desired `split_bias_over` variable.")
+    }
   }
 
   # ensure that the  chosen bias_over only is able to plot elements in which the chosen bias_1 and bias_2 are present at n = 1 each
@@ -83,7 +121,7 @@ bias_histogram <- function(your_SE,
 
   # extract bc data
   temp_subset <- your_SE[,temp_subset_coldata$SAMPLENAME]
-  your_data <- SummarizedExperiment::assays(temp_subset)[["percentages"]]
+  your_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]
 
   # pre-allocate
@@ -101,15 +139,15 @@ bias_histogram <- function(your_SE,
     colnames(temp_your_data) <- c("bias_1", "bias_2")
     temp_your_data %>%
       tibble::rownames_to_column(var = "barcode") %>%
-      dplyr::mutate(added_percentages = bias_1 + bias_2, bias = bias_1/bias_2) %>%
-      dplyr::mutate(log2_bias = log2(.data$bias)) %>%
-      dplyr::mutate(log2_bias_cuts = cut(.data$log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
+      dplyr::mutate(added_proportions = bias_1 + bias_2, bias = bias_1/bias_2) %>%
+      dplyr::mutate(log2_bias = log2(bias)) %>%
+      dplyr::mutate(log2_bias_cuts = cut(log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
 
     if (return_table){
       me <- temp_your_data
     } else {
-    g <- ggplot2::ggplot(temp_your_data[order(temp_your_data$added_percentages),],
-                         ggplot2::aes(x = .data$log2_bias_cuts, y = .data$added_percentages))+
+    g <- ggplot2::ggplot(temp_your_data[order(temp_your_data$added_proportions),],
+                         ggplot2::aes(x = log2_bias_cuts, y = added_proportions))+
       ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize, color = "black")+
       ggplot2::scale_x_discrete(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")"), drop = FALSE)+
       ggplot2::scale_y_continuous(name = "Added Proportions", labels = function(i)(paste0(i*100, "%")))+

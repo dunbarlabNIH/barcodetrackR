@@ -13,6 +13,7 @@ barcode_ggheatmap_stat(
   stat_display = "top",
   show_all_significant = FALSE,
   p_threshold = 0.05,
+  p_adjust = "none",
   bc_threshold = 0,
   plot_labels = NULL,
   n_clones = 10,
@@ -47,13 +48,15 @@ barcode_ggheatmap_stat(
 
 \item{p_threshold}{The p_value threshold to use for statistical testing}
 
+\item{p_adjust}{Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".}
+
 \item{bc_threshold}{Clones must be above this proportion in at least one sample to be included in statistical testing.}
 
 \item{plot_labels}{Vector of x axis labels. Defaults to colnames(your_SE).}
 
 \item{n_clones}{The top 'n' clones to plot.}
 
-\item{cellnote_assay}{Character. One of "stars", "reads", "percentages" or "p_val"}
+\item{cellnote_assay}{Character. One of "stars", "reads", "proportions" or "p_val"}
 
 \item{your_title}{The title for the plot.}
 
@@ -90,6 +93,6 @@ Displays a heatmap in the current plot window. Or if return_table is set to TRUE
 Creates a heatmap from the columns of data in the Summarized Experiment object, with the option to label based on statistical analysis. Uses ggplot2.
 }
 \examples{
-barcode_ggheatmap(your_SE = ZH33_SE, sample_size = rep(5000,ncol(ZH33_SE)), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars")
+barcode_ggheatmap_stat(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars", bc_threshold = 0.005)
 
 }

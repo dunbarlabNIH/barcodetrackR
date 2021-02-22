@@ -10,6 +10,7 @@ barcode_stat_test(
   stat_test = "chi-squared",
   stat_option = "subsequent",
   reference_sample = NULL,
+  p_adjust = "none",
   bc_threshold = 0
 )
 }
@@ -18,11 +19,13 @@ barcode_stat_test(
 
 \item{sample_size}{A numeric vector providing the sample size of each column of the SummarizedExperiment passed to the function. This sample size describes the samples that the barcoding data is meant to approximate, for example the number of cells barcodes were extracted from.}
 
-\item{stat_test}{The statistical test to use on the constructed contingency table for each barcode. Options are "chi-squared" and "fisher." \cr For information, see [ch.sq.test](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/chisq.test) [fisher.test](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/fisher.test)}
+\item{stat_test}{The statistical test to use on the constructed contingency table for each barcode. Options are "chi-squared" and "fisher." \cr For information, see [chisq.test](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/chisq.test) [fisher.test](https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/fisher.test)}
 
 \item{stat_option}{For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column specified in the `reference_sample` arguument.}
 
 \item{reference_sample}{Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.}
+
+\item{p_adjust}{Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".}
 
 \item{bc_threshold}{Clones must be above this proportion in at least one sample to be included in statistical testing. Default is 0. Use this to ignore low-abundance clones which are more likely to be noise or artifact.}
 }
@@ -33,6 +36,6 @@ Returns a list of 3 dataframes containing the following information for each obs
 Carries out a specific instance of statistical testing relevant to clonal tracking experiments. For longitudinal observations (of barcode abundances) in the provided SE object, use a Chi-squared or Fisher exact test whether each barcode proportion has changed between samples. \cr Each column in the provided SE will be "tested" against the reference sample. If the `stat_option` argument is set to its default of "subsequent" then each sample will be compared to the sample before it. If this argument is set to "reference" the reference sample column name must be provided and each column will be tested against that reference sample.
 }
 \examples{
-barcode_stat_test(your_SE = my_SE, sample_size = rep(5000,ncol(my__SE)), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
+barcode_stat_test(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
 
 }

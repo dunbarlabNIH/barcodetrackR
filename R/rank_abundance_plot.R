@@ -20,7 +20,7 @@
 #'@export
 #'
 #'@examples
-#'rank_abundance_plot(your_data = wu_SE, point_size = 4)
+#'rank_abundance_plot(your_SE = wu_subset[,1:4], point_size = 2)
 rank_abundance_plot = function(your_SE,
                                scale_rank = FALSE,
                                point_size = 3,
@@ -36,7 +36,7 @@ rank_abundance_plot = function(your_SE,
   }
   colnames(your_SE) <- plot_labels
   
-  your_data <- SummarizedExperiment::assays(your_SE)[["percentages"]]
+  your_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
   
   lapply(1:ncol(your_data), function(i){
     tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%

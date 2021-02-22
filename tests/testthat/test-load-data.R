@@ -19,3 +19,24 @@ test_that("Thresholding data works", {
 })
 #> Test passed 🥳
 
+
+# Threshold Existing SE
+test_that("Thresholding SE works", {
+  testthat::expect_s4_class(barcodetrackR::threshold_SE(your_SE = wu_subset,
+                                                    threshold_value = 0.005,
+                                                    threshold_type = "relative",
+                                                    verbose = TRUE), "SummarizedExperiment")
+})
+#> Test passed 🥳
+
+# Estimate Barcode Threshold
+test_that("Estimate Barcode Threshold works", {
+  testthat::expect_type(barcodetrackR::estimate_barcode_threshold(capture_efficiency = 0.4,
+                                                                  population_size = 500000,
+                                                                  proportion_labeled = 0.3,
+                                                                  confidence_level = 0.95,
+                                                                  verbose = FALSE), "double")
+})
+#> Test passed 🥳
+
+

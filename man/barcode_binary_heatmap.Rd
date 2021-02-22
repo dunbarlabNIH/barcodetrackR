@@ -33,6 +33,6 @@ Displays a binary heat map in the current plot window. Or if return_table is set
 Creates a binary heatmap showing the absence or presence of new clones in samples ordered from L to R in the SummarizedExperiment.
 }
 \examples{
-barcode_binary_heatmap(your_SE = ZH33_SE[,1:10])
+barcode_binary_heatmap(your_SE = wu_subset[,1:4])
 
 }

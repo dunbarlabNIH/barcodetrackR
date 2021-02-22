@@ -8,6 +8,7 @@ clonal_diversity(
   your_SE,
   plot_over,
   plot_over_display_choices = NULL,
+  keep_numeric = TRUE,
   group_by,
   group_by_choices = NULL,
   index_type = "shannon",
@@ -25,11 +26,13 @@ clonal_diversity(
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
 
+\item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
+
 \item{group_by}{The column of metadata you want to group by e.g. cell_type}
 
 \item{group_by_choices}{Choice(s) from the column designated in group_by that will be used for plotting. Defaults to all if left as NULL.}
 
-\item{index_type}{Character. One of "shannon", "shannon_count", "simpson", or "invsimpson.}
+\item{index_type}{Character. One of "shannon", "shannon_count", "simpson", or "invsimpson".}
 
 \item{point_size}{Numeric. Size of points.}
 
@@ -48,6 +51,6 @@ Outputs plot of a diversity measure tracked for groups over a factor. Or if retu
 A line plot that tracks a diversity measure from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
-diversity_plot(your_data = wu_SE, index_type = "shannon", plot_by = timepoint, group_by = cell_type)
+clonal_diversity(your_SE = wu_subset, index_type = "shannon", plot_over = "months", group_by = "celltype")
 
 }

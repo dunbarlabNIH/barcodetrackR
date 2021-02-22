@@ -6,7 +6,7 @@
 \usage{
 clonal_contribution(
   your_SE,
-  SAMPLENAME_choice,
+  SAMPLENAME_choice = NULL,
   filter_by,
   filter_selection,
   plot_over,
@@ -26,33 +26,33 @@ clonal_contribution(
 \arguments{
 \item{your_SE}{A Summarized Experiment object.}
 
-\item{SAMPLENAME_choice}{The identifying SAMPLENAME from which to obtain the top "n_clones" clones. If NULL, must specify clone_sequences.}
+\item{SAMPLENAME_choice}{The identifying SAMPLENAME from which to obtain the top "n_clones" clones to color. If NULL and clone_sequences is NULL, all clones will be shown as gray.}
 
 \item{filter_by}{Name of metadata column to filter by e.g. Lineage}
 
 \item{filter_selection}{The value of the filter column to display e.g. "T" (within Lineage)}
 
-\item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. Month}
+\item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. Month. For numeric metadata, the x-axis will be ordered in ascending fashion. For categorical metadata, the sample order will be followed.}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.}
 
-\item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be displayed.}
+\item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be assigned a unique color.}
 
 \item{graph_type}{Choice of "bar" or "line" for how to display the clonal contribution data}
 
 \item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
 
-\item{plot_non_selected}{Plot clones not in clones_sequences or that aren't top clones in SAMPLENAME_choice}
+\item{plot_non_selected}{Plot clones NOT found within the top clones in SAMPLENAME_choice or the specified clones passed to clone_sequences. These clones are colored gray. If both SAMPLENAME_choice and clone_sequences are NULL, this argument must be set to TRUE. Otherwise, there will be no data to show.}
 
 \item{linesize}{Numeric. Thickness of the lines.}
 
 \item{text_size}{Numeric. Size of text in plot.}
 
-\item{y_limit}{Numeric. What the max value of the y scale should be for the "percentages" assay.}
+\item{y_limit}{Numeric. What the max value of the y scale should be for the "proportions" assay.}
 
 \item{return_table}{Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.}
 
-\item{clones_sequences}{The identifying rownames within your_SE for which to plot. If NULL, must specify SAMPLENAME_choice.}
+\item{clones_sequences}{The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.}
 }
 \value{
 Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
@@ -61,5 +61,5 @@ Displays a stacked area line or bar plot (made by ggplot2) of the samples' top c
 Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
-clonal_contribution(your_data = your_barcoding_SE, graph_type = "bar",  SAMPLENAME_choice = "Granulocytes_3m", filter_by = "celltype", filter_selection = "Granulocytes", plot_over = "Timepoint_weeks", n_clones = 20)
+clonal_contribution(your_SE = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
 }

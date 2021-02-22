@@ -3,7 +3,7 @@
 #' Plots the pairwise correlation between the specified assay of each sample-sample pair in the provided SummarizedExperiment.
 #'
 #'@param your_SE A Summarized Experiment object.
-#'@param assay The choice of assay to use for the correlation calculation. Set to "percentages" by default.
+#'@param assay The choice of assay to use for the correlation calculation. Set to "proportions" by default.
 #'@param plot_labels Vector of x axis labels. Defaults to colnames(your_SE).
 #'@param method_corr Character. One of "pearson", "spearman", or "kendall".
 #'@param your_title Character. The title for the plot.
@@ -26,11 +26,11 @@
 #'@export
 #'
 #'@examples
-#'cor_plot(your_SE = zh33, your_title = "Pearson correlation of all samples", plot_type = "color")
+#'cor_plot(your_SE = wu_subset, your_title = "Pearson correlation of all samples", plot_type = "color")
 #"
 
 cor_plot = function(your_SE,
-                    assay = "percentages",
+                    assay = "proportions",
                     plot_labels = colnames(your_SE),
                     method_corr ="pearson",
                     your_title = "",

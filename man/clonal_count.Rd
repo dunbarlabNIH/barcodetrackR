@@ -9,6 +9,7 @@ clonal_count(
   percent_threshold = 0,
   plot_over,
   plot_over_display_choices = NULL,
+  keep_numeric = TRUE,
   group_by,
   group_by_choices = NULL,
   cumulative = FALSE,
@@ -27,6 +28,8 @@ clonal_count(
 \item{plot_over}{The column of metadata that you want to be the x-axis of the plot. e.g. timepoint}
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all if left as NULL.}
+
+\item{keep_numeric}{If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.}
 
 \item{group_by}{The column of metadata you want to group by e.g. cell_type.}
 
@@ -51,6 +54,6 @@ Outputs plot of a diversity measure tracked for groups over a factor. Or if retu
 A line plot that tracks the total number of clones or the cumulative number of clones from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
-clonal_count(your_data = wu_SE, cumulative = FALSE, plot_by = "timepoint", group_by = "cell_type")
+clonal_count(your_SE = wu_subset, cumulative = FALSE, plot_over = "months", group_by = "celltype")
 
 }
