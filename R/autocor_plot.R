@@ -73,9 +73,9 @@ autocor_plot = function(your_SE,
   #extracts proportions assay from your_SE
   temp_subset_coldata  %>%
     dplyr::mutate(my_order = !!as.name(plot_over)) %>%
-    dplyr::mutate(my_order = factor(my_order, levels = plot_over_display_choices)) %>%
-    dplyr::arrange(my_order) %>%
-    dplyr::mutate(my_order = as.character(my_order)) -> sorted_temp_subset_coldata
+    dplyr::mutate(my_order = factor(.data$my_order, levels = plot_over_display_choices)) %>%
+    dplyr::arrange(.data$my_order) %>%
+    dplyr::mutate(my_order = as.character(.data$my_order)) -> sorted_temp_subset_coldata
   plotting_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   colnames(plotting_data) <- plyr::mapvalues(colnames(plotting_data),
                                              from = sorted_temp_subset_coldata$SAMPLENAME,
@@ -91,26 +91,26 @@ autocor_plot = function(your_SE,
                               correlation_value = cortest_results$estimate)
     }) %>% do.call(rbind, .)
   }) %>% do.call(rbind, .) %>%
-    dplyr::rename(grouping_sample = sample_i, target_sample = sample_j)
+    dplyr::rename(grouping_sample = .data$sample_i, target_sample = .data$sample_j)
 
   if(is.numeric(plot_over_display_choices) & keep_numeric){
-    plotting_data_longer <- dplyr::mutate(plotting_data_longer, target_sample = as.numeric(target_sample))
-    plotting_data_longer <- dplyr::mutate(plotting_data_longer, grouping_sample = factor(grouping_sample, levels = plot_over_display_choices))
+    plotting_data_longer <- dplyr::mutate(plotting_data_longer, target_sample = as.numeric(.data$target_sample))
+    plotting_data_longer <- dplyr::mutate(plotting_data_longer, grouping_sample = factor(.data$grouping_sample, levels = plot_over_display_choices))
   } else {
-    plotting_data_longer <- dplyr::mutate(plotting_data_longer, target_sample = factor(target_sample, levels = plot_over_display_choices))
-    plotting_data_longer <- dplyr::mutate(plotting_data_longer, grouping_sample = factor(grouping_sample, levels = plot_over_display_choices))
+    plotting_data_longer <- dplyr::mutate(plotting_data_longer, target_sample = factor(.data$target_sample, levels = plot_over_display_choices))
+    plotting_data_longer <- dplyr::mutate(plotting_data_longer, grouping_sample = factor(.data$grouping_sample, levels = plot_over_display_choices))
   }
 
   if(no_negatives){
     plotting_data_longer %>%
-      dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, correlation_value)) -> plotting_data_longer
+      dplyr::mutate(correlation_value = ifelse(.data$correlation_value < 0, 0, .data$correlation_value)) -> plotting_data_longer
   }
 
   if (return_table){
     return(plotting_data_longer)
   }
 
-  gg_autocorplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = target_sample, y = correlation_value, group = grouping_sample, color = grouping_sample)) +
+  gg_autocorplot <- ggplot2::ggplot(plotting_data_longer, ggplot2::aes(x = .data$target_sample, y = .data$correlation_value, group = .data$grouping_sample, color = .data$grouping_sample)) +
     ggplot2::geom_line(size=line_size)+
     ggplot2::geom_point(size=point_size)+
     ggplot2::scale_y_continuous(name = "correlation")+

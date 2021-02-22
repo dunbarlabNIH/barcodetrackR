@@ -118,25 +118,25 @@ clonal_count <- function(your_SE,
 
     if(is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])){
       tidy_counts_filtered %>%
-        dplyr::group_by(group_by,plot_over,sample) %>%
+        dplyr::group_by(.data$group_by,plot_over,.data$sample) %>%
         dplyr::summarise(new_count = dplyr::n(), .groups = 'drop') %>%
         dplyr::group_by(group_by) %>%
-        dplyr::mutate(cumulative_count = cumsum(new_count)) -> summarized_data
+        dplyr::mutate(cumulative_count = cumsum(.data$new_count)) -> summarized_data
     } else {
       tidy_counts_filtered %>%
         dplyr::group_by(group_by,factor(plot_over, levels = levels(plot_over_display_choices)),sample) %>%
         dplyr::summarise(new_count = dplyr::n(), .groups = 'drop') %>%
         dplyr::group_by(group_by) %>%
-        dplyr::mutate(cumulative_count = cumsum(new_count)) -> summarized_data
+        dplyr::mutate(cumulative_count = cumsum(.data$new_count)) -> summarized_data
       colnames(summarized_data)[2] <- "plot_over"
     }
 
     # Put into proper structure
     as.data.frame(summarized_data) %>%
-      dplyr::select(sample,.data$cumulative_count) %>%
-      dplyr::rename(SAMPLENAME = sample, index = .data$cumulative_count) %>%
+      dplyr::select(.data$sample,.data$cumulative_count) %>%
+      dplyr::rename(SAMPLENAME = .data$sample, index = .data$cumulative_count) %>%
       dplyr::mutate(index_type = "unique barcodes") %>%
-      dplyr::mutate(SAMPLENAME = as.character(SAMPLENAME)) -> calculated_index
+      dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) -> calculated_index
 
     # Fix the fact that certain samples will be dropped if they have 0 new clones
     # Hacky way to do it. Need to go back and make it better later.
@@ -182,7 +182,7 @@ clonal_count <- function(your_SE,
   plotting_data$group_by <- plotting_data[[group_by]]
 
   # Create ggplot
-  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
+  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$x_value, y = .data$index, group=.data$group_by, colour=.data$group_by)) +
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+
     ggplot2::labs(x = plot_over, col = group_by, y = ylabel)+

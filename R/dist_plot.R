@@ -76,7 +76,7 @@ dist_plot = function(your_SE,
     pairwise_data <- as.matrix(pairwise_object)
     diag(pairwise_data) <- 0
     measure_string <- paste0(dist_method, " distance")
-    color_scale <- colorRampPalette(rev(RColorBrewer::brewer.pal(9, color_pal)))(255) #color scale snippet from DESeq2 vignette
+    color_scale <- grDevices::colorRampPalette(rev(RColorBrewer::brewer.pal(9, color_pal)))(255) #color scale snippet used from DESeq2 vignette
     if(cluster_tree){
       sample_hclust <- hclust(pairwise_object)
       sample_levels <- sample_hclust$labels[sample_hclust$order]
@@ -105,15 +105,15 @@ dist_plot = function(your_SE,
   pairwise_data <- as.data.frame(pairwise_data)
   pairwise_data_long <- pairwise_data %>%
     tibble::rownames_to_column(var = "sample_i") %>%
-    tidyr::pivot_longer(-sample_i, names_to = "sample_j", values_to = "measure") %>%
-    dplyr::mutate(sample_i = factor(sample_i, levels = sample_levels)) %>%
-    dplyr::mutate(sample_j = factor(sample_j, levels = rev(sample_levels)))
+    tidyr::pivot_longer(-.data$sample_i, names_to = "sample_j", values_to = "measure") %>%
+    dplyr::mutate(sample_i = factor(.data$sample_i, levels = sample_levels)) %>%
+    dplyr::mutate(sample_j = factor(.data$sample_j, levels = rev(sample_levels)))
 
   if(return_table){
     return(pairwise_data_long)
   }
 
-  gg_distplot <- ggplot2::ggplot(pairwise_data_long, ggplot2::aes(x = sample_i, y = sample_j)) +
+  gg_distplot <- ggplot2::ggplot(pairwise_data_long, ggplot2::aes(x = .data$sample_i, y = .data$sample_j)) +
     ggplot2::scale_x_discrete(position = "top", labels = plot_labels) +
     ggplot2::scale_y_discrete(labels = rev(plot_labels)) +
     ggplot2::theme(axis.ticks = ggplot2::element_blank(),
@@ -125,19 +125,19 @@ dist_plot = function(your_SE,
 
   if(plot_type == "color"){
     gg_distplot <- gg_distplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = measure), color = "black") +
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$measure), color = "black") +
       ggplot2::scale_fill_gradientn(colors = color_scale, name = measure_string)
   } else if (plot_type == "circle"){
     gg_distplot <- gg_distplot +
       ggplot2::geom_tile(color = ifelse(grid, "black", "white"), fill = "white") +
-      ggplot2::geom_point(ggplot2::aes(size = abs(measure), fill = measure), shape = 21)+
+      ggplot2::geom_point(ggplot2::aes(size = abs(.data$measure), fill = .data$measure), shape = 21)+
       ggplot2::scale_size(paste0("|", measure_string,"|"), range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colors = color_scale, name = measure_string)
   } else if (plot_type == "number") {
     gg_distplot <- gg_distplot +
-      ggplot2::geom_tile(ggplot2::aes(fill = measure), color = "black") +
+      ggplot2::geom_tile(ggplot2::aes(fill = .data$measure), color = "black") +
       ggplot2::scale_fill_gradientn(colors = color_scale, name = measure_string)+
-      ggplot2::geom_text(ggplot2::aes(label = round(measure, digits = 2)), color = "black", size = number_size)
+      ggplot2::geom_text(ggplot2::aes(label = round(.data$measure, digits = 2)), color = "black", size = number_size)
   } else {
     stop("plot_type must be one of \"color\", \"circle\", or \"number\"")
   }
@@ -145,7 +145,7 @@ dist_plot = function(your_SE,
   if(cluster_tree){
     dendro_data <- ggdendro::dendro_data(sample_hclust, type = 'rectangle')
     gg_dendrogram <- ggplot2::ggplot(ggdendro::segment(dendro_data))+
-      ggplot2::geom_segment(ggplot2::aes(x = x, y = y, xend = xend, yend = yend))+
+      ggplot2::geom_segment(ggplot2::aes(x = .data$x, y = .data$y, xend = .data$xend, yend = .data$yend))+
       ggplot2::ylab(NULL)+
       ggplot2::xlab(NULL)+
       ggplot2::theme(

@@ -9,6 +9,11 @@ build_index_html(
   output = "index.html"
 )
 }
+\arguments{
+\item{target}{the vignette to build}
+
+\item{output}{the target for the vignette output}
+}
 \description{
 Build html for vignette to index.html in docs
 }

@@ -18,6 +18,7 @@
 #'@param plot_non_selected Plot clones NOT found within the top clones in SAMPLENAME_choice or the specified clones passed to clone_sequences. These clones are colored gray. If both SAMPLENAME_choice and clone_sequences are NULL, this argument must be set to TRUE. Otherwise, there will be no data to show.
 #'@param linesize Numeric. Thickness of the lines.
 #'@param text_size Numeric. Size of text in plot.
+#'@param your_title Title string for your plot.
 #'@param y_limit Numeric. What the max value of the y scale should be for the "proportions" assay.
 #'@param return_table Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.
 #'
@@ -58,11 +59,11 @@ clonal_contribution <- function(your_SE,
   if(! filter_selection %in% unique(SummarizedExperiment::colData(your_SE)[[filter_by]])){
     stop("filter_selection must be an element in the colData column specified with filter_by")
   }
-  
+
   if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) == 0){
     stop("please specify only ONE of SAMPLENAME_choice or clone_sequences.")
   }
-  
+
   if(sum(is.null(SAMPLENAME_choice), is.null(clone_sequences)) == 2 & plot_non_selected == FALSE){
     stop("If neither SAMPLENAME_choice nor clone_sequences are specified, plot_non_selected must be TRUE. Otherwise, there is no data to plot.")
   }
@@ -98,7 +99,7 @@ clonal_contribution <- function(your_SE,
   #fetch proportions
   your_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
   your_data <- your_data[rowSums(your_data) > 0,,drop = FALSE]
-  
+
   # If there are duplicate samples within the chosen plot_over argument for the x-axis, then combine but warn the user
   if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
     duplicated_plot_over <- temp_subset_coldata[[plot_over]][duplicated(temp_subset_coldata[[plot_over]])]
@@ -112,7 +113,7 @@ clonal_contribution <- function(your_SE,
     }
     cat("Barcode proportions have been averaged for duplicate samples.\nTo see the duplicate samples as separate replicates, create a categorical column of metadata with your desired plot_over values but _repX appended to the replicate samples. \n")
   }
-  
+
   # turn sample_name into the plot_over equivalents
   plotting_data <- tibble::rownames_to_column(your_data, var = "sequence") %>%
     tidyr::pivot_longer(cols = -sequence, names_to = "sample_name", values_to = "value") %>%

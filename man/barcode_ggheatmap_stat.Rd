@@ -46,6 +46,8 @@ barcode_ggheatmap_stat(
 
 \item{stat_display}{Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.}
 
+\item{show_all_significant}{Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.}
+
 \item{p_threshold}{The p_value threshold to use for statistical testing}
 
 \item{p_adjust}{Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".}
@@ -83,8 +85,6 @@ barcode_ggheatmap_stat(
 \item{color_scale}{A character vector which indicates the colors of the color scale. Must be same length as percent_scale.}
 
 \item{return_table}{Logical. Whether or not to return table of barcode sequences with their log abundance in the 'value' column and cellnote (* indicating statistical signficant change, for example) for each sample instead of displaying a plot. Note, for more in-depth statistical analysis, use the `"barcode_stat_test` function.}
-
-\item{show_all_signficant}{Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.}
 }
 \value{
 Displays a heatmap in the current plot window. Or if return_table is set to TRUE, returns a dataframe of the barcode sequences, log abundances, and cellnote for each sample.

@@ -8,7 +8,7 @@
 #'@param stat_option For "subsequent" statistical testing is performed on each column of data compared to the column before it. For "reference," all other columns of data are compared to a reference column.
 #'@param reference_sample Provide the column name of the reference column if stat_option is set to "reference." Defaults to the first column in the SummarizedExperiment.
 #'@param stat_display Choose which clones to display on the heatmap. IF set to "top," the top n_clones ranked by abundance for each sample will be displayed. If set to "change," the top n_clones with the lowest p-value from statistical testing will be shown for each sample. If set to "increase," the top n_clones (ranked by p-value) which increase in abundance for each sample will be shown. And if set to "decrease," the top n_clones (ranked by lowest p-value) which decrease in abdundance will be shown.
-#'@param show_all_signficant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
+#'@param show_all_significant Logical. If set to TRUE when stat_display = "change," "increase," or "decrease" then the n_clones argument will be overriden and all clones with a statistically singificant change, increase, or decrease in proportion will be shown.
 #'@param p_threshold The p_value threshold to use for statistical testing
 #'@param p_adjust Character, default = "none". To correct p-values for muiltiple comparisons, set to any of the p value adjustment methods in the p.adjust function in R stats, which includes "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", and "fdr".
 #'@param bc_threshold Clones must be above this proportion in at least one sample to be included in statistical testing.
@@ -147,7 +147,7 @@ barcode_ggheatmap_stat <- function(your_SE,
 
     }
     # Adjust p values for multiple comparisons.
-    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) stats::p.adjust(x, method = p_adjust)))
 
     # Add results of statistical testing into SE
     SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
@@ -201,7 +201,7 @@ barcode_ggheatmap_stat <- function(your_SE,
     }
 
     # Adjust p values for multiple comparisons.
-    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) p.adjust(x, method = p_adjust)))
+    p_mat_adj <- as.data.frame(apply(p_mat, 2, function(x) stats::p.adjust(x, method = p_adjust)))
 
     # Add results of statistical testing into SE
     SummarizedExperiment::assays(your_SE)$p_val <- p_mat_adj
@@ -323,9 +323,9 @@ barcode_ggheatmap_stat <- function(your_SE,
     return(plotting_data)
   }
 
-  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = sample_name, y = sequence))+
-    ggplot2::geom_tile(ggplot2::aes(fill = value), color = grid_color)+
-    ggplot2::geom_text(ggplot2::aes(label = cellnote), vjust = 0.75, size = cellnote_size, color = "black", na.rm = TRUE)+
+  g1_heatmap <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$sample_name, y = .data$sequence))+
+    ggplot2::geom_tile(ggplot2::aes(fill = .data$value), color = grid_color)+
+    ggplot2::geom_text(ggplot2::aes(label = .data$cellnote), vjust = 0.75, size = cellnote_size, color = "black", na.rm = TRUE)+
     ggplot2::scale_fill_gradientn(
       paste0("Percentage\nContribution"),
       colors = color_scale,

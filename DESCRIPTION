@@ -8,7 +8,7 @@ Authors@R:
       person("Ryland", "Mortlock", email = "ryland.mortlock@nih.gov", role = c("aut")))
 Description: A package for the analysis of cellular barcoding data.
 URL: https://github.com/dunbarlabNIH/barcodetrackR
-License: CC0
+License: file LICENSE
 LazyData: TRUE
 Encoding: UTF-8
 biocViews:
@@ -45,4 +45,4 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.50)

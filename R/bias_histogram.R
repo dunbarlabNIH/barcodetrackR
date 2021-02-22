@@ -139,15 +139,15 @@ bias_histogram <- function(your_SE,
     colnames(temp_your_data) <- c("bias_1", "bias_2")
     temp_your_data %>%
       tibble::rownames_to_column(var = "barcode") %>%
-      dplyr::mutate(added_proportions = bias_1 + bias_2, bias = bias_1/bias_2) %>%
-      dplyr::mutate(log2_bias = log2(bias)) %>%
-      dplyr::mutate(log2_bias_cuts = cut(log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
+      dplyr::mutate(added_proportions = .data$bias_1 + .data$bias_2, bias = .data$bias_1/.data$bias_2) %>%
+      dplyr::mutate(log2_bias = log2(.data$bias)) %>%
+      dplyr::mutate(log2_bias_cuts = cut(.data$log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
 
     if (return_table){
       me <- temp_your_data
     } else {
     g <- ggplot2::ggplot(temp_your_data[order(temp_your_data$added_proportions),],
-                         ggplot2::aes(x = log2_bias_cuts, y = added_proportions))+
+                         ggplot2::aes(x = .data$log2_bias_cuts, y = .data$added_proportions))+
       ggplot2::geom_bar(stat = "identity", fill = "white", size = linesize, color = "black")+
       ggplot2::scale_x_discrete(name = paste0("log bias: log2(", bias_1, "/", bias_2, ")"), drop = FALSE)+
       ggplot2::scale_y_continuous(name = "Added Proportions", labels = function(i)(paste0(i*100, "%")))+

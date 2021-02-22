@@ -74,7 +74,7 @@ cor_plot = function(your_SE,
       return(result_df)
     }) %>% do.call(rbind, .)
   }) %>% do.call(rbind, .) %>%
-    dplyr::mutate(sample_i = factor(sample_i, levels = plot_labels), sample_j = factor(sample_j, levels = rev(plot_labels)))
+    dplyr::mutate(sample_i = factor(.data$sample_i, levels = plot_labels), sample_j = factor(.data$sample_j, levels = rev(plot_labels)))
 
   if(color_scale == "default"){
     color_scale <- c("#67001F", "#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC", "#053061")
@@ -86,10 +86,10 @@ cor_plot = function(your_SE,
 
   if(no_negatives){
     plotting_data_longer %>%
-      dplyr::mutate(p_value = ifelse(correlation_value < 0, NA, .data$p_value)) %>%
+      dplyr::mutate(p_value = ifelse(.data$correlation_value < 0, NA, .data$p_value)) %>%
    #   dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
   #    dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
-      dplyr::mutate(correlation_value = ifelse(correlation_value < 0, 0, .data$correlation_value)) -> plotting_data_longer
+      dplyr::mutate(correlation_value = ifelse(.data$correlation_value < 0, 0, .data$correlation_value)) -> plotting_data_longer
     color_limits <- c(0, 1)
     floor_limit <- ceiling(length(color_scale)/2)
     color_scale <- color_scale[floor_limit:length(color_scale)]
@@ -117,7 +117,7 @@ cor_plot = function(your_SE,
   } else if (plot_type == "circle"){
     gg_corplot <- gg_corplot +
       ggplot2::geom_tile(color = ifelse(grid, "black", "white"), fill = "white") +
-      ggplot2::geom_point(ggplot2::aes(size = abs(.data$correlation_value), fill = correlation_value), shape = 21)+
+      ggplot2::geom_point(ggplot2::aes(size = abs(.data$correlation_value), fill = .data$correlation_value), shape = 21)+
       ggplot2::scale_size("|correlation|", range = c(0, point_scale)) +
       ggplot2::scale_fill_gradientn(colours = color_scale, limits = color_limits, name = "correlation")
   } else if (plot_type == "number") {

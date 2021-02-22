@@ -48,6 +48,8 @@ clonal_contribution(
 
 \item{text_size}{Numeric. Size of text in plot.}
 
+\item{your_title}{Title string for your plot.}
+
 \item{y_limit}{Numeric. What the max value of the y scale should be for the "proportions" assay.}
 
 \item{return_table}{Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.}

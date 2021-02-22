@@ -121,7 +121,7 @@ clonal_diversity <- function(your_SE,
   plotting_data$group_by <- plotting_data[[group_by]]
 
   # Create ggplot
-  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = x_value, y = index, group=group_by, colour=group_by)) +
+  g <- ggplot2::ggplot(plotting_data, ggplot2::aes(x = .data$x_value, y = .data$index, group=.data$group_by, colour=.data$group_by)) +
     ggplot2::geom_line(size = line_size)+
     ggplot2::geom_point(size = point_size)+
     ggplot2::labs(x = plot_over, col = group_by, y = paste0(index_type, ifelse(index_type == "shannon_count", "", " index")))+

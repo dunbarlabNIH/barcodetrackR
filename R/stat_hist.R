@@ -48,7 +48,7 @@ stat_hist <- function(your_SE,
       if (is.null(your_title)){
         your_title <- colnames(your_data)[i]
       }
-      
+
       g <-ggplot2::ggplot(your_data, ggplot2::aes(x = your_data[,i]))+
         ggplot2::geom_histogram(bins = n_bins, color = "white", fill = "dodgerblue2")+
         cowplot::theme_cowplot()+
@@ -93,7 +93,7 @@ stat_hist <- function(your_SE,
         meta_data_for_plot$metadata_col <- as.factor(meta_data_for_plot$metadata_col)
       }
 
-      g <- ggplot2::ggplot(meta_data_for_plot, ggplot2::aes(x = metadata_col))+
+      g <- ggplot2::ggplot(meta_data_for_plot, ggplot2::aes(x = .data$metadata_col))+
         ggplot2::geom_histogram(bins = n_bins, position = "identity", stat = "count", fill = "dodgerblue2")+
         cowplot::theme_cowplot()+
         ggplot2::labs(x = paste0("metadata: ", metadata_stat)) +
@@ -119,7 +119,7 @@ stat_hist <- function(your_SE,
         meta_data_for_plot$metadata_col <- as.factor(meta_data_for_plot$metadata_col)
       }
 
-      g <- ggplot2::ggplot(meta_data_for_plot, ggplot2::aes(x = metadata_col))+
+      g <- ggplot2::ggplot(meta_data_for_plot, ggplot2::aes(x = .data$metadata_col))+
         ggplot2::geom_histogram(bins = n_bins, stat = "count",fill = "dodgerblue2")+
         cowplot::theme_cowplot()+
         ggplot2::labs(x = paste0("metadata: ", metadata_stat)) +

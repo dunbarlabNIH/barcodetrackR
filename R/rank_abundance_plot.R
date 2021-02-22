@@ -29,31 +29,31 @@ rank_abundance_plot = function(your_SE,
                                plot_labels = NULL,
                                return_table = FALSE) {
 
-  #get labels 
+  #get labels
   plot_labels <- plot_labels %||% colnames(your_SE)
   if(length(plot_labels) != ncol(your_SE)){
     stop("plot_labels must be same length as number of columns being plotted")
   }
   colnames(your_SE) <- plot_labels
-  
+
   your_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
-  
+
   lapply(1:ncol(your_data), function(i){
     tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%
-      dplyr::filter(percentage > 0) %>%
-      dplyr::arrange(desc(percentage)) %>%
-      dplyr::mutate(cumulative_sum = cumsum(percentage), rank = dplyr::row_number()) %>%
-      dplyr::mutate(scaled_rank = dplyr::percent_rank(-percentage))
+      dplyr::filter(.data$percentage > 0) %>%
+      dplyr::arrange(desc(.data$percentage)) %>%
+      dplyr::mutate(cumulative_sum = cumsum(.data$percentage), rank = dplyr::row_number()) %>%
+      dplyr::mutate(scaled_rank = dplyr::percent_rank(-.data$percentage))
   }) %>%
     do.call(rbind, .) %>%
-    dplyr::mutate(sample_name = factor(sample_name, levels = colnames(your_data))) -> plotting_data
+    dplyr::mutate(sample_name = factor(.data$sample_name, levels = colnames(your_data))) -> plotting_data
 
   scale_rank_choice <- ifelse(scale_rank, "scaled_rank", "rank")
 
   if (return_table){
     return(plotting_data)
   }
-  
+
   ggplot2::ggplot(plotting_data, ggplot2::aes_string(x = scale_rank_choice, y = "cumulative_sum", group = "sample_name", color = "sample_name"))+
     ggplot2::geom_point(size = point_size)+
     ggplot2::scale_color_discrete(labels = plot_labels)+
