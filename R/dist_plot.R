@@ -28,7 +28,6 @@
 #'@export
 #'
 #'@examples
-#'trash
 #'dist_plot(your_SE = wu_subset, plot_type = "color")
 #"
 

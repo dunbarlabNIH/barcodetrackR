@@ -22,6 +22,7 @@
 #'                           proportion_labeled = 0.3,
 #'                           confidence_level = 0.95,
 #'                           verbose = TRUE)
+#'trash
 #'
 #'@export
 #'

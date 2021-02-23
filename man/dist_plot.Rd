@@ -62,5 +62,6 @@ Plots pairwise correlation plot for the samples in your_SE.
 Plots the pairwise distances of the specified assay between each sample-sample pair in the provided SummarizedExperiment.
 }
 \examples{
+trash
 dist_plot(your_SE = wu_subset, plot_type = "color")
 }
