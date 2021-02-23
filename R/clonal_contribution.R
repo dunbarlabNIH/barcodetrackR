@@ -137,7 +137,7 @@ clonal_contribution <- function(your_SE,
       dplyr::arrange(desc(.data$value)) %>%
       dplyr::pull(sequence) %>%
       unique() %>%
-      .data$.[!(.data$. %in% selected_sequences)]
+      .[!(. %in% selected_sequences)]
     plotting_data$sequence <- factor(plotting_data$sequence, levels = rev(c(selected_sequences, non_selected_sequences)))
     color_vector <- setNames(c(scales::hue_pal()(length(selected_sequences)), "grey"), c(selected_sequences, "other"))
   } else {
