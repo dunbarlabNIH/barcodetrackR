@@ -2,6 +2,5 @@
 .Rhistory
 .DS_Store
 vignettes/.RDataTmp
-inst/sample_data/unpublished_NK_expansions/
-inst/sample_data/ElderA_etal/GSE149170_RAW/
-inst/sample_data/BelderbosME_etal/mmc2.xlsx
+docs
+inst/sample_data
