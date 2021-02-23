@@ -59,30 +59,30 @@ For this vignette, we will load publically available data from the following pap
 
 ```{r load data, eval = TRUE}
 
-system.file("sample_data/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> wu_dataframe
 
-system.file("sample_data/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> wu_metadata
 
 wu_SE <- create_SE(your_data = wu_dataframe,
                    meta_data = wu_metadata,
                    threshold = 0)
 
-system.file("sample_data/KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
+system.file("extdata", "KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> koelle_dataframe
 
-system.file("sample_data/KoelleSJ_etal/ZH33_metadata.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/KoelleSJ_etal/ZH33_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> koelle_metadata
 
 koelle_SE <- create_SE(your_data = koelle_dataframe,
                        meta_data = koelle_metadata,
                        threshold = 0)
 
-system.file("sample_data/BelderbosME_etal/count_matrix_mouse_C21.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/BelderbosME_etal/count_matrix_mouse_C21.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> belderbos_dataframe
 
-system.file("sample_data/BelderbosME_etal/metadata_mouse_C21.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/BelderbosME_etal/metadata_mouse_C21.txt", package = "barcodetrackR") %>%
   read.delim() -> belderbos_metadata
 
 belderbos_metadata$weeks <- factor(belderbos_metadata$weeks, levels = c("9", "14", "20", "22", "sac"))
@@ -93,10 +93,10 @@ belderbos_SE <- create_SE(your_data = belderbos_dataframe,
 
 
 
-system.file("sample_data/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> six_dataframe
 
-system.file("sample_data/SixE_etal/WAS5_metadata.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/SixE_etal/WAS5_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> six_metadata
 
 six_SE <- create_SE(your_data = six_dataframe,

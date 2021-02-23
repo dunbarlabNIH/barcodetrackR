@@ -3,4 +3,7 @@
 .DS_Store
 vignettes/.RDataTmp
 docs
-inst/sample_data
+inst/extdata/SixE_etal/intSites.mergedSamples.collapsed.csv.gz
+inst/extdata/ElderA_etal/
+inst/extdata/ClarkeEL_etal/
+inst/extdata/EspinozaDA_etal/

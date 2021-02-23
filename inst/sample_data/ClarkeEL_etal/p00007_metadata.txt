@@ -1,6 +1,0 @@
-SAMPLENAME	months
-timepoint_4_months	4
-timepoint_6_months	6
-timepoint_12_months	12
-timepoint_18_months	18
-timepoint_24_months	24
