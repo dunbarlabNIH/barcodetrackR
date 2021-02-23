@@ -5,7 +5,7 @@
 #'@param x NULL
 #'@return Page launching the Shiny Barcode App
 #'@examples
-#'launchApp()
+#'\dontrun{launchApp()}
 #'@export
 launchApp <- function(x = NULL){
   shiny::runApp(system.file("barcode_app", package = "barcodetrackR"))

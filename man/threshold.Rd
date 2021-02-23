@@ -22,5 +22,7 @@ to each column (e.g. if threshold is set as 0.0005, only rows in which an elemen
 its column will be kept).
 }
 \examples{
-threshold(zh33, thresh = 0.0005)
+\dontrun{
+threshold(counts_matrix, thresh = 0.0005)
+}
 }

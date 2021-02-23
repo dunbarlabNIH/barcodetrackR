@@ -18,6 +18,5 @@ Returns a subsetted SummarizedExperiment object.
 Subsets an existing SummarizedExperiment object.
 }
 \examples{
-zh33 <- create_SE(your_data = ZH33_file, meta_data = ZH33_meta_data)
-zh33.B.2month <- subset_SE(zh33, Cell_type = "B", Timepoint = "2m")
+wu_B.5month <- subset_SE(wu_subset, celltype = "B", timepoint = "6.0")
 }
