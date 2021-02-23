@@ -2,8 +2,6 @@
 .Rhistory
 .DS_Store
 vignettes/.RDataTmp
-R/autocor_plot.R
-man/autocor_plot.Rd
 inst/sample_data/unpublished_NK_expansions/
 inst/sample_data/ElderA_etal/GSE149170_RAW/
 inst/sample_data/BelderbosME_etal/mmc2.xlsx
