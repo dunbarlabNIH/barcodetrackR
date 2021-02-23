@@ -33,6 +33,8 @@ Returns a SummarizedExperiment holding your clonal tracking data and the associa
 Creates a SummarizedExperiment object from a data frame containing clonal tracking counts (`your_data`) with rows as observations and columns as samples, and the associated metadata (`meta_data`) with rows as samples and columns of information describing those samples.
 }
 \examples{
-create_SE(your_data = read.delim(system.file("sample_data/app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1), meta_data = read.delim(system.file("sample_data/app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR")))
+my_count_data <- read.delim("barcode_counts.tsv")
+my_metadata <- read.delim("my_metadata.tsv")
+create_SE(your_data = my_count_data, meta_data = my_metadata)
 
 }

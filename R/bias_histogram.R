@@ -22,7 +22,9 @@
 #'@importFrom magrittr %>%
 #'
 #'@examples
-#'bias_histogram(your_SE = wu_subset, split_bias_on = "celltype", bias_1 = "B", bias_2 = "T", split_bias_over = "months", ncols = 2)
+#'bias_histogram(your_SE = wu_subset, split_bias_on = "celltype",
+#'               bias_1 = "B", bias_2 = "T",
+#'               split_bias_over = "months", ncols = 2)
 #'@export
 bias_histogram <- function(your_SE,
                            split_bias_on,

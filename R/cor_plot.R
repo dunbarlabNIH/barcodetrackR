@@ -26,7 +26,7 @@
 #'@export
 #'
 #'@examples
-#'cor_plot(your_SE = wu_subset, your_title = "Pearson correlation of all samples", plot_type = "color")
+#'cor_plot(your_SE = wu_subset, plot_type = "color")
 #"
 
 cor_plot = function(your_SE,

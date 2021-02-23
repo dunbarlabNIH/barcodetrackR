@@ -11,7 +11,7 @@
 #'@param filter_selection The value of the filter column to display e.g. "T" (within Lineage)
 #'@param plot_over The column of metadata that you want to be the x-axis of the plot. e.g. Month. For numeric metadata, the x-axis will be ordered in ascending fashion. For categorical metadata, the sample order will be followed.
 #'@param plot_over_display_choices Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.
-#'@param clones_sequences The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.
+#'@param clone_sequences The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.
 #'@param n_clones Numeric. Number of top clones from SAMPLENAME_choice that should be assigned a unique color.
 #'@param graph_type Choice of "bar" or "line" for how to display the clonal contribution data
 #'@param keep_numeric If plot_over is numeric, whether to space the x-axis appropriately according to the numerical values.
@@ -27,7 +27,10 @@
 #'@return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 #'
 #'@examples
-#'clonal_contribution(your_SE = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
+#'clonal_contribution(your_SE = wu_subset, graph_type = "bar",
+#'                    SAMPLENAME_choice = "ZJ31_20m_T",
+#'                    filter_by = "celltype", filter_selection = "T",
+#'                    plot_over = "months", n_clones = 10)
 #'@export
 
 clonal_contribution <- function(your_SE,

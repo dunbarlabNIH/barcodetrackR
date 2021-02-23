@@ -27,7 +27,6 @@ Imports:
     proxy,
     RColorBrewer,
     rlang,
-    rmdformats,
     scales,
     shiny,
     SummarizedExperiment,
@@ -41,6 +40,7 @@ RoxygenNote: 7.1.1
 Suggests: 
     BiocStyle,
     knitr,
+    rmdformats,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

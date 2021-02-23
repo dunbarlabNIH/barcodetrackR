@@ -24,7 +24,8 @@
 #'@import tibble
 #'
 #'@examples
-#'clonal_diversity(your_SE = wu_subset, index_type = "shannon", plot_over = "months", group_by = "celltype")
+#'clonal_diversity(your_SE = wu_subset, index_type = "shannon",
+#'                 plot_over = "months", group_by = "celltype")
 #'
 #'@export
 clonal_diversity <- function(your_SE,

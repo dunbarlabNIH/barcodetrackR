@@ -39,7 +39,10 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap_stat(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", p_threshold = 0.05, n_clones = 10, cellnote_assay = "stars", bc_threshold = 0.005)
+#'barcode_ggheatmap_stat(your_SE = wu_subset[,1:4], sample_size = rep(5000,4),
+#'                       stat_test = "chi-squared", stat_option = "subsequent",
+#'                       p_threshold = 0.05, n_clones = 10,
+#'                       cellnote_assay = "stars", bc_threshold = 0.005)
 #'
 barcode_ggheatmap_stat <- function(your_SE,
                                    sample_size,

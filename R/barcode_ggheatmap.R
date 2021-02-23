@@ -30,7 +30,8 @@
 #'@export
 #'
 #'@examples
-#'barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 6)
+#'barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,
+#'                  grid = TRUE, label_size = 6)
 #'
 barcode_ggheatmap <- function(your_SE,
                               plot_labels = NULL,

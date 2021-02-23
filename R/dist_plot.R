@@ -28,7 +28,7 @@
 #'@export
 #'
 #'@examples
-#'dist_plot(your_SE = wu_subset, your_title = "Pairwise Euclidean distances between all samples", plot_type = "color")
+#'dist_plot(your_SE = wu_subset, plot_type = "color")
 #"
 
 dist_plot = function(your_SE,
@@ -89,7 +89,7 @@ dist_plot = function(your_SE,
     pairwise_data <- as.matrix(pairwise_object)
     diag(pairwise_data) <- 1
     measure_string <- paste0(dist_method, " similarity")
-    color_scale <- colorRampPalette(RColorBrewer::brewer.pal(9, color_pal))(255) #color scale snippet from DESeq2 vignette
+    color_scale <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, color_pal))(255) #color scale snippet from DESeq2 vignette
     if(cluster_tree){
       pairwise_dist <- proxy::as.dist(pairwise_object)
       sample_hclust <- hclust(pairwise_dist)

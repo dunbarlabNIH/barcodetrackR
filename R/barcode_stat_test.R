@@ -17,7 +17,9 @@
 #'@export
 #'
 #'@examples
-#'barcode_stat_test(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
+#'barcode_stat_test(your_SE = wu_subset[,1:4], sample_size = rep(5000,4),
+#'                  stat_test = "chi-squared", stat_option = "subsequent",
+#'                  bc_threshold = 0.0001)
 #'
 barcode_stat_test <- function(your_SE,
                               sample_size,

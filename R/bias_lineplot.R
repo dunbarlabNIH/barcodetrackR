@@ -19,7 +19,8 @@
 #'@importFrom plyr .
 #'
 #'@examples
-#'bias_lineplot(your_SE = wu_subset, split_bias_on = "celltype", bias_1 = "B", bias_2 = "T", split_bias_over = "months")
+#'bias_lineplot(your_SE = wu_subset, split_bias_on = "celltype",
+#'              bias_1 = "B", bias_2 = "T", split_bias_over = "months")
 #'@export
 bias_lineplot <- function(your_SE,
                           split_bias_on,

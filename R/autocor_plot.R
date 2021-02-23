@@ -21,9 +21,10 @@
 #'@importFrom rlang %||%
 #'@importFrom magrittr %>%
 #'
-#'
 #'@examples
-#'autocor_plot(wu_subset, plot_over = "months", filter_by = "celltype", filter_selection = "T", no_negatives = TRUE, keep_numeric = TRUE)
+#'autocor_plot(wu_subset, plot_over = "months", filter_by = "celltype",
+#'             filter_selection = "T", no_negatives = TRUE,
+#'             keep_numeric = TRUE)
 #"
 
 autocor_plot = function(your_SE,

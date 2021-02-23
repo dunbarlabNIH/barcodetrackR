@@ -36,6 +36,8 @@ Returns a list of 3 dataframes containing the following information for each obs
 Carries out a specific instance of statistical testing relevant to clonal tracking experiments. For longitudinal observations (of barcode abundances) in the provided SE object, use a Chi-squared or Fisher exact test whether each barcode proportion has changed between samples. \cr Each column in the provided SE will be "tested" against the reference sample. If the `stat_option` argument is set to its default of "subsequent" then each sample will be compared to the sample before it. If this argument is set to "reference" the reference sample column name must be provided and each column will be tested against that reference sample.
 }
 \examples{
-barcode_stat_test(your_SE = wu_subset[,1:4], sample_size = rep(5000,4), stat_test = "chi-squared", stat_option = "subsequent", bc_threshold = 0.0001)
+barcode_stat_test(your_SE = wu_subset[,1:4], sample_size = rep(5000,4),
+                 stat_test = "chi-squared", stat_option = "subsequent",
+                 bc_threshold = 0.0001)
 
 }

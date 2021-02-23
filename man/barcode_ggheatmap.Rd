@@ -66,6 +66,7 @@ Displays a heatmap in the current plot window. Or if return_table is set to TRUE
 Creates a heatmap displaying the log abundance of the top 'n' clones from each sample in the Summarized Experiment object, using ggplot2. Clones are on the y-axis and samples are on the x-axis. The ordering and clustering of clones on the y-axis as well as all aesthetics of the plot can be controlled through the arguments described below.
 }
 \examples{
-barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,  grid = TRUE, label_size = 6)
+barcode_ggheatmap(your_SE = wu_subset,  n_clones = 10,
+                 grid = TRUE, label_size = 6)
 
 }

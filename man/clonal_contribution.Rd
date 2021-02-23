@@ -36,6 +36,8 @@ clonal_contribution(
 
 \item{plot_over_display_choices}{Choice(s) from the column designated in plot_over that will be used for plotting. Defaults to all.}
 
+\item{clone_sequences}{The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.}
+
 \item{n_clones}{Numeric. Number of top clones from SAMPLENAME_choice that should be assigned a unique color.}
 
 \item{graph_type}{Choice of "bar" or "line" for how to display the clonal contribution data}
@@ -53,8 +55,6 @@ clonal_contribution(
 \item{y_limit}{Numeric. What the max value of the y scale should be for the "proportions" assay.}
 
 \item{return_table}{Logical. If set to TRUE, the function will return a dataframe with each sequence that is selected and its percentage contribution to each selected sample rather than a plot.}
-
-\item{clones_sequences}{The identifying rownames within your_SE for which to plot. SAMPLENAME_choice should be set to NULL or not specified if clone_sequences is specified.}
 }
 \value{
 Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
@@ -63,5 +63,8 @@ Displays a stacked area line or bar plot (made by ggplot2) of the samples' top c
 Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
-clonal_contribution(your_SE = wu_subset, graph_type = "bar",  SAMPLENAME_choice = "ZJ31_20m_T", filter_by = "celltype", filter_selection = "T", plot_over = "months", n_clones = 10)
+clonal_contribution(your_SE = wu_subset, graph_type = "bar",
+                   SAMPLENAME_choice = "ZJ31_20m_T",
+                   filter_by = "celltype", filter_selection = "T",
+                   plot_over = "months", n_clones = 10)
 }

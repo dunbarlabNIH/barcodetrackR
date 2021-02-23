@@ -8,6 +8,10 @@ output:
     lightbox: false
     css: readthedown_custom_2.css
   github_document: default
+vignette: >
+  %\VignetteIndexEntry{Introduction to barcodetrackR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 
