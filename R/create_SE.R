@@ -14,9 +14,9 @@
 #'@import SummarizedExperiment
 #'
 #'@examples
-#'my_count_data <- read.delim("barcode_counts.tsv")
-#'my_metadata <- read.delim("my_metadata.tsv")
+#'\dontrun{
 #'create_SE(your_data = my_count_data, meta_data = my_metadata)
+#'}
 #'
 #'@export
 #'
