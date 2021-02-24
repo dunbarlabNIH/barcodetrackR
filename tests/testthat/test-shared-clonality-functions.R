@@ -1,5 +1,7 @@
 context("Shared Clonality Functions")
 
+data(wu_subset)
+
 test_that("scatter_plot works", {
     testthat::expect_type(barcodetrackR::scatter_plot(wu_subset[, 1:2]), "list")
 })

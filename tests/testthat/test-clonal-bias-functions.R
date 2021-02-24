@@ -1,5 +1,7 @@
 context("Clonal Bias Functions")
 
+data(wu_subset)
+
 test_that("bias_histogram works", {
     testthat::expect_type(barcodetrackR::bias_histogram(wu_subset,
         split_bias_on = "celltype",

@@ -18,4 +18,5 @@
 #' wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata, threshold = 0.005)
 #' wu_subset <- wu_SE[,1:20]
 #' \url{http://dx.doi.org/10.1126/sciimmunol.aat9781}
+#' @usage data(wu_subset)
 "wu_subset"

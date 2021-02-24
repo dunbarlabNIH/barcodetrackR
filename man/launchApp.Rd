@@ -17,6 +17,6 @@ Launches the Shiny Barcode App.
 }
 \examples{
 \donttest{
-launchApp()
+if (interactive()) launchApp()
 }
 }

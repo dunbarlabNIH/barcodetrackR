@@ -1,5 +1,7 @@
 context("Clonal Diversity Functions")
 
+data(wu_subset)
+
 test_that("rank_abundance works", {
     testthat::expect_type(barcodetrackR::rank_abundance_plot(wu_subset[, 1:5]), "list")
     testthat::expect_s3_class(barcodetrackR::rank_abundance_plot(wu_subset[, 1:5], return_table = TRUE), "data.frame")

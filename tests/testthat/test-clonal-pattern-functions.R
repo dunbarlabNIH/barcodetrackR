@@ -1,5 +1,7 @@
 context("Clonal Pattern Functions")
 
+data(wu_subset)
+
 test_that("barcode_ggheatmap works", {
     testthat::expect_type(barcodetrackR::barcode_ggheatmap(wu_subset), "list")
     testthat::expect_s3_class(barcodetrackR::barcode_ggheatmap(wu_subset, return_table = TRUE), "data.frame")

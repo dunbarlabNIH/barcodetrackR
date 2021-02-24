@@ -6,7 +6,7 @@
 #' @return Page launching the Shiny Barcode App
 #' @examples
 #' \donttest{
-#' launchApp()
+#' if (interactive()) launchApp()
 #' }
 #' @export
 launchApp <- function(x = NULL) {
