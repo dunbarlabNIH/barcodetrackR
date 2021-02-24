@@ -59,22 +59,21 @@ For this vignette, we will load publically available data from the following pap
 
 ```{r load data, eval = TRUE}
 
-system.file("extdata", "/WuC_etal/monkey_ZJ31.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/WuC_etal_appdata/sample_data_ZJ31.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> wu_dataframe
 
-system.file("extdata", "/WuC_etal/monkey_ZJ31_metadata.txt", package = "barcodetrackR") %>%
+system.file("extdata", "/WuC_etal_appdata/sample_metadata_ZJ31.txt", package = "barcodetrackR") %>%
   read.delim() -> wu_metadata
 
 wu_SE <- create_SE(your_data = wu_dataframe,
                    meta_data = wu_metadata,
                    threshold = 0)
 
+
 system.file("extdata", "KoelleSJ_etal/ZH33_reads.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> koelle_dataframe
-
 system.file("extdata", "/KoelleSJ_etal/ZH33_metadata.txt", package = "barcodetrackR") %>%
   read.delim() -> koelle_metadata
-
 koelle_SE <- create_SE(your_data = koelle_dataframe,
                        meta_data = koelle_metadata,
                        threshold = 0)
@@ -90,8 +89,6 @@ belderbos_metadata$weeks <- factor(belderbos_metadata$weeks, levels = c("9", "14
 belderbos_SE <- create_SE(your_data = belderbos_dataframe,
                           meta_data = belderbos_metadata,
                           threshold = 0)
-
-
 
 system.file("extdata", "/SixE_etal/WAS5_reads.txt", package = "barcodetrackR") %>%
   read.delim(row.names = 1) -> six_dataframe
@@ -138,14 +135,19 @@ The population size and proportion labeled must be determined experimentally. Th
 
 
 ```{r estimate threshold, eval = TRUE}
-my_thresh <- estimate_barcode_threshold(capture_efficiency = 0.4, population_size = 500000, proportion_labeled = 0.3,
-                                        confidence_level = 0.95, verbose = TRUE)
+my_thresh <- estimate_barcode_threshold(capture_efficiency = 0.4,
+                                        population_size = 500000,
+                                        proportion_labeled = 0.3,
+                                        confidence_level = 0.95,
+                                        verbose = TRUE)
 ```
 
 This threshold can be applied to an existing SE to remove low abundance barcodes which do not reach the thresold in any sample.
 
 ```{r apply thresholding, eval = TRUE}
-wu_thresh <- threshold_SE(your_SE = wu_SE, threshold_value = 0.005, threshold_type = "relative",
+wu_thresh <- threshold_SE(your_SE = wu_SE,
+                          threshold_value = 0.005,
+                          threshold_type = "relative",
                           verbose = TRUE)
 ```
 
@@ -297,10 +299,7 @@ In some cases, we may be interested in whether each barcode changed in proportio
 The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. Users can view the p-value from the statistical test on the heatmap by changing the `cellnote_assay` parameter to `"p_val"`. Users can also compare each sample to a reference sample (such as the first timepoint) by changing the `stat_option` to `"reference"` and providing the desired sample name to the `reference_sample` parameter.
 
 ```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 10, fig.height=7}
-wu_CD16_NK_order <- c("ZJ31_3m_NK_CD56n_CD16p", "ZJ31_4m_NK_CD56n_CD16p",
-                      "ZJ31_6m_NK_CD56n_CD16p", "ZJ31_8.5m_NK_CD56n_CD16p",
-                      "ZJ31_9.5m_NK_CD56n_CD16p", "ZJ31_12m_NK_CD56n_CD16p",
-                      "ZJ31_17.5m_NK_CD56n_CD16p", "ZJ31_20m_NK_CD56n_CD16p")
+wu_CD16_NK_order <- colnames(wu_SE)[17:20]
 
 barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
                        sample_size = rep(40000,length(wu_CD16_NK_order)),
@@ -425,7 +424,7 @@ bias_ridge_plot(your_SE = wu_SE,
                 bias_1 = "B",
                 bias_2 = "Gr",
                 split_bias_over = "months",
-                bias_over = c("5","6","9.5","12","20"),
+                bias_over = c("6","9.5","12","20"),
                 weighted = FALSE,
                 add_dots = TRUE)
 ```
