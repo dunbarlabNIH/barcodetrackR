@@ -127,7 +127,7 @@ if (!weighted){
     cell_list <- colnames(temp_binary)[which(unique_count[i,seq_along(colnames(temp_binary))]>0)]
     comb_mat <- combn(cell_list,2)
     # Loop through number of links that must be drawn
-    for (j in 1:num_links){
+    for (j in seq_len(num_links)){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
@@ -136,7 +136,7 @@ if (!weighted){
                             col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
-    for (k in 1:num_cells){
+    for (k in seq_len(num_cells)){
       count_index[cell_list[k]] <- count_index[cell_list[k]] + as.numeric(unique_count[i,"freq"])
     }
   }
@@ -168,14 +168,14 @@ else if (weighted){
                              niceFacing = TRUE, cex = text_size/12)
 
   # Loop through rows of unique_count
-  for (i in 1:nrow(unique_prop)){
-    num_cells <- sum(unique_count[i,1:length(colnames(temp_prop))])
+  for (i in seq_len(nrow(unique_prop))){
+    num_cells <- sum(unique_count[i,seq_along(colnames(temp_prop))])
     num_links <- num_cells*(num_cells-1)/2
 
-    cell_list <- colnames(temp_prop)[which(unique_prop[i,1:length(colnames(temp_prop))]>0)]
+    cell_list <- colnames(temp_prop)[which(unique_prop[i,seq_along(colnames(temp_prop))]>0)]
     comb_mat <- combn(cell_list,2)
     # Loop through number of links that must be drawn
-    for (j in 1:num_links){
+    for (j in seq_len(num_links)){
       # Draw links
       cell.1 <- comb_mat[1,j]
       cell.2 <- comb_mat[2,j]
@@ -184,7 +184,7 @@ else if (weighted){
                             col = adjustcolor(my_cols[i],alpha.f = alpha))
     }
     # Update indices
-    for (k in 1:num_cells){
+    for (k in seq_len(num_cells)){
       prop_count_index[cell_list[k]] <- prop_count_index[cell_list[k]] + as.numeric(unique_prop[i,cell_list[k]])
     }
   }

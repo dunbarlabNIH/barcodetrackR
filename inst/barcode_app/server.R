@@ -780,7 +780,7 @@ shinyServer(
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$clone_plot_over, {updateSelectizeInput(session,
                                                                 inputId = 'clone_plot_over_choices',
-                                                                choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]),decreasing = F))})
+                                                                choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$clone_plot_over]),decreasing = FALSE))})
 
       observeEvent(input$clone_group_by, {updateSelectizeInput(session,
                                                                inputId = 'clone_group_by_choices',
@@ -869,7 +869,7 @@ shinyServer(
       # Helper function to get unique values of the plot_over parameter
       observeEvent(input$div_plot_over, {updateSelectizeInput(session,
                                                               inputId = 'div_plot_over_choices',
-                                                              choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$div_plot_over]), decreasing = F))})
+                                                              choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$div_plot_over]), decreasing = FALSE))})
 
       observeEvent(input$div_group_by, {updateSelectizeInput(session,
                                                              inputId = 'div_group_by_choices',
@@ -968,7 +968,7 @@ shinyServer(
 
       observeEvent(input$ridge_split_bias_over, {updateSelectizeInput(session,
                                                                       inputId = 'ridge_bias_over_select',
-                                                                      choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_over]), decreasing = F))})
+                                                                      choices = sort(unique(SummarizedExperiment::colData(thresholded_data())[,input$ridge_split_bias_over]), decreasing = FALSE))})
 
 
       fluidRow(

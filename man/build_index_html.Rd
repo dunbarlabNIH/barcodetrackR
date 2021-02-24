@@ -14,6 +14,9 @@ build_index_html(
 
 \item{output}{the target for the vignette output}
 }
+\value{
+Writes the vignette to docs/index.html. Only for internal use (get outta here!).
+}
 \description{
 Build html for vignette to index.html in docs
 }

@@ -147,7 +147,7 @@ clonal_contribution <- function(your_SE,
   }
 
   if (return_table){
-    return(plotting_data[,seq_along(1:3)])
+    return(plotting_data[,seq_len(3)])
   }
 
   if (graph_type == "bar"){

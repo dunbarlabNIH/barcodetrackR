@@ -17,7 +17,7 @@ chord_diagram(
 \arguments{
 \item{your_SE}{Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.}
 
-\item{weighted}{Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = T will make the link width based on the clone's proportion in the samples.}
+\item{weighted}{Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = TRUE will make the link width based on the clone's proportion in the samples.}
 
 \item{plot_label}{Character. Name of colData variable to use as labels for regions. Defaults to SAMPLENAME}
 

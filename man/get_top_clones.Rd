@@ -13,6 +13,9 @@ get_top_clones(your_SE, SAMPLENAME_choice, n_clones = 10)
 
 \item{n_clones}{Numeric. Number of top clones from the specified sample that should be retrieved.}
 }
+\value{
+The row indices for the top n_clones in the dataset, using the 'ranks' assay.
+}
 \description{
 Retrieves the sequence(s) (row-identifier(s)) of the top "n_clones" within the specified sample from a SummarizedExperiment object.
 }
