@@ -114,7 +114,7 @@ if (weighted == FALSE){
   circlize::circos.track(factors = factor(colnames(your_data), levels = colnames(your_data)), ylim = c(0, 1), bg.col = "grey",
                bg.border = NA, track.height = 0.1)
   # Add labels
-  circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,seq_along(colnames(your_data))),
+  circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
                              niceFacing = T, cex = text_size/12)
