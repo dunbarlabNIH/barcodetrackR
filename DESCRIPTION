@@ -12,7 +12,10 @@ URL: https://github.com/dunbarlabNIH/barcodetrackR
 License: file LICENSE
 LazyData: TRUE
 Encoding: UTF-8
-biocViews: Software
+biocViews:
+    Software,
+    Visualization,
+    Sequencing
 Imports:
     cowplot,
     circlize,
