@@ -28,6 +28,7 @@ Imports:
     rlang,
     scales,
     shiny,
+    stats,
     SummarizedExperiment,
     S4Vectors,
     tibble,
