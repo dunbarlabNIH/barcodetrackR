@@ -70,7 +70,7 @@ unique_prop <- unique_count
 unique_prop$freq <- NULL
 count_vec <- unique_count$freq
 my_counter <- 1
-for (i in 1:nrow(unique_count)){
+for (i in seq_len(nrow(unique_count))){
   my_start <- my_counter
   my_end <- my_counter + count_vec[i] - 1
   if (my_start == my_end){
@@ -105,7 +105,7 @@ if (weighted == FALSE){
 
   # Make x limits matrix
   xlims <- matrix(data = 0, nrow = length(colnames(your_data)), ncol = 2) # Just a placeholder
-  for (m in 1:length(colnames(your_data))){
+  for (m in seq_along(colnames(your_data))){
     xlims[m,2] <- colSums(your_data != 0)[m]
   }
   circlize::circos.initialize(factors = factor(colnames(your_data), levels = colnames(your_data)), xlim = xlims)
@@ -114,17 +114,17 @@ if (weighted == FALSE){
   circlize::circos.track(factors = factor(colnames(your_data), levels = colnames(your_data)), ylim = c(0, 1), bg.col = "grey",
                bg.border = NA, track.height = 0.1)
   # Add labels
-  circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
+  circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,seq_along(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
                              niceFacing = T, cex = text_size/12)
 
   # Loop through rows of unique_count
-  for (i in 1:nrow(unique_count)){
-    num_cells <- sum(unique_count[i,1:length(colnames(temp_binary))])
+  for (i in seq_len(nrow(unique_count))){
+    num_cells <- sum(unique_count[i,seq_along(colnames(temp_binary))])
     num_links <- num_cells*(num_cells-1)/2
 
-    cell_list <- colnames(temp_binary)[which(unique_count[i,1:length(colnames(temp_binary))]>0)]
+    cell_list <- colnames(temp_binary)[which(unique_count[i,seq_along(colnames(temp_binary))]>0)]
     comb_mat <- combn(cell_list,2)
     # Loop through number of links that must be drawn
     for (j in 1:num_links){

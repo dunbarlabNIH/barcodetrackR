@@ -7,7 +7,10 @@ Authors@R:
     c(person(c("Diego", "Alexander"), "Espinoza", email = "diego.espinoza@pennmedicine.upenn.edu", role = c("aut", "cre")),
       person("Ryland", "Mortlock", email = "ryland.mortlock@nih.gov", role = c("aut")))
 Description:barcodetrackR is an R package developed for the analysis and
-            visualization of clonal tracking data from cellular barcoding experiments.
+            visualization of clonal tracking data. Data required is samples
+            and tag abundances in matrix form, whether from cellular barcoding
+            experiments, integration site retrieval analyses, or similar
+            technologies.
 URL: https://github.com/dunbarlabNIH/barcodetrackR
 License: file LICENSE
 LazyData: TRUE

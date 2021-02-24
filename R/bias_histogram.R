@@ -73,7 +73,7 @@ bias_histogram <- function(your_SE,
   }
 
   # Check each value of bias_over
-  for (i in 1:length(bias_over)){
+  for (i in seq_along(bias_over)){
     num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
     num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
 
@@ -101,7 +101,7 @@ bias_histogram <- function(your_SE,
   }
 
   # Repeat the loop to throw the error if there are ambiguous samples after printing all helpful info.
-  for (i in 1:length(bias_over)){
+  for (i in seq_along(bias_over)){
     num_samples1 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_1,])
     num_samples2 <- nrow(SummarizedExperiment::colData(your_SE)[SummarizedExperiment::colData(your_SE)[[split_bias_over]] == bias_over[i] & SummarizedExperiment::colData(your_SE)[[split_bias_on]] == bias_2,])
     if (num_samples1 > 1 | num_samples2 > 1){
@@ -129,7 +129,7 @@ bias_histogram <- function(your_SE,
   # pre-allocate
   your_data_list <- list()
 
-  plot_list <- lapply(1:length(bias_over), function(i){
+  plot_list <- lapply(seq_along(bias_over), function(i){
     loop_coldata <- temp_subset_coldata %>% dplyr::filter(!!as.name(split_bias_over) %in% bias_over[i])
     loop_bias_1 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_1) %>% dplyr::pull("SAMPLENAME") %>% as.character()
     loop_bias_2 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_2) %>% dplyr::pull("SAMPLENAME") %>% as.character()

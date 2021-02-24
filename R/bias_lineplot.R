@@ -75,7 +75,7 @@ bias_lineplot <- function(your_SE,
   your_data <- your_data[rowSums(your_data) > 0, ,drop = FALSE]
 
 
-  lapply(1:length(bias_over), function(i){
+  lapply(seq_along(bias_over), function(i){
     loop_coldata <- temp_subset_coldata %>% dplyr::filter(!!as.name(split_bias_over) %in% bias_over[i])
     loop_bias_1 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_1) %>% dplyr::pull("SAMPLENAME") %>% as.character()
     loop_bias_2 <- dplyr::filter(loop_coldata, !!as.name(split_bias_on) == bias_2) %>% dplyr::pull("SAMPLENAME") %>% as.character()

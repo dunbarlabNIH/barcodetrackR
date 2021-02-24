@@ -107,7 +107,7 @@ clonal_contribution <- function(your_SE,
   if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
     duplicated_plot_over <- temp_subset_coldata[[plot_over]][duplicated(temp_subset_coldata[[plot_over]])]
     cat("Duplicate samples with the same value of the plot_over variable:",plot_over, "\n")
-    for (i in 1:length(duplicated_plot_over)){
+    for (i in seq_along(duplicated_plot_over)){
       duplicated_samplenames <- temp_subset_coldata[["SAMPLENAME"]][temp_subset_coldata[[plot_over]] == duplicated_plot_over[i]]
       cat(plot_over, "value =",duplicated_plot_over[i], "; Duplicate sample names =", duplicated_samplenames, "\n")
       your_data[,duplicated_samplenames[1]] <- rowMeans(your_data[,duplicated_samplenames])
@@ -147,7 +147,7 @@ clonal_contribution <- function(your_SE,
   }
 
   if (return_table){
-    return(plotting_data[,1:3])
+    return(plotting_data[,seq_along(1:3)])
   }
 
   if (graph_type == "bar"){
