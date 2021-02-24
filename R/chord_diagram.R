@@ -3,7 +3,7 @@
 #' Creates a chord diagram showing each cell type (or other factor) as a region around a circle and shared clones between these cell types as links between the regions. The space around the regions which is not connected to a chord indicates clones unique to that sample, not shared with other samples.
 #'
 #'@param your_SE Summarized Experiment object containing clonal tracking data as created by the barcodetrackR `create_SE` function.
-#'@param weighted Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = T will make the link width based on the clone's proportion in the samples.
+#'@param weighted Logical. weighted = F which is default will make links based on the number of shared clones between the factors. Weighted = TRUE will make the link width based on the clone's proportion in the samples.
 #'@param plot_label Character. Name of colData variable to use as labels for regions. Defaults to SAMPLENAME
 #'@param alpha Numeric. Transparency of links. Default = 1 is opaque. 0 is completely transluscent
 #'@param your_title Character. The title for the plot.
@@ -92,7 +92,7 @@ names(prop_count_index) <- colnames(temp_binary)
 my_cols = viridis::viridis(nrow(unique_count))
 
 
-if (weighted == FALSE){
+if (!weighted){
 
   if (return_table){
     return(unique_count)
@@ -117,7 +117,7 @@ if (weighted == FALSE){
   circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
-                             niceFacing = T, cex = text_size/12)
+                             niceFacing = TRUE, cex = text_size/12)
 
   # Loop through rows of unique_count
   for (i in seq_len(nrow(unique_count))){
@@ -144,7 +144,7 @@ if (weighted == FALSE){
   # circos.clear()
 }
 
-else if (weighted == TRUE){
+else if (weighted){
 
   if (return_table){
     return(unique_prop)
@@ -165,7 +165,7 @@ else if (weighted == TRUE){
   circlize::circos.trackText(x = xlims[,2]/2, y = rep(0.5,length(colnames(your_data))),
                              factors = factor(colnames(your_data),levels = colnames(your_data)),
                              labels = factor(colnames(your_data), levels = colnames(your_data)),
-                             niceFacing = T, cex = text_size/12)
+                             niceFacing = TRUE, cex = text_size/12)
 
   # Loop through rows of unique_count
   for (i in 1:nrow(unique_prop)){

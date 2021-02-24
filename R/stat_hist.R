@@ -45,7 +45,7 @@ stat_hist <- function(your_SE,
     your_data <- SummarizedExperiment::assays(your_SE)[[assay_choice]]
 
     # Make plots
-    plot_list <- lapply(1:ncol(your_data), function(i){
+    plot_list <- lapply(seq_len(ncol(your_data)), function(i){
       if (is.null(your_title)){
         your_title <- colnames(your_data)[i]
       }

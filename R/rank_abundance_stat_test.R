@@ -36,7 +36,7 @@ rank_abundance_stat_test = function(your_SE,
                                  dimnames=list(colnames(your_data), colnames(your_data))))
 
   # Get rank_abundance_data
-  lapply(1:ncol(your_data), function(i){
+  lapply(seq_len(ncol(your_data)), function(i){
     tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%
       dplyr::filter(.data$percentage > 0) %>%
       dplyr::arrange(desc(.data$percentage)) %>%
@@ -45,7 +45,7 @@ rank_abundance_stat_test = function(your_SE,
   }) -> my_data_list
 
   # Compare each pairwise rank abundance profile
-  for (i in 1:(length(my_data_list))){ # column index
+  for (i in seq_along(my_data_list)){ # column index
 
     for (j in i:(length(my_data_list))){ # row index
 

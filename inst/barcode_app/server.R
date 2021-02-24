@@ -111,7 +111,7 @@ shinyServer(
     })
 
     observeEvent(input$samplebutton, {
-      message("loading sample data") 
+      message("loading sample data")
       thresholded_data(barcodetrackR::wu_subset)
       appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
       appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
@@ -436,13 +436,13 @@ shinyServer(
         )
       )
     })
-    
-    
+
+
     #======================================================================================================
     #DISTPLOT TAB
-    
+
     output$DistPlot <- renderUI({
-      
+
       distplotInput <- function(){
         barcodetrackR::dist_plot(your_SE = distplot_data(),
                                  assay = input$distplot_assay,
@@ -458,12 +458,12 @@ shinyServer(
                                  point_scale = input$distplot_point_scale,
                                  minkowski_p = input$displot_minkowski_p)
       }
-      
-      
+
+
       output$viewdistplot <- renderPlot({
         distplotInput()
       })
-      
+
       output$downloadDistData <- downloadHandler(
         filename = function() {paste(gsub(".txt","",input$file1), "distplot_data.txt", sep = "_")},
         content = function(file){
@@ -484,7 +484,7 @@ shinyServer(
                       file = file, sep = "\t", quote = FALSE, row.names = FALSE, col.names = TRUE)
         }
       )
-      
+
       distplot_data <- reactive({
         se <- thresholded_data()
         se <- se[,se$SAMPLENAME %in% input$distplot_Samples] # subset samples
@@ -492,11 +492,11 @@ shinyServer(
         se <- se[,order(se$SAMPLENAME)]
         return(se)
       })
-      
+
       #======================================================================================================
       observeEvent(input$distplot_Copier, {updateSelectizeInput(session, inputId = 'distplot_Samples', selected = input$Heatmap_samples)})
-      
-      
+
+
       fluidRow(
         column(3,
                wellPanel(
@@ -526,13 +526,13 @@ shinyServer(
                  downloadButton('downloadDistData', 'Dist_data')
                )
         ),
-        
+
         column(8,
                plotOutput('viewdistplot', height = 800)
         )
       )
     })
-    
+
 
 
     #======================================================================================================
@@ -693,7 +693,7 @@ shinyServer(
 
       observeEvent(input$cc_plot_over, {updateSelectizeInput(session,
                                                              inputId = 'cc_plot_over_choices',
-                                                             choices = sort(unique(colData(thresholded_data())[,input$cc_plot_over]), decreasing = F))})
+                                                             choices = sort(unique(colData(thresholded_data())[,input$cc_plot_over]), decreasing = FALSE))})
 
 
       fluidRow(

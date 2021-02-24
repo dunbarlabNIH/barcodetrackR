@@ -42,7 +42,7 @@ test_that("bias_lineplot works", {
                                                          bias_1 = "B",
                                                          bias_2 = "Gr",
                                                          split_bias_over = "months",
-                                                         remove_unique = TRUE, 
+                                                         remove_unique = TRUE,
                                                          return_table = TRUE), "data.frame")
 })
 #> Test passed 🥳

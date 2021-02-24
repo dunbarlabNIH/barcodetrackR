@@ -38,7 +38,7 @@ rank_abundance_plot = function(your_SE,
 
   your_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
 
-  lapply(1:ncol(your_data), function(i){
+  lapply(seq_len(ncol(your_data)), function(i){
     tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[,i]) %>%
       dplyr::filter(.data$percentage > 0) %>%
       dplyr::arrange(desc(.data$percentage)) %>%

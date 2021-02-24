@@ -90,7 +90,7 @@ clonal_count <- function(your_SE,
     your_data %>%
       dplyr::mutate(barcode_seq = rownames(your_data)) %>%
       dplyr::select(.data$barcode_seq, everything()) %>%
-      tidyr::pivot_longer(cols = 1:ncol(your_data)+1,  names_to = "sample", values_to = "count") %>%
+      tidyr::pivot_longer(cols = seq_len(ncol(your_data))+1,  names_to = "sample", values_to = "count") %>%
       dplyr::filter(count>0) -> tidy_counts
 
     # Add group by variable into tidy counts
@@ -150,7 +150,7 @@ clonal_count <- function(your_SE,
         dplyr::arrange(factor(.data$SAMPLENAME), levels = unique(tidy_counts_ordered$sample))  -> calculated_index
 
       # Give the missing samples the same cumulative count as above samples
-      for (i in 1:nrow(calculated_index)){
+      for (i in seq_along(nrow(calculated_index))){
         if (calculated_index[i,"SAMPLENAME"] %in% samples_not_found){
           calculated_index[i,"index"] = calculated_index[i-1,"index"]
         }

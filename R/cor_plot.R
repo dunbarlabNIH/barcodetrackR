@@ -57,8 +57,8 @@ cor_plot = function(your_SE,
 
   plotting_data_columns <- colnames(plotting_data)
 
-  plotting_data_longer <- lapply(1:length(plotting_data_columns), function(i){
-    lapply(1:length(plotting_data_columns), function(j){
+  plotting_data_longer <- lapply(seq_along(plotting_data_columns), function(i){
+    lapply(seq_along(plotting_data_columns), function(j){
 
       temp_df <- data.frame(plotting_data[[i]], plotting_data[[j]])
       temp_df <- temp_df[rowSums(temp_df) > 0, ]
