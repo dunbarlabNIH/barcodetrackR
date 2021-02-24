@@ -16,5 +16,7 @@ Page launching the Shiny Barcode App
 Launches the Shiny Barcode App.
 }
 \examples{
-\dontrun{launchApp()}
+\donttest{
+launchApp()
+}
 }

@@ -55,5 +55,4 @@ A line plot that tracks the total number of clones or the cumulative number of c
 }
 \examples{
 clonal_count(your_SE = wu_subset, cumulative = FALSE, plot_over = "months", group_by = "celltype")
-
 }

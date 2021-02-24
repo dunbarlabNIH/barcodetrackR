@@ -27,7 +27,8 @@ Returns a SummarizedExperiment containing only barcodes which passed the supplie
 Removes barcodes from a SummarizedExperiment object which have an abundance lower than the provided relative or absolute threshold. See the function `estimate_barcode_threshold` to estimate an appropriate threshold for an SE.
 }
 \examples{
-threshold_SE(your_SE = wu_subset, threshold_value = 0.005,
-            threshold_type = "relative", verbose = TRUE)
-
+threshold_SE(
+    your_SE = wu_subset, threshold_value = 0.005,
+    threshold_type = "relative", verbose = TRUE
+)
 }

@@ -54,7 +54,9 @@ Histogram of log bias for two factors faceted over another set of factors. Or, i
 Given a summarized experiment, gives histogram of log biases for 2 cell types. Each stacked bar in the histogram represents a clone binned by log bias defined as the log2 of the percentage abundance in the sample specified in "bias_1" divided by the percentage abundance in "bias_2."
 }
 \examples{
-bias_histogram(your_SE = wu_subset, split_bias_on = "celltype",
-              bias_1 = "B", bias_2 = "T",
-              split_bias_over = "months", ncols = 2)
+bias_histogram(
+    your_SE = wu_subset, split_bias_on = "celltype",
+    bias_1 = "B", bias_2 = "T",
+    split_bias_over = "months", ncols = 2
+)
 }

@@ -55,4 +55,5 @@ Plots the pairwise correlation between the specified assay of each sample-sample
 }
 \examples{
 cor_plot(your_SE = wu_subset, plot_type = "color")
+# "
 }

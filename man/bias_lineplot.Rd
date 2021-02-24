@@ -45,6 +45,8 @@ Bias line plot for two lineages over time. Or if return_table is set to TRUE, a 
 Given a summarized experiment and a specified factor to compare bias between "split_bias_on", shows the value of that bias plotted against another specified factor "split_bias_over" where each clone is represented by a line shaded by its overall abundance in the two samples being compared.
 }
 \examples{
-bias_lineplot(your_SE = wu_subset, split_bias_on = "celltype",
-             bias_1 = "B", bias_2 = "T", split_bias_over = "months")
+bias_lineplot(
+    your_SE = wu_subset, split_bias_on = "celltype",
+    bias_1 = "B", bias_2 = "T", split_bias_over = "months"
+)
 }

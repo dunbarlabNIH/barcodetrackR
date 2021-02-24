@@ -48,8 +48,9 @@ Bias plot for two lineages over time. Or a dataframe containing the bias value a
 Given a summarized experiment and a specified factor to compare bias between, gives ridge plots which show the density of clones at each value of log bias where log bias is calculated as log((normalized abundance in sample 1 + 1)/(normalized abundance in sample 2 + 1)). If the weighted option is set to TRUE, the density estimator will weight the estimation by the added proportion of the clone between the two samples.
 }
 \examples{
-bias_ridge_plot(your_SE = wu_subset, split_bias_on = "celltype",
-               bias_1 = "B", bias_2 = "T", split_bias_over = "months",
-               add_dots = TRUE)
-
+bias_ridge_plot(
+    your_SE = wu_subset, split_bias_on = "celltype",
+    bias_1 = "B", bias_2 = "T", split_bias_over = "months",
+    add_dots = TRUE
+)
 }

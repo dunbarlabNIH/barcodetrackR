@@ -14,9 +14,16 @@
 #' @import SummarizedExperiment
 #'
 #' @examples
-#' \dontrun{
-#' create_SE(your_data = my_count_data, meta_data = my_metadata)
-#' }
+#' count_path <- system.file("extdata",
+#'                           "/WuC_etal_appdata/sample_data_ZJ31.txt",
+#'                           package = "barcodetrackR")
+#' wu_dataframe <- read.delim(count_path, row.names = 1)
+#' metadata_path <- system.file("extdata",
+#'                           "/WuC_etal_appdata/sample_metadata_ZJ31.txt",
+#'                           package = "barcodetrackR")
+#' wu_metadata <- read.delim(metadata_path)
+#' wu_SE <- create_SE(your_data = wu_dataframe, meta_data = wu_metadata,
+#'                   threshold = 0)
 #'
 #' @export
 #'

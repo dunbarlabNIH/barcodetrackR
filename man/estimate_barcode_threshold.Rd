@@ -33,10 +33,11 @@ The proportional abundance of a clonal tag of size N is \cr `N / (T * F)` \cr wh
 The population size and proportion labeled must be determined experimentally. The capture efficiency should be estimated for a given clonal tracking technique by simulating the barcode retrieval process in silico and finding the capture efficiency which leads to a total # of detected barcodes matching the experimentally determined number. Adair et al `(PMID: 32355868)` performed this analysis for viral integration site analysis and DNA barcode sequencing and determined good estimates for the capture efficiencies of these two technologies to be 0.05 and 0.4 respectively.
 }
 \examples{
-estimate_barcode_threshold(capture_efficiency = 0.4,
-                          population_size = 500000,
-                          proportion_labeled = 0.3,
-                          confidence_level = 0.95,
-                          verbose = TRUE)
-
+estimate_barcode_threshold(
+    capture_efficiency = 0.4,
+    population_size = 500000,
+    proportion_labeled = 0.3,
+    confidence_level = 0.95,
+    verbose = TRUE
+)
 }

@@ -63,4 +63,5 @@ Plots the pairwise distances of the specified assay between each sample-sample p
 }
 \examples{
 dist_plot(your_SE = wu_subset, plot_type = "color")
+# "
 }
