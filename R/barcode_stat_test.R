@@ -66,7 +66,7 @@ barcode_stat_test <- function(your_SE,
 
             # Perform statistical test
             if (stat_test == "chi-squared") {
-                p_val_df[, i] <- sapply(1:nrow(your_SE), function(z) {
+                p_val_df[, i] <- sapply(seq_len(nrow(your_SE)), function(z) {
                     chisq.test(x = rbind(
                         c(
                             SummarizedExperiment::assays(your_SE)$proportions[z, i] * sample_size[i],
@@ -79,7 +79,7 @@ barcode_stat_test <- function(your_SE,
                     ))$p.val
                 })
             } else if (stat_test == "fisher") {
-                p_val_df[, i] <- sapply(1:nrow(your_SE), function(z) {
+                p_val_df[, i] <- sapply(seq_len(nrow(your_SE)), function(z) {
                     fisher.test(x = rbind(
                         c(
                             SummarizedExperiment::assays(your_SE)$proportions[z, i] * sample_size[i],
@@ -99,7 +99,7 @@ barcode_stat_test <- function(your_SE,
         if (stat_ref_choice %in% colnames(your_SE) == FALSE) {
             stop("reference_sample must be a column name in your_SE")
         }
-        stat_test_index <- 1:length(colnames(your_SE))
+        stat_test_index <- seq_along(colnames(your_SE))
         stat_ref_index <- which(colnames(your_SE) %in% stat_ref_choice)
         stat_test_index <- stat_test_index[!stat_test_index %in% stat_ref_index] # Remove reference column
 
@@ -116,7 +116,7 @@ barcode_stat_test <- function(your_SE,
 
             # Perform statistical test compared to reference
             if (stat_test == "chi-squared") {
-                p_mat[, i] <- sapply(1:nrow(your_SE), function(z) {
+                p_mat[, i] <- sapply(seq_len(nrow(your_SE)), function(z) {
                     chisq.test(x = rbind(
                         c(
                             SummarizedExperiment::assays(your_SE)$proportions[z, i] * sample_size[i],
@@ -129,7 +129,7 @@ barcode_stat_test <- function(your_SE,
                     ))$p.val
                 })
             } else if (stat_test == "fisher") {
-                p_mat[, i] <- sapply(1:nrow(your_SE), function(z) {
+                p_mat[, i] <- sapply(seq_len(nrow(your_SE)), function(z) {
                     fisher.test(x = rbind(
                         c(
                             SummarizedExperiment::assays(your_SE)$proportions[z, i] * sample_size[i],
