@@ -24,6 +24,7 @@
 #' @import tibble
 #'
 #' @examples
+#' data(wu_subset)
 #' clonal_diversity(
 #'     your_SE = wu_subset, index_type = "shannon",
 #'     plot_over = "months", group_by = "celltype"

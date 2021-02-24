@@ -6,6 +6,7 @@
 #' @param ... Arguments passed to subset_SE in the form of `X = keys` where `X` is a column from SE's colData and `keys` are entries in the colData to subset.
 #' @return Returns a subsetted SummarizedExperiment object.
 #' @examples
+#' data(wu_subset)
 #' wu_B.5month <- subset_SE(wu_subset, celltype = "B", timepoint = "6.0")
 #' @export
 subset_SE <- function(your_SE, ...) {

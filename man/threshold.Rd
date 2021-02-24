@@ -22,6 +22,7 @@ to each column (e.g. if threshold is set as 0.0005, only rows in which an elemen
 its column will be kept).
 }
 \examples{
+data(wu_subset)
 threshold(SummarizedExperiment::assay(wu_subset, assay = "counts"),
     thresh = 0.0005
 )

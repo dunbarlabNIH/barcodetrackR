@@ -30,6 +30,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' barcode_ggheatmap(
 #'     your_SE = wu_subset, n_clones = 10,
 #'     grid = TRUE, label_size = 6

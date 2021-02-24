@@ -16,6 +16,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' rank_abundance_stat_test(your_SE = wu_subset, statistical_test = "ks")
 rank_abundance_stat_test <- function(your_SE,
     statistical_test = "ks") {

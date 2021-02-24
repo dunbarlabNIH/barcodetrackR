@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' barcode_binary_heatmap(your_SE = wu_subset[, 1:4])
 barcode_binary_heatmap <- function(your_SE, plot_labels = NULL, threshold = 0,
     your_title = NULL, label_size = 12, return_table = FALSE) {

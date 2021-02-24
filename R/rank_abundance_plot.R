@@ -20,6 +20,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' rank_abundance_plot(your_SE = wu_subset[, 1:4], point_size = 2)
 rank_abundance_plot <- function(your_SE,
     scale_rank = FALSE,

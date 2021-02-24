@@ -22,6 +22,7 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples
+#' data(wu_subset)
 #' bias_histogram(
 #'     your_SE = wu_subset, split_bias_on = "celltype",
 #'     bias_1 = "B", bias_2 = "T",

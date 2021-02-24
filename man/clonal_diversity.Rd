@@ -51,6 +51,7 @@ Outputs plot of a diversity measure tracked for groups over a factor. Or if retu
 A line plot that tracks a diversity measure from selected samples of the SummarizedExperiment object plotted over a specified variable.
 }
 \examples{
+data(wu_subset)
 clonal_diversity(
     your_SE = wu_subset, index_type = "shannon",
     plot_over = "months", group_by = "celltype"

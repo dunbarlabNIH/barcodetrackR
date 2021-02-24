@@ -23,6 +23,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' chord_diagram(your_SE = wu_subset[, c(4, 8, 12)], plot_label = "celltype")
 chord_diagram <- function(your_SE,
     weighted = FALSE,

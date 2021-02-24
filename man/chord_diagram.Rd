@@ -36,5 +36,6 @@ Displays a chord diagram in the current plot window depicting shared clonality b
 Creates a chord diagram showing each cell type (or other factor) as a region around a circle and shared clones between these cell types as links between the regions. The space around the regions which is not connected to a chord indicates clones unique to that sample, not shared with other samples.
 }
 \examples{
+data(wu_subset)
 chord_diagram(your_SE = wu_subset[, c(4, 8, 12)], plot_label = "celltype")
 }

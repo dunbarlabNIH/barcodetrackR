@@ -18,5 +18,6 @@ Returns a subsetted SummarizedExperiment object.
 Subsets an existing SummarizedExperiment object.
 }
 \examples{
+data(wu_subset)
 wu_B.5month <- subset_SE(wu_subset, celltype = "B", timepoint = "6.0")
 }

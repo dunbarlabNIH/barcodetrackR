@@ -24,6 +24,7 @@
 #' @import tibble
 #'
 #' @examples
+#' data(wu_subset)
 #' clonal_count(your_SE = wu_subset, cumulative = FALSE, plot_over = "months", group_by = "celltype")
 #' @export
 clonal_count <- function(your_SE,

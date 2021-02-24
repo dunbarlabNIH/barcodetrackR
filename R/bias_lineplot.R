@@ -19,6 +19,7 @@
 #' @importFrom plyr .
 #'
 #' @examples
+#' data(wu_subset)
 #' bias_lineplot(
 #'     your_SE = wu_subset, split_bias_on = "celltype",
 #'     bias_1 = "B", bias_2 = "T", split_bias_over = "months"

@@ -27,6 +27,7 @@
 #' @return Displays a stacked area line or bar plot (made by ggplot2) of the samples' top clones. Or, if return_table is set to TRUE, returns a dataframe of the percentage abundances in each sample.
 #'
 #' @examples
+#' data(wu_subset)
 #' clonal_contribution(
 #'     your_SE = wu_subset, graph_type = "bar",
 #'     SAMPLENAME_choice = "ZJ31_20m_T",

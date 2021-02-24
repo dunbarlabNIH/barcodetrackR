@@ -26,6 +26,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' cor_plot(your_SE = wu_subset, plot_type = "color")
 #' # "
 cor_plot <- function(your_SE,

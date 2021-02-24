@@ -28,6 +28,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' dist_plot(your_SE = wu_subset, plot_type = "color")
 #' # "
 dist_plot <- function(your_SE,

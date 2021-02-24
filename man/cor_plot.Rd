@@ -54,6 +54,7 @@ Plots pairwise correlation plot for the samples in your_SE.
 Plots the pairwise correlation between the specified assay of each sample-sample pair in the provided SummarizedExperiment.
 }
 \examples{
+data(wu_subset)
 cor_plot(your_SE = wu_subset, plot_type = "color")
 # "
 }

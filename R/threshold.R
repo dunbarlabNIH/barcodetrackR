@@ -11,6 +11,7 @@
 #' @param thresh_type Character. One of "relative" or "absolute"
 #' @return A data frame where all rows (barcodes) that did not have at least one element meet the threshold have been discarded.
 #' @examples
+#' data(wu_subset)
 #' threshold(SummarizedExperiment::assay(wu_subset, assay = "counts"),
 #'     thresh = 0.0005
 #' )

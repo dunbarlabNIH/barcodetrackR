@@ -93,6 +93,7 @@ Displays a heatmap in the current plot window. Or if return_table is set to TRUE
 Creates a heatmap from the columns of data in the Summarized Experiment object, with the option to label based on statistical analysis. Uses ggplot2.
 }
 \examples{
+data(wu_subset)
 barcode_ggheatmap_stat(
     your_SE = wu_subset[, 1:4], sample_size = rep(5000, 4),
     stat_test = "chi-squared", stat_option = "subsequent",

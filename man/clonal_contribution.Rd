@@ -63,6 +63,7 @@ Displays a stacked area line or bar plot (made by ggplot2) of the samples' top c
 Bar or line plot of percentage contribution of the top clones from a selected sample or all clones across samples matching the specified filter within the SummarizedExperiment object. Usually used for tracking a cell lineage's top clones over time.
 }
 \examples{
+data(wu_subset)
 clonal_contribution(
     your_SE = wu_subset, graph_type = "bar",
     SAMPLENAME_choice = "ZJ31_20m_T",

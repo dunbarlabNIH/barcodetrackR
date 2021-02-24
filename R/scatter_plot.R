@@ -19,6 +19,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' scatter_plot(your_SE = wu_subset[, c(4, 8)])
 #' # "
 scatter_plot <- function(your_SE,

@@ -38,5 +38,6 @@ Use this function to visualize the distribution of barcode abundances within sam
 Note: If comparing the visualization to the statistical testing results from `rank_abundance_stat_test` function in barcodetrackR, please set the `scale_rank` to TRUE. The K-S test is agnostic to number of samples so it is directly comparable to the visualization produced when the barcode ranks are scaled between 0 and 1.
 }
 \examples{
+data(wu_subset)
 rank_abundance_plot(your_SE = wu_subset[, 1:4], point_size = 2)
 }

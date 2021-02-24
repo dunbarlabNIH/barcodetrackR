@@ -39,6 +39,7 @@ Displays a scatter plot of the specified assay for the specified samples in your
 Plots a scatter plot of two samples in the Summarized Experiment object
 }
 \examples{
+data(wu_subset)
 scatter_plot(your_SE = wu_subset[, c(4, 8)])
 # "
 }

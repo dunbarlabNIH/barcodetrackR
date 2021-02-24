@@ -5,7 +5,7 @@
 #' @param x NULL
 #' @return Page launching the Shiny Barcode App
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' launchApp()
 #' }
 #' @export

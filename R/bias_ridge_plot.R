@@ -22,6 +22,7 @@
 #' @import utils
 #'
 #' @examples
+#' data(wu_subset)
 #' bias_ridge_plot(
 #'     your_SE = wu_subset, split_bias_on = "celltype",
 #'     bias_1 = "B", bias_2 = "T", split_bias_over = "months",

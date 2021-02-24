@@ -22,6 +22,7 @@
 #' @export
 #'
 #' @examples
+#' data(wu_subset)
 #' mds_plot(your_SE = wu_subset, method_dist = "bray", group_by = "celltype")
 #' # "
 mds_plot <- function(your_SE,
