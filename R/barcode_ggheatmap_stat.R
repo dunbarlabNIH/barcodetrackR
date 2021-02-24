@@ -35,6 +35,7 @@
 #'@importFrom stats hclust
 #'@importFrom stats fisher.test
 #'@importFrom stats cutree
+#'@importFrom stats p.adjust
 #'
 #'@export
 #'

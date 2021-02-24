@@ -13,6 +13,7 @@
 #'
 #'@importFrom rlang %||%
 #'@importFrom stats chisq.test
+#'@importFrom stats p.adjust
 #'
 #'@export
 #'
