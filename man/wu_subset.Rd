@@ -21,7 +21,7 @@ wu_subset <- wu_SE[,1:20]
 \url{http://dx.doi.org/10.1126/sciimmunol.aat9781}
 }
 \usage{
-wu_subset
+data(wu_subset)
 }
 \description{
 A SummarizedExperiment object containing a subset of the Wu barcoding dataset.
