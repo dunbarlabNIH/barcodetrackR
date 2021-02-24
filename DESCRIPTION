@@ -21,7 +21,6 @@ Imports:
     ggridges,
     graphics,
     grDevices,
-    gridGraphics,
     magrittr,
     plyr,
     proxy,
@@ -45,4 +44,4 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Depends: 
-    R (>= 3.50)
+    R (>= 4.00)
