@@ -19,3 +19,7 @@ The row indices for the top n_clones in the dataset, using the 'ranks' assay.
 \description{
 Retrieves the sequence(s) (row-identifier(s)) of the top "n_clones" within the specified sample from a SummarizedExperiment object.
 }
+\examples{
+get_top_clones(wu_subset, "ZJ31_6m_T", n_clones = 10)
+
+}

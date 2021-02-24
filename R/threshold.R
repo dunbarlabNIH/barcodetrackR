@@ -12,7 +12,8 @@
 #' @return A data frame where all rows (barcodes) that did not have at least one element meet the threshold have been discarded.
 #' @examples
 #' threshold(SummarizedExperiment::assay(wu_subset, assay = "counts"),
-#'           thresh = 0.0005)
+#'     thresh = 0.0005
+#' )
 #' @export
 threshold <- function(your_data, thresh = 0.0005, thresh_type = "relative") {
     if (thresh_type == "relative") {
