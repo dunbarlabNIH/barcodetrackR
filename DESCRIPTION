@@ -13,7 +13,7 @@ Description:barcodetrackR is an R package developed for the analysis and
             technologies.
 URL: https://github.com/dunbarlabNIH/barcodetrackR
 License: file LICENSE
-LazyData: TRUE
+LazyData: FALSE
 Encoding: UTF-8
 biocViews:
     Software,

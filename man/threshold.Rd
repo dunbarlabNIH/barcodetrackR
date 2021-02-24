@@ -23,5 +23,6 @@ its column will be kept).
 }
 \examples{
 threshold(SummarizedExperiment::assay(wu_subset, assay = "counts"),
-          thresh = 0.0005)
+    thresh = 0.0005
+)
 }

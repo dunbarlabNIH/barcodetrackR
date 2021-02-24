@@ -9,7 +9,7 @@ get_top_clones(your_SE, SAMPLENAME_choice, n_clones = 10)
 \arguments{
 \item{your_SE}{A summarized experiment.}
 
-\item{SAMPLENAME_choice}{Name of the SAMPeLNAME identifier within your_SE from which to retrieve the top clones from.}
+\item{SAMPLENAME_choice}{Name of the SAMPLENAME identifier within your_SE from which to retrieve the top clones from.}
 
 \item{n_clones}{Numeric. Number of top clones from the specified sample that should be retrieved.}
 }
@@ -21,5 +21,4 @@ Retrieves the sequence(s) (row-identifier(s)) of the top "n_clones" within the s
 }
 \examples{
 get_top_clones(wu_subset, "ZJ31_6m_T", n_clones = 10)
-
 }
