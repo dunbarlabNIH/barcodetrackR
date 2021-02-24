@@ -1,8 +1,8 @@
 context("Load data")
 
 # Load sample data
-test_data <- read.delim(system.file("extdata", "app_sample_data/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
-test_metadata <- read.delim(system.file("extdata", "app_sample_data/sample_metadata_ZJ31.txt", package = "barcodetrackR"))
+test_data <- read.delim(system.file("extdata", "WuC_etal_appdata/sample_data_ZJ31.txt", package = "barcodetrackR"), row.names = 1)
+test_metadata <- read.delim(system.file("extdata", "WuC_etal_appdata/sample_metadata_ZJ31.txt", package = "barcodetrackR"))
 
 test_that("Creating SE works", {
   testthat::expect_s4_class(barcodetrackR::create_SE(your_data = test_data,
