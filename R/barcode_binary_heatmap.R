@@ -38,7 +38,9 @@ barcode_binary_heatmap <- function(your_SE, plot_labels = NULL, threshold = 0,
     plotting_data$sequence <- factor(plotting_data$sequence, levels = barcode_order)
     x_column <- plyr::mapvalues(plotting_data$sample_name, from = colnames(your_SE), to = plot_labels)
 
-    if (return_table) return(plotting_data)
+    if (return_table) {
+        return(plotting_data)
+    }
 
     plotting_data[["x_labels"]] <- factor(x_column, levels = plot_labels)
 
