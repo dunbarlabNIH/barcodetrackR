@@ -1,7 +1,7 @@
 Package: barcodetrackR
 Type: Package
 Title: Functions for Analyzing Cellular Barcoding Data
-Version: 0.99.0
+Version: 0.99.1
 Date: 2021-02-18
 Authors@R: 
     c(person(c("Diego", "Alexander"), "Espinoza", email = "diego.espinoza@pennmedicine.upenn.edu", role = c("aut", "cre")),
