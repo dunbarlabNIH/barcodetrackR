@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .DS_Store
+*.Rproj
 vignettes/.RDataTmp
 docs
 inst/extdata/SixE_etal/intSites.mergedSamples.collapsed.csv.gz
