@@ -26,7 +26,6 @@ knitr::opts_chunk$set(tidy = FALSE,
                       message = TRUE,
                       error = TRUE,
                       warning = TRUE)
-plot_figures <- TRUE
 #rmdformats::readthedown:
     # self_contained: true
     # thumbnails: false
@@ -190,7 +189,7 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 ```
 
 If desired, we can also calculate and visualize the Pearson correlations for the _"logs"_ assay for the same samples above.
-```{r cor_plot 2, eval = plot_figures, fig.width = 6, fig.height = 5}
+```{r cor_plot 2, eval = TRUE, fig.width = 6, fig.height = 5}
 wu_cor_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
@@ -200,7 +199,7 @@ cor_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 We can return a table of the Pearson correlations as well as the p-values and confidence intervals for each of the comparisons above. This argument `"return_table"` is included in all barcodetrackR functions which conduct mathematical or statistical analysis. By setting the option to "TRUE", users can return the calculated data as a dataframe rather than display the  visualization. Here, we return the p-values and confidence intervals for the correlations calculated using the _"proportions"_ assay.
 
-```{r cor_plot 3, eval = plot_figures}
+```{r cor_plot 3, eval = TRUE}
 cor_plot(wu_SE[,wu_cor_plot_sample_selection],
          method_corr = "pearson",
          assay = "proportions",
@@ -211,7 +210,7 @@ Above, we used two of the three available correlation visualizations (`"color"` 
 
 When there are a smaller number of samples to analyze, the `"number"` option can be used to view the actual correlation within the grid. Here is an example visualizing the Pearson correlations of peripheral blood samples at subsequent timepoints from the Belderbos et al sample data set. Note: within these samples, U stands for unsorted.
 
-```{r cor_plot 4, eval = plot_figures, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
+```{r cor_plot 4, eval = TRUE, fig.width = 4, fig.height = 3, warning=FALSE, message=FALSE}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 cor_plot(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
          method_corr = "pearson",
@@ -229,7 +228,7 @@ summary(proxy::pr_DB)
 ```
 
 We will use the Wu dataset as in the correlation plots above, this time using the `logs` assay to determine pairwise sample distances or similarities. The use of a similarity or distance will be automatically detected in the argument `dist_method` and plotted appropriately. The samples may be clustered or not, using the `cluster_tree` argument. We first show the Manhattan distances calculated between samples for the Wu dataset.
-```{r dist plot 1, eval = plot_figures, fig.width = 7, fig.height = 5}
+```{r dist plot 1, eval = TRUE, fig.width = 7, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "manhattan",
           plot_type = "color",
@@ -238,7 +237,7 @@ dist_plot(wu_SE[,wu_cor_plot_sample_selection],
 
 Here is the same example, this time using the cosine similarity as the pairwise measure, and imposing a clustering on the resulting similarities (note, in the case of calculating hierarchical clustering on a similarity matrix, we use `proxy` to convert similarities to distances prior to clustering). We can also pick a number of color scales, here choosing "Greens".
 
-```{r dist plot 2, eval = plot_figures, fig.width = 7, fig.height = 5}
+```{r dist plot 2, eval = TRUE, fig.width = 7, fig.height = 5}
 dist_plot(wu_SE[,wu_cor_plot_sample_selection],
           dist_method =  "cosine",
           plot_type = "color",
@@ -256,7 +255,7 @@ A useful visualization to study clonal patterns over time is by using a heat map
 
 We first visualize the top 10 clones from the selected samples in the Wu dataset. The default cell note is stars for the top 10 clones in each sample.
 
-```{r barcode_ggheatmap wu_SE 1, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=8, eval = plot_figures}
+```{r barcode_ggheatmap wu_SE 1, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=8, eval = TRUE}
 barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
                   n_clones = 10,
                   grid = FALSE,
@@ -266,7 +265,7 @@ barcode_ggheatmap(your_SE = wu_SE[,wu_cor_plot_sample_selection],
 
 We can also add a dendogram which clusters clones based on the Euclidean distance between each clone's log assay. Here we plot the top 5 clones from each sample within the Six dataset. First, we order the columns to group them by celltype. The dendrograms make it easily to visually categorize groups of similar clones.
 
-```{r barcode_ggheatmap six_SE, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=6, eval = plot_figures}
+```{r barcode_ggheatmap six_SE, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=6, eval = TRUE}
 six_celltype_order <- c("m13_TCELLS", "m36_TCELLS", "m43_TCELLS",
                         "m55_TCELLS","m13_BCELLS", "m36_BCELLS",
                         "m43_BCELLS", "m55_BCELLS", "m13_NKCELLS",
@@ -293,7 +292,7 @@ In some cases, we may be interested in whether each barcode changed in proportio
 
 The stars in the heat map indicate which barcodes in a given sample had a statistically signficant change in proportion, as compared to the previous sample using a chi-squared test. Users can view the p-value from the statistical test on the heatmap by changing the `cellnote_assay` parameter to `"p_val"`. Users can also compare each sample to a reference sample (such as the first timepoint) by changing the `stat_option` to `"reference"` and providing the desired sample name to the `reference_sample` parameter.
 
-```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=6, eval = plot_figures}
+```{r barcode_ggheatmap_stat wu_SE, echo=TRUE, warning = FALSE, fig.width = 8, fig.height=6, eval = TRUE}
 wu_CD16_NK_order <- colnames(wu_SE)[17:20]
 
 barcode_ggheatmap_stat(your_SE = wu_SE[,wu_CD16_NK_order],
@@ -310,7 +309,7 @@ Users can also return the results from the statistical test using the `barcode_s
 
 Here we make statistical comparisons on the CD16+ NK samples from the Wu dataset. 
 
-```{r barcode_stat_test wu_SE, eval = plot_figures, echo=TRUE, warning = FALSE}
+```{r barcode_stat_test wu_SE, eval = TRUE, echo=TRUE, warning = FALSE}
 
 sample_size <- rep(40000,length(wu_CD16_NK_order))
 wu_CD16_NK_statistics <- barcode_stat_test(your_SE = wu_SE[,wu_CD16_NK_order],
@@ -328,7 +327,7 @@ In either the barcode_ggheatmap_stat or the barcode_stat_test functions, p-value
 
 In some cases, we may be interested in a global view of the presence or absence of barcodes across samples, regardless of read abundance. In that case, a binary heat map can be generated using `barcode_binary_heatmap` to give the simplest visual representation. Here we view the binary heat map of the belderbos data with a threshold of 0.01, meaning clones that make up less than 1% of a sample are treated as not detected.
 
-```{r binary_heat_map, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r binary_heat_map, echo=TRUE, warning = FALSE, eval = TRUE}
 barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
                        label_size = 12,
                        threshold = 0.01)
@@ -338,7 +337,7 @@ barcode_binary_heatmap(your_SE = belderbos_SE[,belderbos_wk_samples_PB],
 
 Another familiar way to visualize clonal patterns over time is using a line or bar chart showing the proportion of top clones. In the above heat maps for wu data, we could see that there are some large uni-lineage CD56-/CD16+ NK cell clones. We can view the expansion of the top clones from the final timepoint through a stacked area line chart showing the proportion of each clone in CD56-/CD16+ NK cell samples across time. Each color indicates one of the top clones from the final timepoint.
 
-```{r clonal_contribution wu_SE, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r clonal_contribution wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 clonal_contribution(your_SE = wu_SE,
                     SAMPLENAME_choice = "ZJ31_20m_NK_CD56n_CD16p",
                     n_clones = 10,
@@ -358,7 +357,7 @@ The most straightforward way to view the bias between samples is using a histogr
 
 The function allows users to compare two samples from a given piece of metadata `"split_bias_on"` faceted by another piece of metadata `"split_bias_over"`, which is illustrated below using the Wu et al data comparing clonal bias between B and T cells from the 6, 9.5, 12, and 20 month post-transplant timepoints.
 
-```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r bias_histogram wu_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_bias_plot_sample_selection <- colData(wu_SE)$SAMPLENAME[1:20]
 
 bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
@@ -371,7 +370,7 @@ bias_histogram(your_SE = wu_SE[,wu_bias_plot_sample_selection],
 
 The stacked bars of the histogram represent individual clones. For the Wu dataset, there are a multitude of small clones so the stacked bars are not visible. We can view clonal bias between B and T cells from the Six, et al dataset which has a smaller number of larger clones.
 
-```{r bias_histogram six_SE, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r bias_histogram six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 bias_histogram(your_SE = six_SE,
                split_bias_on = "celltype",
                bias_1 = "B",
@@ -389,7 +388,7 @@ $logbias=log(\frac{normalized_1+1}{normalized_2+1})$
 
 Here, we view a ridge plot showing clonal bias between B cells and Granulocytes from the Wu dataset. We calculate the density statistic using the cumulative sum of the normalized values for each log2 comparison. We also visualize each clone as a dot on the plot, proportionate to the cumulative sum of the normalized values.
 
-```{r bias_ridge_plot wu_SE 1, echo=TRUE, warning = FALSE, message=FALSE, eval = plot_figures}
+```{r bias_ridge_plot wu_SE 1, echo=TRUE, warning = FALSE, message=FALSE, eval = TRUE}
 bias_ridge_plot(your_SE = wu_SE,
                 split_bias_on = "celltype",
                 bias_1 = "B",
@@ -402,7 +401,7 @@ bias_ridge_plot(your_SE = wu_SE,
 
 We again view a comparison in the Wu dataset, this time comparing B cells to Granulocytes but turning the weighting OFF. In this visualization, the density statistics does not take into account eh abundance of the clones, so each clone is treated as equal. The fact that these ridge plots appear more biased than in the above visualization shows that many of the high-abundance clones are shared between samples, and the more biased clones tend to have lower overall abundance.
 
-```{r bias_ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, message=FALSE, eval = plot_figures}
+```{r bias_ridge_plot wu_SE 2, echo=TRUE, warning = FALSE, message=FALSE, eval = TRUE}
 bias_ridge_plot(your_SE = wu_SE,
                 split_bias_on = "celltype",
                 bias_1 = "B",
@@ -416,7 +415,7 @@ bias_ridge_plot(your_SE = wu_SE,
 ## `bias_lineplot`
 In some cases, there may be enough data to observe more interesting longitudinal trends. In the Six dataset, we can track the Monocyte vs Granulocyte abundance bias of all individual clones over time; each line represents a single clone with shading weighted by its added proportion between both cell types. The clones that have higher expression are evident on the plot and suggest that the highest abundance clones in both lineages are relatively unbiased to lineage over time.
 
-```{r bias_lineplot six_SE, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r bias_lineplot six_SE, echo=TRUE, warning = FALSE, eval = TRUE}
 bias_lineplot(your_SE = six_SE,
               split_bias_on = "celltype",
               bias_1 = "Gr",
@@ -429,7 +428,7 @@ bias_lineplot(your_SE = six_SE,
 
 ## `clonal_count`
 We may be interested in the number of clones detected per group across another variable (such as time). Here, we will use the function `clonal_count` to plot the number of unique clones detected in each lineage over time for the Six dataset.
-```{r clone counts 1, eval = plot_figures}
+```{r clone counts 1, eval = TRUE}
 clonal_count(your_SE = six_SE,
              plot_over = "months",
              group_by = "celltype")
@@ -437,7 +436,7 @@ clonal_count(your_SE = six_SE,
 
 
 We can also set the argument `cumulative = TRUE` to plot the cumulative detection of clones in each lineage over time for the Six dataset. This plot can help us determine whether the clones being detected in each successive time point are newly detected or have previously been detected. 
-```{r clone counts cumulative, eval = plot_figures}
+```{r clone counts cumulative, eval = TRUE}
 clonal_count(your_SE = six_SE,
              plot_over = "months",
              group_by = "celltype",
@@ -451,7 +450,7 @@ A way to depict clone richness and evenness within a plot is by using a rank-abu
 
 Here, we plot the first 8 samples from the Belderbos dataset. Note that the week 9 samples appear to have the most _evenness_ across detected clones, while the other samples contain both large and small detected clones.
 
-```{r belderbos rank_abundance, eval = plot_figures}
+```{r belderbos rank_abundance, eval = TRUE}
 rank_abundance_plot(belderbos_SE[,1:8],
                     scale_rank = TRUE,
                     point_size = 2)
@@ -461,7 +460,7 @@ In addition to visually comparing rank abundance plots, one might want to emply 
 
 Below, we illustrate this test on the same 8 samples from Belderbos et al shown above and print the p-values for all pairwise comparisons.
 
-```{r belderbos rank_abundance stat_test, eval = plot_figures, warning = FALSE}
+```{r belderbos rank_abundance stat_test, eval = TRUE, warning = FALSE}
 stat_result <- rank_abundance_stat_test(belderbos_SE[,1:8])
 print(stat_result[["p_value"]])
 ```
@@ -476,7 +475,7 @@ Within-sample diversity indices (also referred to as alpha diversities) are indi
 We also include `"count"` as an option for `index_type` in order to use the total detected clones per sample as a measure for diversity.
 
 As an example, we can plot the shannon diversities for the 5 cell types within the Wu dataset over time.
-```{r wu shannon, eval = plot_figures}
+```{r wu shannon, eval = TRUE}
 clonal_diversity(wu_SE[,1:20],
                  plot_over = "months",
                  group_by = "celltype",
@@ -485,7 +484,7 @@ clonal_diversity(wu_SE[,1:20],
 
 Here we show the simpson indices for the Peripheral Blood samples in the Belderbos dataset over time; the last time point splits the cell fraction in to T, B, and Granulocyte fractions, allowing comparison of their shannon indices.
 
-```{r belderbos shannon, eval = plot_figures}
+```{r belderbos shannon, eval = TRUE}
 clonal_diversity(belderbos_SE[,1:6],
                  plot_over = "weeks",
                  group_by = "celltype", 
@@ -494,7 +493,7 @@ clonal_diversity(belderbos_SE[,1:6],
 
 Similar to the Wu dataset, the Six dataset contains clonal tracking information for the T, B, Gr, Monocyte, and NK lineages. We can plot these over time as well and utilize the simpson index as a measure of diversity. 
 
-```{r six simpson, eval = plot_figures}
+```{r six simpson, eval = TRUE}
 clonal_diversity(six_SE,
                  plot_over = "months",
                  group_by = "celltype",
@@ -505,13 +504,13 @@ clonal_diversity(six_SE,
 Measures of simmilarity or dissimilarity between samples are known as beta-diversity indices (or distances if they are metrics). A common way for depicting these beta-diversity indices are using what are known as PCoA (Principal Coordinate Analysis) plots, in which an input distance matrix is plotted in two dimensions. Again, we leverage the `"vegan"` package here to call `vegandist` which allows us to calculate a number of dissimilarity indices between our samples (choosing an assay from the `SummarizedExperiment` object) and then perform principal coordinates analysis using `cmdscale`. Note that using `"euclidean"` as our index is equivalent to performing PCA (Prinicipal Components Analysis) on our data.
 
 One of the most commonly used beta-diversity indices is the [Bray-Curtis Dissimilarity](https://en.wikipedia.org/wiki/Bray%E2%80%93Curtis_dissimilarity). Here, we find the Bray-Curtis dissimilarity index between all of the samples in the Wu dataset and use PCoA to plot them on two dimensions. From the plot, it is evident that NK cells are most dissimilar from all other celltypes when considering the Bray-Curtis index.
-```{r wu bray diversity, eval = plot_figures}
+```{r wu bray diversity, eval = TRUE}
 mds_plot(wu_SE, group_by = "celltype",
          method_dist = "bray", assay = "proportions")
 ```
 
 When using the Bray-Curtis dissimilarity index between all of the samples in the Six dataset, we find that similarly to the Wu dataset, NK cells appear dissimilar from the remainder of the celltypes, while Monocytes and Granulocytes appear most similar to one another.
-```{r six bray diversity, eval = plot_figures}
+```{r six bray diversity, eval = TRUE}
 mds_plot(six_SE, group_by = "celltype",
          method_dist = "bray", assay = "proportions")
 ```
@@ -521,7 +520,7 @@ mds_plot(six_SE, group_by = "celltype",
 
 The chord diagram provides an informative way to view relationships between variables. We make use of the [circlize package](https://jokergoo.github.io/circlize_book/book/graphics.html) to show shared clones between compartments as links between regions around a circle. Here, we will start by subetting our data to a single timepoint and comparing just three cell types: T cells, B cells, and Granulocytes. 
 
-```{r chord_diagram wu_SE 1, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r chord_diagram wu_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_circos_selection <- c("ZJ31_12m_T","ZJ31_12m_B","ZJ31_12m_Gr")
 chord_diagram(wu_SE[,wu_circos_selection], plot_label = "celltype")
 ```
@@ -530,7 +529,7 @@ Here, we can see that most clones are present in all three cell types (*purple l
 
 We can also create a weighted circos plot. The difference is that in the previous plot, the width of the links between cell types are proportional to the *number of clones* shared between those cell types. In the weighted heat map, the width of the links between two cell types is proportional to the *proportion of contribution* of the shared clones to the overall hematopoiesis in that cell type.
 
-```{r chord_diagram wu_SE 2, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r chord_diagram wu_SE 2, echo=TRUE, warning = FALSE, eval = TRUE}
 chord_diagram(wu_SE[,wu_circos_selection],
               plot_label = "celltype",
               weighted = TRUE)
@@ -540,7 +539,7 @@ In this example, the circos plots look very similar. But you can see the subtle 
 
 The circos plot can handle any number of inputs but keep in mind that the number of unique combinations rises exponentially with the number of compartments. Here, we use the alpha parameter to control the transparency of the links. And we plot four cell types rather than three.
 
-```{r chord_diagram wu_SE 3, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r chord_diagram wu_SE 3, echo=TRUE, warning = FALSE, eval = TRUE}
 wu_circos_selection2 <- c("ZJ31_12m_T",
                           "ZJ31_12m_B",
                           "ZJ31_12m_Gr",
@@ -554,14 +553,14 @@ The plot is quite involved, but we can quickly draw a few high-level conclusions
 
 The regions of the circos plot need not be cell types. They could also be timepoints. Here, we show that example using the belderbos dataset from mouse studies showing only the first four timepoints of peripheral blood samples.
 
-```{r chord_diagram belderbos_SE 1, echo=TRUE, warning = FALSE, eval = plot_figures}
+```{r chord_diagram belderbos_SE 1, echo=TRUE, warning = FALSE, eval = TRUE}
 belderbos_wk_samples_PB <- c("wk9_U", "wk14_U", "wk20_U", "wk22_U")
 chord_diagram(belderbos_SE[,belderbos_wk_samples_PB])
 ```
 
 From the chord diagram, there are some clones shared between all timepoints (*dark purple links*) and some shared only between the wk14, wk20, and wk22 timepoints (*light green and yellow links*).
 
-```{r chord_diagram belderbos_SE 2, echo=TRUE, warning = FALSE, eval=plot_figures}
+```{r chord_diagram belderbos_SE 2, echo=TRUE, warning = FALSE, eval=TRUE}
 chord_diagram(belderbos_SE[,belderbos_wk_samples_PB],
             weighted = TRUE)
 ```

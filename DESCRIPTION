@@ -1,7 +1,7 @@
 Package: barcodetrackR
 Type: Package
 Title: Functions for Analyzing Cellular Barcoding Data
-Version: 0.99.2
+Version: 0.99.3
 Date: 2021-02-18
 Authors@R: 
     c(person(c("Diego", "Alexander"), "Espinoza", email = "diego.espinoza@pennmedicine.upenn.edu", role = c("aut", "cre")),
@@ -53,4 +53,4 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Depends: 
-    R (>= 4.0)
+    R (>= 4.1)
