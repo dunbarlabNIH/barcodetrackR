@@ -18,9 +18,12 @@ remotes::install_github("d93espinoza/barcodetrackR")
 ```
 
 #### 3) Zenodo installation
+
+[![DOI](https://zenodo.org/badge/47579726.svg)](https://zenodo.org/badge/latestdoi/47579726)
 ```
-#frozen on ____/__/__, prior to publication 
+# v0.99.3 was frozen on Zenodo on 2021-03-16, prior to publication and can be accessed using the above DOI badge.
 ```
+
 
 ## Usage, and Documentation
 
