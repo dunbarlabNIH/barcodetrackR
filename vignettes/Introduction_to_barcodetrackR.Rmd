@@ -25,7 +25,7 @@ vignette: >
 [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) is an R package developed for the analysis and visualization of clonal tracking data from cellular barcoding experiments.
 
 ## Installation
-Currently, [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) is available at Github and can be downloaded using the devtools package.
+Currently, [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) is available at Github and can be downloaded using the devtools package. Bioconductor installation coming soon!
 ```{r installation, eval = FALSE}
 devtools::install_github("dunbarlabNIH/barcodetrackR")
 ```
