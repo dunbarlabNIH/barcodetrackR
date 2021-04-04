@@ -48,7 +48,6 @@ Suggests:
     BiocStyle,
     knitr,
     magick,
-    rmdformats,
     rmarkdown,
     testthat
 VignetteBuilder: knitr

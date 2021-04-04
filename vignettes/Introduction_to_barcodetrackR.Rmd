@@ -26,11 +26,6 @@ knitr::opts_chunk$set(tidy = FALSE,
                       message = TRUE,
                       error = TRUE,
                       warning = TRUE)
-#rmdformats::readthedown:
-    # self_contained: true
-    # thumbnails: false
-    # lightbox: false
-    # css: readthedown_custom_2.css
 ```
 
 # Introduction
