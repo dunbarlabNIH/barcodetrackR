@@ -39,7 +39,7 @@ rank_abundance_plot <- function(your_SE,
 
     your_data <- SummarizedExperiment::assays(your_SE)[["proportions"]]
 
-    lapply(seq_len(ncol(your_data)), function(i) {
+    plotting_data <- lapply(seq_len(ncol(your_data)), function(i) {
         tibble::tibble(sample_name = colnames(your_data)[i], percentage = your_data[, i]) %>%
             dplyr::filter(.data$percentage > 0) %>%
             dplyr::arrange(desc(.data$percentage)) %>%
@@ -47,7 +47,7 @@ rank_abundance_plot <- function(your_SE,
             dplyr::mutate(scaled_rank = dplyr::percent_rank(-.data$percentage))
     }) %>%
         do.call(rbind, .) %>%
-        dplyr::mutate(sample_name = factor(.data$sample_name, levels = colnames(your_data))) -> plotting_data
+        dplyr::mutate(sample_name = factor(.data$sample_name, levels = colnames(your_data)))
 
     scale_rank_choice <- ifelse(scale_rank, "scaled_rank", "rank")
 

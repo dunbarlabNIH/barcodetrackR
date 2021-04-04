@@ -36,26 +36,21 @@ mds_plot <- function(your_SE,
     kmeans_cluster = FALSE,
     k.param = 3,
     draw_ellipses = FALSE) {
-    SummarizedExperiment::colData(your_SE) %>%
+    your_colData <- SummarizedExperiment::colData(your_SE) %>%
         tibble::as_tibble() %>%
-        dplyr::mutate_if(is.factor, as.character) -> your_colData
+        dplyr::mutate_if(is.factor, as.character)
 
     # extracts chosen assay from your_SE
-    t(SummarizedExperiment::assays(your_SE)[[assay]]) %>%
+    plotting_data <- t(SummarizedExperiment::assays(your_SE)[[assay]]) %>%
         vegan::vegdist(method = method_dist) %>%
         stats::cmdscale() %>%
         magrittr::set_colnames(c("MDS_1", "MDS_2")) %>%
         as.data.frame(stringsAsFactors = FALSE) %>%
         tibble::rownames_to_column(var = "SAMPLENAME") %>%
-        dplyr::left_join(your_colData, by = "SAMPLENAME") -> plotting_data
-
-    # if(is.null(your_title)){
-    #   your_title <- paste0("PCoA on pairwise ", method_dist, " values")
-    # }
+        dplyr::left_join(your_colData, by = "SAMPLENAME")
 
     if (kmeans_cluster) {
         plotting_data$kmeans_cluster <- as.factor(stats::kmeans(t(SummarizedExperiment::assays(your_SE)[[assay]]), k.param)$cluster)
-        # plotting_data$kmeans_cluster <- as.factor(kmeans(plotting_data[,c("MDS_1","MDS_2")], k.param)$cluster) # if we wanted to cluster in mds space.
         if (draw_ellipses) {
             if (min(table(plotting_data$kmeans_cluster)) < 4) {
                 stop("Please choose a lower k.param value. Ellipses cannot be drawn if less than 4 observations are in one k mean cluster.")

@@ -60,7 +60,6 @@ chord_diagram <- function(your_SE,
     temp_binary <- temp_binary[rowSums(temp_binary) > 1, ]
 
     # Count the number of occurences of the unique combinations
-    # unique_count <- as.data.frame(temp_binary) %>% group_by_all %>% count
     unique_count <- plyr::count(as.data.frame(temp_binary))
     # Sort decreasing
     unique_count <- unique_count[do.call(order, -unique_count), ]
@@ -100,7 +99,6 @@ chord_diagram <- function(your_SE,
         # Initialize circos plot
         par(mar = c(0.5, 0.5, 1, 0.5))
         circlize::circos.par(points.overflow.warning = FALSE)
-        # circos.par(cell.padding = c(0, 0, 0, 0))
 
         # Make x limits matrix
         xlims <- matrix(data = 0, nrow = length(colnames(your_data)), ncol = 2) # Just a placeholder
@@ -145,7 +143,6 @@ chord_diagram <- function(your_SE,
             }
         }
         title(your_title, adj = 0)
-        # circos.clear()
     }
 
     else if (weighted) {
@@ -197,7 +194,6 @@ chord_diagram <- function(your_SE,
             }
         }
         title(your_title, adj = 0)
-        # circlize::circos.clear()
     }
     my_p <- par()
     circlize::circos.clear()

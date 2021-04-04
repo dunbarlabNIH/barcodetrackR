@@ -55,7 +55,7 @@ clonal_count <- function(your_SE,
         plot_over_display_choices <- plot_over_display_choices %||% sort(unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
         plot_over_display_choices <- as.numeric(as.character(plot_over_display_choices))
     } else if (is.factor(SummarizedExperiment::colData(your_SE)[[plot_over]])) {
-        plot_over_display_choices <- plot_over_display_choices %||% factor(SummarizedExperiment::colData(your_SE)[[plot_over]], , levels = levels(SummarizedExperiment::colData(your_SE)[[plot_over]]))
+        plot_over_display_choices <- plot_over_display_choices %||% factor(SummarizedExperiment::colData(your_SE)[[plot_over]], levels = levels(SummarizedExperiment::colData(your_SE)[[plot_over]]))
     } else {
         plot_over_display_choices <- plot_over_display_choices %||% factor(SummarizedExperiment::colData(your_SE)[[plot_over]], levels = unique(SummarizedExperiment::colData(your_SE)[[plot_over]]))
     }
@@ -80,18 +80,18 @@ clonal_count <- function(your_SE,
 
     # calculate measure for each sample
     if (!cumulative) {
-        colSums(your_data > percent_threshold) %>%
+        calculated_index <- colSums(your_data > percent_threshold) %>%
             tibble::enframe(name = "SAMPLENAME", value = "index") %>%
-            dplyr::mutate(index_type = "unique barcode count") -> calculated_index
+            dplyr::mutate(index_type = "unique barcode count")
         ylabel <- "unique barcode count"
     } else {
 
         # Get count data into tidy format (and remove zeros)
-        your_data %>%
+        tidy_counts <- your_data %>%
             dplyr::mutate(barcode_seq = rownames(your_data)) %>%
             dplyr::select(.data$barcode_seq, everything()) %>%
             tidyr::pivot_longer(cols = seq_len(ncol(your_data)) + 1, names_to = "sample", values_to = "count") %>%
-            dplyr::filter(count > 0) -> tidy_counts
+            dplyr::filter(count > 0)
 
         # Add group by variable into tidy counts
         tidy_counts$group_by <- temp_subset_coldata[match(tidy_counts$sample, temp_subset_coldata$SAMPLENAME), ][[group_by]]
@@ -102,41 +102,41 @@ clonal_count <- function(your_SE,
 
         # Order tidy counts by desired order
         if (is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])) {
-            tidy_counts %>%
-                dplyr::arrange(group_by, plot_over) -> tidy_counts_ordered
+            tidy_counts_ordered <- tidy_counts %>%
+                dplyr::arrange(group_by, plot_over)
         } else {
-            tidy_counts %>%
-                dplyr::arrange(group_by, factor(plot_over, levels = levels(plot_over_display_choices))) -> tidy_counts_ordered
+            tidy_counts_ordered <- tidy_counts %>%
+                dplyr::arrange(group_by, factor(plot_over, levels = levels(plot_over_display_choices)))
         }
 
         # Only keep the first occurence of each barcode within each group_by category
-        tidy_counts_ordered %>%
+        tidy_counts_filtered <- tidy_counts_ordered %>%
             dplyr::group_by(group_by) %>%
-            dplyr::distinct(.data$barcode_seq, .keep_all = TRUE) -> tidy_counts_filtered
+            dplyr::distinct(.data$barcode_seq, .keep_all = TRUE)
 
         # Summarize number of new barcodes and cumulative barcodes at each timepoint
 
         if (is.numeric(SummarizedExperiment::colData(your_SE)[[plot_over]])) {
-            tidy_counts_filtered %>%
+            summarized_data <- tidy_counts_filtered %>%
                 dplyr::group_by(.data$group_by, plot_over, .data$sample) %>%
                 dplyr::summarise(new_count = dplyr::n(), .groups = "drop") %>%
                 dplyr::group_by(group_by) %>%
-                dplyr::mutate(cumulative_count = cumsum(.data$new_count)) -> summarized_data
+                dplyr::mutate(cumulative_count = cumsum(.data$new_count))
         } else {
-            tidy_counts_filtered %>%
+            summarized_data <- tidy_counts_filtered %>%
                 dplyr::group_by(group_by, factor(plot_over, levels = levels(plot_over_display_choices)), sample) %>%
                 dplyr::summarise(new_count = dplyr::n(), .groups = "drop") %>%
                 dplyr::group_by(group_by) %>%
-                dplyr::mutate(cumulative_count = cumsum(.data$new_count)) -> summarized_data
+                dplyr::mutate(cumulative_count = cumsum(.data$new_count))
             colnames(summarized_data)[2] <- "plot_over"
         }
 
         # Put into proper structure
-        as.data.frame(summarized_data) %>%
+        calculated_index <- as.data.frame(summarized_data) %>%
             dplyr::select(.data$sample, .data$cumulative_count) %>%
             dplyr::rename(SAMPLENAME = .data$sample, index = .data$cumulative_count) %>%
             dplyr::mutate(index_type = "unique barcodes") %>%
-            dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) -> calculated_index
+            dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME))
 
         # Fix the fact that certain samples will be dropped if they have 0 new clones
         # Hacky way to do it. Need to go back and make it better later.
@@ -148,8 +148,8 @@ clonal_count <- function(your_SE,
                 index_type = rep("unique barcodes", length(samples_not_found))
             ))
             # Reorder
-            calculated_index %>%
-                dplyr::arrange(factor(.data$SAMPLENAME), levels = unique(tidy_counts_ordered$sample)) -> calculated_index
+            calculated_index <- calculated_index %>%
+                dplyr::arrange(factor(.data$SAMPLENAME), levels = unique(tidy_counts_ordered$sample))
 
             # Give the missing samples the same cumulative count as above samples
             for (i in seq_along(nrow(calculated_index))) {
@@ -162,9 +162,9 @@ clonal_count <- function(your_SE,
     }
 
     # merge measures with colData
-    temp_subset_coldata %>%
+    plotting_data <- temp_subset_coldata %>%
         dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) %>%
-        dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
+        dplyr::left_join(calculated_index, by = "SAMPLENAME")
 
     # Make sure plot over is a factor if not numeric or specified to not keep numeric.
     if (is.numeric(temp_subset_coldata[[plot_over]]) & keep_numeric) {

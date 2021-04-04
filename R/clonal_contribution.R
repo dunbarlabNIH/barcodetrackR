@@ -98,12 +98,6 @@ clonal_contribution <- function(your_SE,
         as.data.frame() %>%
         dplyr::mutate_if(is.factor, as.character)
 
-
-    # #ensure that filter_by/filter_selection results in a subset of samples that is identified by a unique element in plot_over
-    # if(length(temp_subset_coldata[[plot_over]]) != length(unique(temp_subset_coldata[[plot_over]]))){
-    #   stop("after subsetting using filter_by/filter_selection, the remaining elements in the plot_over column must be unique")
-    # }
-
     # fetch proportions
     your_data <- SummarizedExperiment::assays(temp_subset)[["proportions"]]
     your_data <- your_data[rowSums(your_data) > 0, , drop = FALSE]

@@ -113,13 +113,13 @@ bias_histogram <- function(your_SE,
 
     # ensure that the  chosen bias_over only is able to plot elements in which the chosen bias_1 and bias_2 are present at n = 1 each
     # within each split_bias_over choice
-    colData(your_SE) %>%
+    temp_subset_coldata <- colData(your_SE) %>%
         tibble::as_tibble() %>%
         dplyr::filter(!!as.name(split_bias_over) %in% bias_over) %>%
         dplyr::filter(!!as.name(split_bias_on) %in% c(bias_1, bias_2)) %>%
         dplyr::group_by(!!as.name(split_bias_over)) %>%
         dplyr::filter((dplyr::n() == 2)) %>%
-        dplyr::filter(any(!!as.name(split_bias_on) %in% bias_1) & any(!!as.name(split_bias_on) %in% bias_2)) -> temp_subset_coldata
+        dplyr::filter(any(!!as.name(split_bias_on) %in% bias_1) & any(!!as.name(split_bias_on) %in% bias_2))
     bias_over_possibilities <- dplyr::group_keys(temp_subset_coldata) %>% dplyr::pull(!!as.name(split_bias_over))
     bias_over <- bias_over[bias_over %in% bias_over_possibilities]
 
@@ -145,11 +145,11 @@ bias_histogram <- function(your_SE,
             temp_your_data <- temp_your_data[rowSums(temp_your_data > 0) == 2, ]
         }
         colnames(temp_your_data) <- c("bias_1", "bias_2")
-        temp_your_data %>%
+        temp_your_data <- temp_your_data %>%
             tibble::rownames_to_column(var = "barcode") %>%
             dplyr::mutate(added_proportions = .data$bias_1 + .data$bias_2, bias = .data$bias_1 / .data$bias_2) %>%
             dplyr::mutate(log2_bias = log2(.data$bias)) %>%
-            dplyr::mutate(log2_bias_cuts = cut(.data$log2_bias, breaks = breaks, include.lowest = TRUE)) -> temp_your_data
+            dplyr::mutate(log2_bias_cuts = cut(.data$log2_bias, breaks = breaks, include.lowest = TRUE))
 
         if (return_table) {
             me <- temp_your_data

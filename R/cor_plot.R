@@ -87,11 +87,9 @@ cor_plot <- function(your_SE,
     }
 
     if (no_negatives) {
-        plotting_data_longer %>%
+        plotting_data_longer <- plotting_data_longer %>%
             dplyr::mutate(p_value = ifelse(.data$correlation_value < 0, NA, .data$p_value)) %>%
-            #   dplyr::mutate(ci_lo = ifelse(correlation_value < 0, NA, ci_lo)) %>%
-            #    dplyr::mutate(ci_hi = ifelse(correlation_value < 0, NA, ci_hi)) %>%
-            dplyr::mutate(correlation_value = ifelse(.data$correlation_value < 0, 0, .data$correlation_value)) -> plotting_data_longer
+            dplyr::mutate(correlation_value = ifelse(.data$correlation_value < 0, 0, .data$correlation_value))
         color_limits <- c(0, 1)
         floor_limit <- ceiling(length(color_scale) / 2)
         color_scale <- color_scale[floor_limit:length(color_scale)]

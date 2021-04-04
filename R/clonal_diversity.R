@@ -80,32 +80,23 @@ clonal_diversity <- function(your_SE,
 
     # calculate measure for each sample
     if (index_type %in% c("shannon", "simpson", "invsimpson")) {
-        vegan::diversity(your_data, MARGIN = 2, index = index_type) %>%
+        calculated_index <- vegan::diversity(your_data, MARGIN = 2, index = index_type) %>%
             tibble::enframe(name = "SAMPLENAME", value = "index") %>%
-            dplyr::mutate(index_type = index_type) -> calculated_index
+            dplyr::mutate(index_type = index_type)
     } else if (index_type == "shannon_count") {
-        vegan::diversity(your_data, MARGIN = 2, index = "shannon") %>%
+        calculated_index <- vegan::diversity(your_data, MARGIN = 2, index = "shannon") %>%
             tibble::enframe(name = "SAMPLENAME", value = "index") %>%
-            dplyr::mutate(index_type = index_type) -> calculated_index
+            dplyr::mutate(index_type = index_type)
         calculated_index$index <- exp(calculated_index$index)
     } else {
         stop("index_type must be one of \"shannon\", \"shannon_count\", \"simpson\", or \"invsimpson\"")
     }
 
-    # #calculate measure for each sample
-    # if(index_type %in% c("variety", "entropy","blau","gini-simpson", "simpson", "hill-numbers", "herfindahl-hirschman", "bergerparker", "renyi", "evenness", "rao", "rao-stirling")){
-    #   diverse::diversity(as.matrix(your_data), type = index_type, category_row = TRUE) %>%
-    #     rownames_to_column(var = "SAMPLENAME") %>%
-    #     dplyr::rename(index = all_of(index_type)) %>%
-    #     dplyr::mutate(index_type = index_type) -> calculated_index
-    # } else {
-    #   stop("index_type must be one of \"variety\", \"entropy\", \"blau\", \"gini-simpson\", \"simpson\", \"hill-numbers\", \"herfindahl-hirschman\", \"bergerparker\", \"renyi\", \"evenness\", \"rao\", or \"rao-stirling\"")
-    # }
 
     # merge measures with colData
-    temp_subset_coldata %>%
+    plotting_data <- temp_subset_coldata %>%
         dplyr::mutate(SAMPLENAME = as.character(.data$SAMPLENAME)) %>%
-        dplyr::left_join(calculated_index, by = "SAMPLENAME") -> plotting_data
+        dplyr::left_join(calculated_index, by = "SAMPLENAME")
 
 
     # Make sure plot over is a factor if not numeric or specified to not keep numeric.
