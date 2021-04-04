@@ -3,6 +3,9 @@
 .DS_Store
 *.Rproj
 vignettes/.RDataTmp
+vignettes/libs
+vignettes/*.png
+vignettes/.css
 docs
 inst/extdata/SixE_etal/intSites.mergedSamples.collapsed.csv.gz
 inst/extdata/ElderA_etal/
