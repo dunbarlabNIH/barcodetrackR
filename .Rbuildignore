@@ -6,3 +6,5 @@ inst/extdata/ElderA_etal/
 inst/extdata/ClarkeEL_etal/
 inst/extdata/EspinozaDA_etal/
 
+^doc$
+^Meta$

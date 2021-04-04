@@ -8,7 +8,7 @@ abstract: >
   [barcodetrackR](http://github.com/dunbarlabNIH/barcodetrackR) is an R package developed for the analysis and visualization of clonal tracking data from cellular barcoding experiments.
 output:
   BiocStyle::html_document:
-    toc_float: true
+    toc: true
 vignette: >
   %\VignetteIndexEntry{barcodetrackR}
   %\VignetteEngine{knitr::rmarkdown}
