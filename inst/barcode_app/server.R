@@ -112,6 +112,7 @@ shinyServer(
 
     observeEvent(input$samplebutton, {
       message("loading sample data")
+      data("wu_subset", package = "barcodetrackR")
       thresholded_data(barcodetrackR::wu_subset)
       appendTab("Panel", tab = tabPanel("Descriptive Statistics", uiOutput("DataStatistics")))
       appendTab("Panel", tab = tabPanel("Heatmap", uiOutput("Heatmap")))
