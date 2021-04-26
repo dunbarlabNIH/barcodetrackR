@@ -13,8 +13,9 @@ remotes::install_github("d93espinoza/barcodetrackR")
 ```
 
 #### 2) Bioconductor installation
+[barcodetrackR Bioconductor page](https://www.bioconductor.org/packages/devel/bioc/html/barcodetrackR.html)
 ```
-#coming soon!
+BiocManager::install("barcodetrackR")
 ```
 
 #### 3) Zenodo installation
