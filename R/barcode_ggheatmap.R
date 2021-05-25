@@ -73,17 +73,28 @@ barcode_ggheatmap <- function(your_SE,
 
     # subset the rows of the summarized experiment and get the ordering of barcodes within the heatmap for plotting
     if (row_order == "hierarchical" | row_order == "emergence") {
-
+        
         # subsets those barcodes that have at least one top N clone
-        top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x) {
-            any(x <= n_clones, na.rm = TRUE)
-        })
+        if (any(colSums(SummarizedExperiment::assays(your_SE)$counts > 0) < n_clones)){ # in case one column doesn't have enough non-zero barcodes
+            top_clones_choices1 <- rowSums(SummarizedExperiment::assays(your_SE)$counts[,colSums(SummarizedExperiment::assays(your_SE)$counts > 0) < n_clones, drop = FALSE] > 0) > 0
+            top_clones_choices2 <- apply(SummarizedExperiment::assays(your_SE)$ranks[,colSums(SummarizedExperiment::assays(your_SE)$counts > 0) >= n_clones], 1, function(x) {
+                any(x <= n_clones, na.rm = TRUE)
+            })
+            top_clones_choices <- top_clones_choices1 == TRUE | top_clones_choices2 == TRUE 
+        } else {
+            top_clones_choices <- apply(SummarizedExperiment::assays(your_SE)$ranks, 1, function(x) {
+                any(x <= n_clones, na.rm = TRUE)
+            })
+        }
+        
+        # Keep only top clones
         your_SE <- your_SE[top_clones_choices, ]
 
         # creates data frame with '*' for those cells w/ top clones
         cellnote_matrix <- SummarizedExperiment::assays(your_SE)$ranks
         cellnote_matrix[cellnote_matrix > n_clones] <- NA
         cellnote_matrix[cellnote_matrix <= n_clones] <- "*"
+        cellnote_matrix[SummarizedExperiment::assays(your_SE)$counts == 0] <- NA # if count is zero, set to NA
         SummarizedExperiment::assays(your_SE)$stars <- as.data.frame(cellnote_matrix)
 
         # this does the heavy duty plotting set-up. It sets the order of the data on the heatmap and the dendrogram/cluster cuts
